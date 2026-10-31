@@ -96,7 +96,8 @@
     if (cf && cf.colo) co.textContent = cf.colo;
   }
   const kindOf = l => (S.exits.find(e => e.letter === l) || {}).kind || "proxy";
-  const chip = (l, big) => `<i class="lt k-${kindOf(l)}${big ? " big" : ""}">${esc(l)}</i>`;
+  // each numbered exit has its own shade: D1/D2 greens, P1…P4 orange, violet, pink, red
+  const chip = (l, big) => `<i class="lt k-${kindOf(l)} n${(/\d+$/.exec(l) || [1])[0]}${big ? " big" : ""}">${esc(l)}</i>`;
   function renderChips() {
     const of = exitOfProbe(S.exits);
     for (const p of PROBES) {
