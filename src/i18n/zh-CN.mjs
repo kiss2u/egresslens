@@ -66,6 +66,7 @@ export default {
 
 
   faq_h: "常见问题",
+  close: "关闭",
   faq: [
     ["为什么不同网站看到的 IP 不一样？", "Clash、Surge、Shadowrocket、sing-box 这类带规则的代理和 VPN 会按目的地选线路：国内网站直连，AI 服务走一个节点，其他网站走另一个节点。只问一个网站，只能看到那一条线路。这个页面同时询问几十个目的地，再按网络把结果归成几个出口。"],
     ["怎么知道 ChatGPT、Claude 看到的是哪个 IP？", "Cloudflare 后面的网站，在自己的域名上提供 /cdn-cgi/trace，返回连到它的地址，而且允许任何网页读取。浏览器像平时一样连接 chatgpt.com，走的是你的规则给它选的线路，再读回 chatgpt.com 看到的地址。"],

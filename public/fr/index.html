@@ -51,7 +51,7 @@
       <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">Questions</span>
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
       </button>
-      <button class="icon-btn" id="theme" type="button" aria-label="Theme">
+      <button class="icon-btn" id="theme" type="button" aria-label="Thème : système">
         <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
         <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
         <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
@@ -101,7 +101,7 @@
   <footer class="foot"><span>Open source, licence MIT. Tout s’exécute dans votre navigateur.</span><a href="https://github.com/yt1988/egress" target="_blank" rel="noopener noreferrer">GitHub</a></footer>
 </div>
 <dialog class="help" id="help" aria-labelledby="helpH">
-  <div class="help-h"><h2 id="helpH" data-i="faq_h">Questions</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="help-h"><h2 id="helpH" data-i="faq_h">Questions</h2><button class="icon-btn" type="button" data-close aria-label="Fermer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
 <details><summary>Pourquoi chaque site voit-il une IP différente ?</summary><p>Les applications de proxy et VPN à règles (Clash, Surge, Shadowrocket, sing-box…) choisissent la route selon la destination : sites chinois en direct, services d’IA par un serveur, le reste par un autre. Un test qui n’interroge qu’un site ne voit que la route de ce site. Cette page interroge des dizaines de destinations à la fois et regroupe les réponses par réseau.</p></details>
 <details><summary>Comment sait-elle ce que voient ChatGPT ou Claude ?</summary><p>Les sites derrière Cloudflare répondent sur /cdn-cgi/trace de leur propre domaine avec l’adresse qui s’est connectée, et laissent n’importe quelle page la lire. Votre navigateur se connecte à chatgpt.com comme d’habitude, par la route que vos règles choisissent, puis lit l’adresse vue par chatgpt.com.</p></details>
 <details><summary>Qu’est-ce qu’une fuite WebRTC ?</summary><p>WebRTC (les appels vidéo dans le navigateur) trouve votre adresse publique en interrogeant un serveur STUN en UDP. Beaucoup de proxies ne transportent que TCP : cette requête UDP part alors par votre propre ligne, et n’importe quelle page peut lire le résultat sans demander d’autorisation. Si un serveur STUN voit votre adresse locale alors que les sites voient le proxy, la page signale une fuite.</p></details>

@@ -51,7 +51,7 @@
       <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">자주 묻는 질문</span>
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
       </button>
-      <button class="icon-btn" id="theme" type="button" aria-label="Theme">
+      <button class="icon-btn" id="theme" type="button" aria-label="테마: 시스템">
         <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
         <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
         <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
@@ -101,7 +101,7 @@
   <footer class="foot"><span>오픈 소스, MIT 라이선스. 모두 브라우저에서 실행됩니다.</span><a href="https://github.com/yt1988/egress" target="_blank" rel="noopener noreferrer">GitHub</a></footer>
 </div>
 <dialog class="help" id="help" aria-labelledby="helpH">
-  <div class="help-h"><h2 id="helpH" data-i="faq_h">자주 묻는 질문</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="help-h"><h2 id="helpH" data-i="faq_h">자주 묻는 질문</h2><button class="icon-btn" type="button" data-close aria-label="닫기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
 <details><summary>왜 사이트마다 보이는 IP가 다른가요?</summary><p>Clash, Surge, Shadowrocket, sing-box 같은 규칙 기반 프록시와 VPN은 목적지에 따라 경로를 고릅니다. 중국 사이트는 직접, AI 서비스는 한 서버, 나머지는 다른 서버로 보내는 식입니다. 한 사이트에만 물으면 그 사이트의 경로만 보입니다. 이 페이지는 수십 곳에 동시에 묻고 결과를 네트워크별로 묶습니다.</p></details>
 <details><summary>ChatGPT나 Claude가 보는 IP를 어떻게 알죠?</summary><p>Cloudflare 뒤에 있는 사이트는 자기 도메인의 /cdn-cgi/trace에서 접속한 주소를 돌려주고, 어떤 페이지든 읽을 수 있게 허용합니다. 브라우저는 평소처럼 규칙이 고른 경로로 chatgpt.com에 접속하고, chatgpt.com이 본 주소를 읽어 옵니다.</p></details>
 <details><summary>WebRTC 누출이란?</summary><p>WebRTC(브라우저 영상 통화)는 UDP로 STUN 서버에 자기 공인 주소를 묻습니다. TCP만 전달하는 프록시가 많아 이 UDP 요청은 내 회선으로 나가고, 그 결과는 어떤 페이지든 권한 요청 없이 읽을 수 있습니다. STUN 서버는 로컬 주소를, 웹사이트는 프록시를 본다면 누출로 표시합니다.</p></details>

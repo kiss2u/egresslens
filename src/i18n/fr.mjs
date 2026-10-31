@@ -66,6 +66,7 @@ export default {
 
 
   faq_h: "Questions",
+  close: "Fermer",
   faq: [
     ["Pourquoi chaque site voit-il une IP différente ?", "Les applications de proxy et VPN à règles (Clash, Surge, Shadowrocket, sing-box…) choisissent la route selon la destination : sites chinois en direct, services d’IA par un serveur, le reste par un autre. Un test qui n’interroge qu’un site ne voit que la route de ce site. Cette page interroge des dizaines de destinations à la fois et regroupe les réponses par réseau."],
     ["Comment sait-elle ce que voient ChatGPT ou Claude ?", "Les sites derrière Cloudflare répondent sur /cdn-cgi/trace de leur propre domaine avec l’adresse qui s’est connectée, et laissent n’importe quelle page la lire. Votre navigateur se connecte à chatgpt.com comme d’habitude, par la route que vos règles choisissent, puis lit l’adresse vue par chatgpt.com."],

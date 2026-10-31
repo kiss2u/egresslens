@@ -51,7 +51,7 @@
       <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">よくある質問</span>
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
       </button>
-      <button class="icon-btn" id="theme" type="button" aria-label="Theme">
+      <button class="icon-btn" id="theme" type="button" aria-label="テーマ：システム">
         <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
         <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
         <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
@@ -101,7 +101,7 @@
   <footer class="foot"><span>オープンソース、MIT ライセンス。すべてブラウザ内で動作します。</span><a href="https://github.com/yt1988/egress" target="_blank" rel="noopener noreferrer">GitHub</a></footer>
 </div>
 <dialog class="help" id="help" aria-labelledby="helpH">
-  <div class="help-h"><h2 id="helpH" data-i="faq_h">よくある質問</h2><button class="icon-btn" type="button" data-close aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="help-h"><h2 id="helpH" data-i="faq_h">よくある質問</h2><button class="icon-btn" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
 <details><summary>サイトによって見える IP が違うのはなぜ？</summary><p>Clash、Surge、Shadowrocket、sing-box などのルール付きプロキシや VPN は宛先ごとに経路を選びます。中国のサイトは直接、AI サービスはあるサーバー、それ以外は別のサーバー、という具合です。1 つのサイトに聞くだけでは、そのサイトの経路しか分かりません。このページは数十の宛先に同時に問い合わせ、結果をネットワークごとにまとめます。</p></details>
 <details><summary>ChatGPT や Claude に見えている IP がなぜ分かる？</summary><p>Cloudflare 配下のサイトは、自分のドメインの /cdn-cgi/trace で接続元のアドレスを返し、どのページからも読み取れるようにしています。ブラウザはいつもどおり、ルールが選んだ経路で chatgpt.com に接続し、chatgpt.com に見えたアドレスを読み取ります。</p></details>
 <details><summary>WebRTC 漏れとは？</summary><p>WebRTC（ブラウザのビデオ通話）は UDP で STUN サーバーに自分のグローバルアドレスを尋ねます。TCP しか転送しないプロキシが多いため、この UDP 通信は自分の回線から出てしまい、その結果はどのページも許可なしに読み取れます。STUN サーバーにはローカルのアドレス、サイトにはプロキシが見えている場合、漏れとして表示します。</p></details>

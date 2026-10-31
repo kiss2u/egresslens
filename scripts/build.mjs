@@ -64,12 +64,13 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
   for (const [lang, slug, locale] of langs) {
-    const d = I[lang], T = k => d[k] ?? en[k] ?? k;
+    // no fallback to English: a string missing in this language stops the build
+    const d = I[lang], T = k => { if (d[k] == null) throw new Error(`${lang}: missing string "${k}"`); return d[k]; };
     const strings = Object.fromEntries(Object.keys(en).filter(k => !RUNTIME_SKIP.has(k)).map(k => [k, T(k)]));
     const sjs = `window.LEGRESS=${JSON.stringify(strings).replace(/</g, "\\u003c")};\n`;
     const sName = `l.${lang.toLowerCase()}.${hash(sjs)}.js`;
@@ -112,7 +113,7 @@ export async function build({ check = false } = {}) {
       .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", slug ? "" : " data-root")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
       .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(T("intro"), { n: N })))
-      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot")))
+      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot"))).replace("{{themeLabel}}", esc(T("th_system"))).replace("{{closeLabel}}", esc(T("close")))
       .replace("{{data}}", JSON.stringify({ lang, paths }).replace(/</g, "\\u003c"));
     if (/\{\{\w+\}\}/.test(html)) throw new Error("unfilled placeholder in " + path(slug) + ": " + /\{\{\w+\}\}/.exec(html)[0]);
     pages.push({ file: (slug ? slug + "/" : "") + "index.html", url, html });

@@ -30,3 +30,15 @@ test("pages: charset first, standard lang, no inline styles, every probe listed"
     assert.ok(h.length < 60_000, l + ": page too big");
   }
 });
+
+// Visible text that is not in the strings files is a brand (the same everywhere) or a gap: on every other language's
+// page, an aria-label, title or alt that reads exactly like the English page's must be one of these.
+const BRANDS = new Set(["", "1ms", "GitHub", "EgressLens"]);
+test("no English left on other languages' pages (aria-label, title, alt)", async () => {
+  const attrs = h => [...h.matchAll(/s(aria-label|title|alt)="([^"]*)"/g)].map(m => m[2]).filter(v => !/^https?:/.test(v));
+  const en = new Set(attrs(await page("")));
+  for (const [l, slug] of LANGS.slice(1)) {
+    const leaks = attrs(await page(slug)).filter(v => en.has(v) && !BRANDS.has(v) && !/^[w.-]+.[a-z]{2,}$/.test(v));
+    assert.deepEqual([...new Set(leaks)], [], l + ": untranslated");
+  }
+});
