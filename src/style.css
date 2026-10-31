@@ -98,6 +98,8 @@ select option:checked { background-color: var(--soft); }
 .ips { font: 12.5px var(--f-num); display: flex; flex-wrap: wrap; gap: 2px 12px; min-width: 0; }
 .ips span { overflow-wrap: anywhere; }
 .ips em { font-style: normal; color: var(--muted); font-family: var(--f-ui); font-size: 11.5px; margin-right: 4px; }
+.ips a.ipq { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--muted); }
+.ips a.ipq:hover { border-bottom-style: solid; }
 .flag { width: 20px; height: 15px; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); object-fit: cover; flex: none; }
 
 #finds { display: flex; flex-direction: column; gap: 8px; }

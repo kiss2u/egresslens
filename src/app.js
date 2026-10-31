@@ -110,8 +110,12 @@
   const exRef = l => { const e = S.exits.find(x => x.letter === l); return e ? `${chip(l)} ${esc(e.cc ? country(e.cc) : whereOf(e))}` : esc(l); };
   // While probes answer, the exits fill two slots drawn at the start (most visitors have a local line and a proxy);
   // an address shows once its network is known. The final sort, numbering and any extra exit come at the end.
+  // a host can announce an IP quality check with <meta name="ipqs" content="https://…">: each address links to it
+  // (not while addresses are hidden)
+  const IPQS = (document.querySelector('meta[name="ipqs"]') || {}).content || "";
+  const ipQ = ip => IPQS && !masked() ? `<a class="ipq" href="${esc(IPQS)}/?ip=${encodeURIComponent(ip)}" target="_blank" rel="noopener">${esc(ip)}</a>` : esc(ipTxt(ip));
   const exCard = e => {
-    const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ip => esc(ipTxt(ip))).join(" · ")}</span>` : "").join("");
+    const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ipQ).join(" · ")}</span>` : "").join("");
     return `<li class="ex">${chip(e.letter, true)}<div class="ex-b">` +
       `<div class="where">${flag(e.cc)}<b>${esc(whereOf(e))}</b>${e.org ? `<span class="m">${esc(e.org)}${e.asn ? " · AS" + e.asn : ""}</span>` : ""}</div>` +
       `<div class="ips">${ips}</div></div></li>`;
