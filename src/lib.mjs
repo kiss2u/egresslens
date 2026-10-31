@@ -122,10 +122,11 @@ export function findings(probes, exits, cf, tzCc) {
   const R = {};
   // routing: mainland sites vs. sites abroad
   R.route = cn && cn !== abroad ? { s: "info", k: "split", v: { a: cn, b: abroad } } : { s: "ok", k: "one", v: { a: abroad } };
-  // exceptions: AI services and sites that take another exit than the rest of the world
-  const odd = {};
-  for (const p of probes) if ((p.g === "ai" || p.g === "web") && of[p.id] && !of[p.id].includes(abroad)) (odd[of[p.id][0]] = odd[of[p.id][0]] || []).push(p.id);
-  const groups = Object.entries(odd).map(([x, list]) => ({ x, list }));
+  // exceptions: any probe abroad (lookup services, AI, sites, single-stack hosts) on another exit than the rest of the
+  // world. When every IPv6-only host is in one group they stand as one item, "@v6" (the IPv6 row says why).
+  const odd = {}, v6only = probes.filter(p => p.g === "stack" && p.fam === 6).map(p => p.id);
+  for (const p of probes) if (["intl", "ai", "web", "stack"].includes(p.g) && of[p.id] && !of[p.id].includes(abroad)) (odd[of[p.id][0]] = odd[of[p.id][0]] || []).push(p.id);
+  const groups = Object.entries(odd).map(([x, list]) => ({ x, list: v6only.every(id => list.includes(id)) ? ["@v6", ...list.filter(id => !v6only.includes(id))] : list }));
   R.except = groups.length ? { s: "info", k: "some", v: { groups } } : { s: "ok", k: "none", v: {} };
   // AI region: the country ChatGPT and Claude see (their own trace), and whether they serve it
   const seen = AI_CHECK.filter(id => cf[id] && /^[A-Z]{2}$/.test(cf[id].loc || ""));

@@ -19,6 +19,7 @@ export default {
   v_route_split: "中国 {a}、海外 {b}",
   v_except_none: "なし",
   v_except_some: "{list} → {x}",
+  v6_sites: "IPv6 専用サイト",
   v_ai_ok: "{x}：ChatGPT と Claude の提供地域です",
   v_ai_bad: "{list} からは{c}：公式の提供地域外です",
   v_dc: "。データセンター IP は制限を受けやすくなります",

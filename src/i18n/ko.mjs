@@ -19,6 +19,7 @@ export default {
   v_route_split: "중국 {a}, 해외 {b}",
   v_except_none: "없음",
   v_except_some: "{list} → {x}",
+  v6_sites: "IPv6 전용 사이트",
   v_ai_ok: "{x}: ChatGPT와 Claude 지원 지역",
   v_ai_bad: "{list}에서 보이는 위치 {c}: 공식 지원 지역 아님",
   v_dc: " · 데이터센터 IP라 제한받기 쉬움",

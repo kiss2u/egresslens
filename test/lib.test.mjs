@@ -76,7 +76,8 @@ test("checks: split routing, AI region, WebRTC and IPv6 leaks, time zone", () =>
   const F = findings(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"), cfAll("JP"), "CN");
   assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "v6", "tz"]);
   assert.deepEqual(F.route, { s: "info", k: "split", v: { a: "D", b: "P" } });
-  assert.deepEqual(F.except, { s: "ok", k: "none", v: {} });
+  // the IPv6-only hosts take the local line: one exception item, consistent with the IPv6 row below
+  assert.deepEqual(F.except, { s: "info", k: "some", v: { groups: [{ x: "D", list: ["@v6"] }] } });
   assert.deepEqual(F.ai, { s: "ok", k: "ok", v: { x: "P", c: "JP", dc: true } });
   assert.deepEqual(F.rtc, { s: "bad", k: "leak", v: { a: "D" } });
   assert.deepEqual(F.v6, { s: "bad", k: "leak", v: { a: "D" } });

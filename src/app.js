@@ -148,7 +148,7 @@
       const f = S.finds[row], v = {};
       for (const [k, x] of Object.entries(f.v)) {
         if (k === "list") v[k] = esc(list(x.map(NAME_OF)));
-        else if (k === "groups") v[k] = x.map(g => t("v_except_some", { list: esc(list(g.list.map(NAME_OF))), x: exRef(g.x) })).join(" · ");
+        else if (k === "groups") v[k] = x.map(g => t("v_except_some", { list: esc(list(g.list.map(id => id === "@v6" ? t("v6_sites") : NAME_OF(id)))), x: exRef(g.x) })).join(" · ");
         else if (k === "x" && f.v.c) v[k] = `${chip(x)} ${esc(country(f.v.c))}`;
         else if (typeof x === "string") v[k] = isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
       }

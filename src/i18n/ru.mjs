@@ -19,6 +19,7 @@ export default {
   v_route_split: "Китай {a}, зарубеж {b}",
   v_except_none: "Нет",
   v_except_some: "{list} → {x}",
+  v6_sites: "сайты только с IPv6",
   v_ai_ok: "{x}: ChatGPT и Claude там доступны",
   v_ai_bad: "{list} видят {c}: регион не поддерживается",
   v_dc: " · IP дата-центра, чаще проверки",

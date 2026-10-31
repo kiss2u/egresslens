@@ -19,6 +19,7 @@ export default {
   v_route_split: "中國大陸 {a}，海外 {b}",
   v_except_none: "無",
   v_except_some: "{list} → {x}",
+  v6_sites: "僅 IPv6 的站點",
   v_ai_ok: "{x}，ChatGPT 和 Claude 都支援該地區",
   v_ai_bad: "{list} 看到{c}，官方不支援該地區",
   v_dc: "，機房 IP 較易觸發風控",
