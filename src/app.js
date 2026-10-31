@@ -42,14 +42,18 @@
   const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.g]));
   const NAME_OF = id => { const p = PROBES.find(x => x.id === id); return p.g === "stack" ? p.name + " IPv" + p.fam : p.g === "udp" ? "STUN " + p.name : p.name; };
 
+  // A probe that gives no address says why, as { why, n }: "timeout", "http" (n = status), "net" (no connection:
+  // blocked by the network, the proxy or an ad blocker), "parse" (an answer without a usable address), "stun".
+  const fail = (why, n) => Object.assign(new Error(why), { why, n });
   async function httpProbe(p) {
-    const r = await fetch(bust(p.url), { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(7000) });
-    if (!r.ok) throw new Error(r.status);
-    const text = await r.text();
-    let body = text;
-    if (p.read !== "text" && p.read !== "trace") body = JSON.parse(text);
-    const res = readProbe(p, body);
-    return res ? [res] : [];
+    let r;
+    try { r = await fetch(bust(p.url), { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(7000) }); }
+    catch (e) { throw fail(e && e.name === "TimeoutError" ? "timeout" : "net"); }
+    if (!r.ok) throw fail("http", r.status);
+    let res = null;
+    try { const text = await r.text(); res = readProbe(p, p.read === "text" || p.read === "trace" ? text : JSON.parse(text)); } catch (e) {}
+    if (!res) throw fail("parse");
+    return [res];
   }
   // one peer connection per STUN server, so each server's answer is its own
   async function stunProbe(p) {
@@ -70,7 +74,7 @@
   }
 
   /* ---------- state and rendering ---------- */
-  const S = { res: {}, ok: {}, ms: {}, geo: {}, warp: "off", exits: [], finds: [], done: false, gen: 0 };
+  const S = { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: [], odd: {}, done: false, gen: 0 };
   const masked = () => store.get(K.mask) === "1";
   const ipTxt = ip => masked() ? maskIp(ip) : ip;
   const eye = $("#eye");
@@ -86,6 +90,11 @@
     const row = $("#p-" + p.id); if (!row) return;
     const res = S.res[p.id], ip = row.querySelector(".pip"), ms = row.querySelector(".pms"), co = row.querySelector(".pco");
     row.classList.toggle("fail", S.ok[p.id] === false); row.classList.toggle("wait", S.gen > 0 && S.ok[p.id] == null);
+    // a row that stands out (no answer, another exit than its kind, a WebRTC leak) is tinted and says why on hover
+    const o = S.done && S.odd[p.id], w = S.why[p.id];
+    row.classList.toggle("odd", !!o && o.k === "odd"); row.classList.toggle("leak", !!o && o.k === "leak");
+    const why = S.ok[p.id] === false && w ? t("why_" + w.why, { n: w.n }) : o ? t("why_" + o.k, { x: exTxt(o.x), y: exTxt(o.y) }) : "";
+    if (why) { row.dataset.why = why; row.tabIndex = 0; } else { delete row.dataset.why; row.removeAttribute("tabindex"); }
     ms.textContent = ""; co.textContent = ""; ip.title = "";
     if (S.ok[p.id] == null) { ip.textContent = S.gen ? t("wait") : "–"; return; }
     if (S.ok[p.id] === false) { ip.textContent = t("fail"); return; }
@@ -107,6 +116,8 @@
     }
   }
   const whereOf = e => [e.city, e.cc && country(e.cc)].filter(Boolean).join(", ") || "?";
+  // an exit in plain text (the tooltip): its label and country
+  const exTxt = l => { const e = S.exits.find(x => x.letter === l); return e ? `${l} ${e.cc ? country(e.cc) : whereOf(e)}` : l || ""; };
   // in a sentence an exit is its chip and country: short, and the card above has the rest
   const exRef = l => { const e = S.exits.find(x => x.letter === l); return e ? `${chip(l)} ${esc(e.cc ? country(e.cc) : whereOf(e))}` : esc(l); };
   // While probes answer, the exits fill two slots drawn at the start (most visitors have a local line and a proxy);
@@ -170,7 +181,7 @@
   async function run() {
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
-    Object.assign(S, { res: {}, ok: {}, ms: {}, geo: {}, warp: "off", exits: [], finds: {}, done: false });
+    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, done: false });
     renderExits(); renderGroups(); renderChecks();
     $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running");
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
@@ -189,7 +200,8 @@
     await Promise.all(PROBES.map(async p => {
       const t0 = performance.now();
       let res = [];
-      try { res = await (p.read === "stun" ? stunProbe(p) : httpProbe(p)); } catch (e) { res = []; }
+      try { res = await (p.read === "stun" ? stunProbe(p) : httpProbe(p)); } catch (e) { res = []; S.why[p.id] = { why: e.why || "net", n: e.n }; }
+      if (!res.length && !S.why[p.id]) S.why[p.id] = { why: "stun" };
       if (gen !== S.gen) return;
       S.ms[p.id] = p.read === "stun" ? null : performance.now() - t0;
       S.ok[p.id] = res.length > 0; S.res[p.id] = res;
@@ -205,12 +217,28 @@
     S.exits = groupExits(seenAll(), S.geo, GROUP_OF, S.warp);
     const cf = Object.fromEntries(PROBES.map(p => [p.id, ((S.res[p.id] || [])[0] || {}).cf]).filter(([, c]) => c));
     S.finds = findings(PROBES, S.exits, cf, tzCc());
+    S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
-    renderExits(); renderChips(); renderChecks(); setProg(PROBES.length, PROBES.length);
+    renderExits(); renderChips(); renderChecks(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
     $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun");
   }
 
   $("#run").onclick = () => run();
+
+  /* ---------- a row's reason, on hover or focus ---------- */
+  const tip = document.body.appendChild(Object.assign(document.createElement("div"), { className: "tip", role: "tooltip" }));
+  const showTip = row => {
+    tip.textContent = row.dataset.why;
+    const r = row.getBoundingClientRect(), w = Math.min(tip.offsetWidth, innerWidth - 16);
+    tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + 120)) + "px"; tip.style.top = r.bottom + 4 + "px";
+    tip.classList.add("on");
+  };
+  const list_ = $(".pgroups");
+  list_.addEventListener("mouseover", e => { const row = e.target.closest(".pr[data-why]"); row ? showTip(row) : tip.classList.remove("on"); });
+  list_.addEventListener("mouseleave", () => tip.classList.remove("on"));
+  list_.addEventListener("focusin", e => { const row = e.target.closest(".pr[data-why]"); if (row) showTip(row); });
+  list_.addEventListener("focusout", () => tip.classList.remove("on"));
+  addEventListener("scroll", () => tip.classList.remove("on"), { passive: true });
 
   /* ---------- questions: a dialog behind the ? button ---------- */
   const help = $("#help");

@@ -158,5 +158,25 @@ export function findings(probes, exits, cf, tzCc) {
     : { s: "warn", k: "bad", v: { a: tzCc, b: cc } };
   return R;
 }
+// Probe rows that stand out, by probe id: { k: "odd", x, y } a probe on another exit (x) than most of its kind (y:
+// mainland sites against mainland sites, everything else against sites abroad), or { k: "leak", x } a STUN server
+// that sees the local line while websites abroad see a proxy.
+export function oddProbes(probes, exits) {
+  const of = exitOfProbe(exits), byL = Object.fromEntries(exits.map(e => [e.letter, e])), out = {};
+  const ids = g => probes.filter(p => p.g === g).map(p => p.id);
+  const cn = majority(ids("cn"), of), abroad = majority([...ids("intl"), ...ids("ai"), ...ids("web")], of) || cn;
+  if (!abroad) return out;
+  for (const p of probes) {
+    const l = of[p.id]; if (!l) continue;
+    if (p.g === "udp") {
+      const loc = l.find(x => byL[x].kind === "local");
+      if (loc && byL[abroad].kind !== "local") out[p.id] = { k: "leak", x: loc };
+      continue;
+    }
+    const want = p.g === "cn" ? cn : abroad;
+    if (want && !l.includes(want)) out[p.id] = { k: "odd", x: l[0], y: want };
+  }
+  return out;
+}
 // the rows in the order the page shows them
 export const CHECKS = ["route", "except", "ai", "rtc", "v6", "tz"];

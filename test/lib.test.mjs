@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readProbe, srflxOf, groupExits, exitOfProbe, findings, maskIp, parseTrace, sameNet } from "../src/lib.mjs";
+import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet } from "../src/lib.mjs";
 import { PROBES, GROUPS } from "../src/probes.mjs";
 
 const P = id => PROBES.find(p => p.id === id);
@@ -105,4 +105,14 @@ test("checks: one exit, a service on its own route, no WebRTC answer", () => {
   assert.deepEqual(F.except, { s: "info", k: "some", v: { groups: [{ x: "P", list: ["chatgpt", "claude"] }] } });
   // no exits at all: every row is empty
   assert.ok(Object.values(findings(PROBES, [], {}, "US")).every(r => r.s === "none"));
+});
+
+test("odd rows: probes on another exit than their kind, and a WebRTC leak", () => {
+  const { seen } = scenario();
+  const O = oddProbes(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"));
+  // the IPv6-only hosts take the local line while sites abroad take the proxy; STUN sees the local line too
+  assert.deepEqual(O.ipsb6, { k: "odd", x: "D", y: "P" });
+  assert.deepEqual(O["stun-cf"], { k: "leak", x: "D" });
+  assert.equal(O.chatgpt, undefined);
+  assert.equal(O.ipip, undefined);
 });
