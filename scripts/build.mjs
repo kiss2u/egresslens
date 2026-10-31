@@ -100,7 +100,7 @@ export async function build({ check = false } = {}) {
     // one line per probe: name (host on hover), the address it saw, the exit label, Cloudflare colo, time
     const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(p.host)}">${esc(p.name)}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
       `<span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li>`;
-    const groups = GROUPS.map(g => `<div class="pg"><h3>${esc(T("g_" + g))}</h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
+    const groups = GROUPS.map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
     const faq = T("faq").map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
     const langOpts = langs.map(([l, , , nm]) => `<option value="${l}"${l === lang ? " selected" : ""}>${esc(nm)}</option>`).join("");
     const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));

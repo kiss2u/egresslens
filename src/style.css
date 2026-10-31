@@ -1,26 +1,26 @@
-/* Egress. Same tokens as the other 1ms.dog tools (me2cloud, ls, home), so a shared top bar can follow the page's
-   theme. The accent is cyan; --ok marks your own line (D), --px a proxy (P).  */
+/* EgressLens. Same tokens as the other 1ms.dog tools (me2cloud, ls, home), so a shared top bar can follow the page's
+   theme. The accent is teal. Exits: --e-d / --e-d2 your own line (D), --e-p1…--e-p4 proxies (P1…P4). */
 :root {
-  --bg: #f6f6f7; --panel: #ffffff; --soft: #f0f0f2; --line: #e4e4e8;
-  --fg: #141416; --muted: #6e6e78; --ink: #0e7490; --ink-fg: #ffffff;
-  --ok: #1a8a5a; --warn: #b86e00; --bad: #d23a2f;
-  --px: #c2410c; --p2: #7c3aed; --p3: #db2777; --p4: #b91c1c; --d2: #0f766e;
+  --bg: #f6f6f7; --panel: #ffffff; --soft: #f3f3f5; --line: #e4e4e8;
+  --fg: #141416; --muted: #6e6e78; --ink: #0f766e; --ink-fg: #ffffff;
+  --ok: #059669; --bad: #dc2626;
+  --e-d: #059669; --e-d2: #0d9488; --e-p1: #d97706; --e-p2: #7c3aed; --e-p3: #db2777; --e-p4: #dc2626;
   --f-ui: "Geist", "PingFang SC", "Microsoft YaHei", "Hiragino Sans", "Yu Gothic", "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans", system-ui, sans-serif;
   --f-num: "Geist Mono", ui-monospace, "SF Mono", Consolas, monospace;
   --r: 14px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #1c1c1c; --panel: #232323; --soft: #2a2a2a; --line: #363636;
-  --fg: #ededed; --muted: #a0a0a0; --ink: #22d3ee; --ink-fg: #062a33;
-  --ok: #3ecf8e; --warn: #f5a524; --bad: #f56565;
-  --px: #fb923c; --p2: #a78bfa; --p3: #f472b6; --p4: #f87171; --d2: #2dd4bf;
+  --bg: #1c1c1c; --panel: #232323; --soft: #282828; --line: #363636;
+  --fg: #ededed; --muted: #a0a0a0; --ink: #2dd4bf; --ink-fg: #042f2a;
+  --ok: #34d399; --bad: #f87171;
+  --e-d: #34d399; --e-d2: #2dd4bf; --e-p1: #fbbf24; --e-p2: #a78bfa; --e-p3: #f472b6; --e-p4: #f87171;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #1c1c1c; --panel: #232323; --soft: #2a2a2a; --line: #363636;
-  --fg: #ededed; --muted: #a0a0a0; --ink: #22d3ee; --ink-fg: #062a33;
-  --ok: #3ecf8e; --warn: #f5a524; --bad: #f56565;
-  --px: #fb923c; --p2: #a78bfa; --p3: #f472b6; --p4: #f87171; --d2: #2dd4bf;
+  --bg: #1c1c1c; --panel: #232323; --soft: #282828; --line: #363636;
+  --fg: #ededed; --muted: #a0a0a0; --ink: #2dd4bf; --ink-fg: #042f2a;
+  --ok: #34d399; --bad: #f87171;
+  --e-d: #34d399; --e-d2: #2dd4bf; --e-p1: #fbbf24; --e-p2: #a78bfa; --e-p3: #f472b6; --e-p4: #f87171;
   color-scheme: dark; }
 
 * { box-sizing: border-box; }
@@ -76,21 +76,21 @@ select option:checked { background-color: var(--soft); }
 .sec-h { display: flex; align-items: center; gap: 8px; height: 22px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
 .mini { border: 1px solid var(--line); background: transparent; border-radius: 6px; font-size: 11px; padding: 1px 7px; cursor: pointer; color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 500; }
 
-/* exit labels: D (direct, your own line) in green, P (proxy) in orange; the same chip on the exit, in the findings and
-   on every probe row */
-.lt { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 5px; font: 700 11px/1 var(--f-num); font-style: normal; color: #fff; vertical-align: -3px; flex: none; }
-.lt.big { min-width: 28px; height: 28px; font-size: 14px; border-radius: 7px; }
-.lt.k-local { background: var(--ok); } .lt.k-proxy { background: var(--px); }
-.lt.k-local.n2 { background: var(--d2); } .lt.k-proxy.n2 { background: var(--p2); } .lt.k-proxy.n3 { background: var(--p3); } .lt.k-proxy.n4 { background: var(--p4); }
-:root[data-theme="dark"] .lt { color: #111; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lt { color: #111; } }
+/* exit labels: D (your own line) green, P (proxy) amber, and each numbered exit its own hue. A tinted chip with the
+   exit's color as text, the same on the exit card, in the findings and on every probe row. */
+.lt { --c: var(--e-p1); display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 4px; border-radius: 5px;
+  font: 700 11px/1 var(--f-num); font-style: normal; vertical-align: -3px; flex: none;
+  color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent); }
+.lt.big { min-width: 34px; height: 34px; font-size: 14px; border-radius: 9px; }
+.lt.k-local { --c: var(--e-d); } .lt.k-local.n2 { --c: var(--e-d2); }
+.lt.k-proxy.n2 { --c: var(--e-p2); } .lt.k-proxy.n3 { --c: var(--e-p3); } .lt.k-proxy.n4 { --c: var(--e-p4); }
 
-#exList { display: flex; flex-direction: column; gap: 6px; }
-.ex { display: flex; align-items: center; gap: 12px; background: var(--soft); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
-/* an exit slot still waiting: a light dashed outline as tall as a real card, no fill */
-.ex { min-height: 64px; }
-.ex.sk { background: transparent; border: 1px dashed var(--line); color: var(--muted); align-items: center; }
-.lt.k-none { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+#exList { display: flex; flex-direction: column; gap: 8px; }
+/* each exit: a light outlined card, its chip carrying the color */
+.ex { display: flex; align-items: center; gap: 12px; min-height: 64px; border: 1px solid var(--line); border-radius: 11px; padding: 10px 12px; font-size: 13px; }
+/* a slot still waiting: the same card, dashed and empty */
+.ex.sk { border-style: dashed; color: var(--muted); }
+.lt.k-none { --c: var(--muted); box-shadow: inset 0 0 0 1px var(--line); background: transparent; }
 .ex-b { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
 .where { display: flex; align-items: center; gap: 7px; min-width: 0; white-space: nowrap; }
 .where b { font-weight: 600; flex: none; }
@@ -101,15 +101,15 @@ select option:checked { background-color: var(--soft); }
 .flag { width: 20px; height: 15px; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); object-fit: cover; flex: none; }
 
 #finds { display: flex; flex-direction: column; gap: 8px; }
-.fd { display: flex; gap: 9px; font-size: 13.5px; line-height: 1.5; }
-/* while running: one line per probe group with its count; the dot turns green when the group is done */
-.fd.gp { align-items: center; color: var(--muted); }
-.fd.gp > i { margin-top: 0; background: var(--line); }
-.fd.gp.done { color: var(--fg); } .fd.gp.done > i { background: var(--ok); }
-.fd.gp b { margin-left: auto; font: 12px var(--f-num); font-variant-numeric: tabular-nums; }
-.fd > i { flex: none; width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; background: var(--muted); }
+.fd { display: flex; gap: 9px; font-size: 13.5px; line-height: 1.55; }
+.fd > i { flex: none; width: 6px; height: 6px; border-radius: 50%; margin-top: 8px; background: var(--line); }
 .fd.lv-ok > i { background: var(--ok); } .fd.lv-warn > i { background: var(--bad); }
-.fd.lv-warn { color: var(--fg); font-weight: 500; }
+.fd.lv-warn b { color: var(--bad); font-weight: 600; }
+/* while running, the findings column holds skeleton lines the same size as findings; the result fades in over them */
+.fd.sk span { height: 10px; margin-top: 6px; border-radius: 5px; background: var(--soft); flex: 1; max-width: 92%; animation: blink 1.4s ease-in-out infinite; }
+.fd.sk:nth-child(2) span { max-width: 70%; } .fd.sk:nth-child(3) span { max-width: 84%; } .fd.sk:nth-child(4) span { max-width: 58%; } .fd.sk:nth-child(5) span { max-width: 76%; }
+#finds.in { animation: fadein .35s ease-out; }
+@keyframes fadein { from { opacity: 0; } }
 .fd .lt { margin-right: 1px; }
 
 /* action bar along the bottom of the hero; the progress line sits on its top border */
@@ -122,14 +122,18 @@ select option:checked { background-color: var(--soft); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; font-weight: 500; white-space: nowrap; }
 .btn svg { width: 15px; height: 15px; }
 .btn.pri { background: var(--ink); color: var(--ink-fg); border-color: transparent; font-weight: 600; }
-.btn:disabled { opacity: .45; cursor: default; }
+.btn:disabled { opacity: .5; cursor: default; }
+/* while a run is in progress the main button keeps its color and spins its icon */
+.btn.pri.busy { opacity: 1; } .btn.pri.busy svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* probe list: rows keep their size from the first paint; only the text inside changes */
 .probes { padding: 18px 22px 14px; display: flex; flex-direction: column; gap: 12px; }
 .probes h2, .help h2 { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
 .pgroups { columns: 2 420px; column-gap: 28px; }
 .pg { break-inside: avoid; margin-bottom: 14px; }
-.pg h3 { font-size: 11.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; height: 20px; }
+.pg h3 { font-size: 11.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; height: 20px; display: flex; align-items: center; }
+.pg-n { margin-left: auto; font: 500 11.5px var(--f-num); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .pr { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 13fr) 52px 34px 52px; align-items: center; gap: 8px; height: 34px; border-top: 1px solid var(--line); font-size: 13px; }
 .pn { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pn .m { font-size: 11px; }

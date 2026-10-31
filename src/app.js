@@ -106,7 +106,8 @@
     }
   }
   const whereOf = e => [e.city, e.cc && country(e.cc)].filter(Boolean).join(", ") || "?";
-  const exRef = l => { const e = S.exits.find(x => x.letter === l); return e ? `${chip(l)} ${esc(whereOf(e))}` : esc(l); };
+  // in a sentence an exit is its chip and country: short, and the card above has the rest
+  const exRef = l => { const e = S.exits.find(x => x.letter === l); return e ? `${chip(l)} ${esc(e.cc ? country(e.cc) : whereOf(e))}` : esc(l); };
   // While probes answer, the exits fill two slots drawn at the start (most visitors have a local line and a proxy);
   // an address shows once its network is known. The final sort, numbering and any extra exit come at the end.
   const exCard = e => {
@@ -121,22 +122,28 @@
     if (S.done && !E.length) { ul.innerHTML = `<li class="ex sk">${esc(t("no_net"))}</li>`; return; }
     ul.innerHTML = E.map(exCard).join("") + (S.done ? "" : slot().repeat(Math.max(0, 2 - E.length)));
   }
-  // while running, the findings column shows each group's progress (one line per group, drawn at the start)
+  // While running, each probe group's heading in the list counts its answers, and the findings column holds five
+  // skeleton lines (about the size of the findings); the findings fade in over them once every probe is in.
   function renderGroups() {
-    $("#finds").innerHTML = GROUPS.map(g => {
+    for (const g of GROUPS) {
       const ids = PROBES.filter(p => p.g === g).map(p => p.id), d = ids.filter(id => S.ok[id] != null).length;
-      return `<li class="fd gp${d === ids.length ? " done" : ""}"><i></i><span>${esc(t("g_" + g))}</span><b>${d} / ${ids.length}</b></li>`;
-    }).join("");
+      const el = document.querySelector(`[data-g="${g}"] .pg-n`);
+      if (el) el.textContent = S.gen ? `${d} / ${ids.length}` : "";
+    }
   }
+  const skeleton = () => { const ul = $("#finds"); ul.classList.remove("in"); ul.innerHTML = `<li class="fd sk"><i></i><span></span></li>`.repeat(5); };
   function renderFinds() {
-    const names = ids => list(ids.map(NAME_OF));
     const isExit = x => S.exits.some(e => e.letter === x);
-    $("#finds").innerHTML = S.finds.map(f => {
+    const ul = $("#finds");
+    ul.innerHTML = S.finds.map(f => {
       const v = {};
-      for (const [k, x] of Object.entries(f.v)) v[k] = k === "list" ? esc(names(x)) : isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
+      for (const [k, x] of Object.entries(f.v)) v[k] = k === "list" ? esc(list(x.map(NAME_OF))) : isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
       if (f.key === "f_fail") v.n = f.v.list.length;
-      return `<li class="fd lv-${f.level}"><i></i><span>${t(f.key, v)}</span></li>`;
+      // a warning's lead-in (up to the first colon) is set in bold
+      const txt = t(f.key, v).replace(/^([^:：<]{2,30}[:：])/, f.level === "warn" ? "<b>$1</b>" : "$1");
+      return `<li class="fd lv-${f.level}"><i></i><span>${txt}</span></li>`;
     }).join("");
+    void ul.offsetWidth; ul.classList.add("in");
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
 
@@ -153,8 +160,8 @@
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
     Object.assign(S, { res: {}, ok: {}, ms: {}, geo: {}, warp: "off", exits: [], finds: [], done: false });
-    renderExits(); renderGroups();
-    $("#run").disabled = true; $("#copy").disabled = true; $("#run span").textContent = t("rerun");
+    renderExits(); renderGroups(); skeleton();
+    $("#run").disabled = true; $("#run").classList.add("busy"); $("#copy").disabled = true; $("#run span").textContent = t("running");
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
     // this site's own Cloudflare trace says whether WARP carries the traffic (absent when self-hosted elsewhere)
     fetch("/cdn-cgi/trace", { cache: "no-store", signal: AbortSignal.timeout(5000) }).then(r => r.ok ? r.text() : "")
@@ -188,7 +195,7 @@
     S.finds = findings(PROBES, S.exits, S.ok, tzCc());
     S.done = true;
     renderExits(); renderChips(); renderFinds(); setProg(PROBES.length, PROBES.length);
-    $("#run").disabled = false; $("#copy").disabled = !S.exits.length;
+    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#copy").disabled = !S.exits.length;
   }
 
   /* ---------- copy as text ---------- */
@@ -228,7 +235,7 @@
   else {
     // waiting for Start: the placeholders say so, and the button reads Start until the first run
     $("#exList").innerHTML = `<li class="ex sk">${esc(t("idle"))}</li>`;
-    $("#finds").innerHTML = "";
+    skeleton();
     $("#run span").textContent = t("start"); $("#run").disabled = false;
   }
 })();
