@@ -1,0 +1,60 @@
+# EgressLens
+
+[English](README.md) · **简体中文**
+
+不同的网站，看到的是你的哪个 IP？带规则的代理和 VPN 会按网站选线路，只查一次“我的 IP”只能看到一条线路。[EgressLens](https://egress.1ms.dog) 同时询问 51 个探测器，把结果归成几个出口：**D** 是你自己的线路（直连），**P** 是代理；同类有多个时编号为 D1、D2、P1、P2……
+
+**在线使用：** https://egress.1ms.dog
+
+## 探测器
+
+| 分组 | 内容 |
+|---|---|
+| 国内网站 | IPIP.NET、爱奇艺、ipify.cn、DNSPod（IPv4 和 IPv6），分流规则通常让它们直连 |
+| IP 查询服务 | IP.SB、ipinfo.io、ipapi.co、ipwho.is、GeoJS、ipleak.net、ident.me、ip.guide、icanhazip、BigDataCloud |
+| AI 服务 | ChatGPT、OpenAI、Sora、Claude、Anthropic、Grok、Perplexity、Copilot、Mistral、Poe、Character.AI、DeepL |
+| 常用网站 | Cloudflare、1.1.1.1、GitLab、npm、Notion、Linear、Zoom、Medium、Coinbase、Crunchyroll、Patreon、Shopify |
+| 仅 IPv4 / 仅 IPv6 | 单栈站点上的 IP.SB、Cloudflare Radar、ipify、icanhazip |
+| WebRTC（UDP） | Cloudflare、Google、Twilio、小米的 STUN 服务器 |
+
+AI 服务和常用网站读取的是各站点自己域名上的 Cloudflare `/cdn-cgi/trace`：它返回连接过来的地址，并带 `Access-Control-Allow-Origin: *`。所以页面能看到在你的规则下，chatgpt.com、claude.ai 实际看到的是哪个出口。
+
+页面据此给出结论：国内外分流、单独走一条线路的服务、WebRTC 泄露（网站看到代理，UDP 却从自己的线路出去）、IPv6 泄露、时区与出口国家不一致，以及 Cloudflare WARP。
+
+**隐私：** 网站只有静态文件。浏览器直接连接每个探测器，结果不会发给本站。截图前可以用“隐藏 IP”遮住地址。
+
+## 自行部署
+
+`public/` 已经提交到仓库，不改代码就不需要构建。
+
+```bash
+git clone https://github.com/yt1988/egress
+cd egress
+npx wrangler login
+npx wrangler deploy        # 纯静态资源 Worker：没有脚本，免费且不计请求数
+```
+
+`wrangler.toml` 关闭了 `*.workers.dev` 和预览地址。在 **Workers & Pages → egress → Settings → Domains & Routes** 绑定自己的域名，或临时设 `workers_dev = true` 测试。任何静态托管都可以，`public/_headers` 是 Cloudflare 格式的安全响应头。WARP 检测读取的是页面所在域名的 `/cdn-cgi/trace`，只在 Cloudflare 后面有效。
+
+把规范链接和 sitemap 换成自己的域名：
+
+```bash
+npm install
+SITE_URL=https://egress.example.com npm run build
+```
+
+## 开发
+
+```bash
+npm install
+npm run dev        # http://localhost:8787，带生产环境的响应头
+npm run build      # 修改 src/ 后重新生成 public/（public/ 要提交）
+npm test           # 检查 public/ 是否最新、页面约定和逻辑测试
+npm run verify     # 检查每个 HTTPS 探测器：无跳转、允许 CORS、能读出地址
+```
+
+新增探测器的要求：一次 GET、没有跳转、对任何来源允许 CORS，返回的客户端地址能被 `src/lib.mjs` 里的读取函数解析。请在同时有 IPv4 和 IPv6 的网络上运行 `npm run verify`。
+
+## 许可
+
+MIT
