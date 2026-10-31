@@ -68,25 +68,40 @@ test("exits: grouped by network, local first, labeled D/P", () => {
   assert.deepEqual(E2.map(e => e.letter), ["D", "P1", "P2"]);
 });
 
-test("findings: split routing, WebRTC and IPv6 leaks, time zone", () => {
-  const { seen, ok } = scenario();
-  const E = groupExits(seen, { ...GEO, [LOCAL6]: GEO[LOCAL4], [PROXY6]: GEO[PROXY4] }, GROUP_OF, "off");
-  const F = findings(PROBES, E, ok, "CN"), keys = F.map(f => f.key);
-  assert.deepEqual(F.find(f => f.key === "f_split").v, { a: "D", b: "P" });
-  assert.ok(keys.includes("f_rtc_leak"));
-  assert.ok(keys.includes("f_v6_leak"));
-  assert.deepEqual(F.find(f => f.key === "f_tz").v, { a: "CN", b: "JP" });
-  assert.ok(!keys.includes("f_fail") && !keys.includes("f_one"));
+const BOTH = () => ({ ...GEO, [LOCAL6]: GEO[LOCAL4], [PROXY6]: GEO[PROXY4] });
+const cfAll = loc => Object.fromEntries(["chatgpt", "openai", "claude", "anthropic"].map(id => [id, { loc, colo: "NRT" }]));
+
+test("checks: split routing, AI region, WebRTC and IPv6 leaks, time zone", () => {
+  const { seen } = scenario();
+  const F = findings(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"), cfAll("JP"), "CN");
+  assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "v6", "tz"]);
+  assert.deepEqual(F.route, { s: "info", k: "split", v: { a: "D", b: "P" } });
+  assert.deepEqual(F.except, { s: "ok", k: "none", v: {} });
+  assert.deepEqual(F.ai, { s: "ok", k: "ok", v: { x: "P", c: "JP", dc: true } });
+  assert.deepEqual(F.rtc, { s: "bad", k: "leak", v: { a: "D" } });
+  assert.deepEqual(F.v6, { s: "bad", k: "leak", v: { a: "D" } });
+  assert.deepEqual(F.tz, { s: "warn", k: "bad", v: { a: "CN", b: "JP" } });
 });
 
-test("findings: one exit, a service on its own route, failures", () => {
+test("checks: AI services that see an unsupported region", () => {
+  const { seen } = scenario();
+  const cf = { ...cfAll("JP"), claude: { loc: "HK" }, anthropic: { loc: "HK" } };
+  const F = findings(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"), cf, "JP");
+  assert.deepEqual(F.ai, { s: "bad", k: "bad", v: { list: ["claude", "anthropic"], c: "HK" } });
+  assert.equal(F.tz.s, "ok");
+});
+
+test("checks: one exit, a service on its own route, no WebRTC answer", () => {
   const seen = PROBES.filter(p => p.g !== "udp").map(p => ({ ip: p.fam === 6 ? "2001:db8::1" : "1.2.3.4", probe: p.id }));
-  const ok = Object.fromEntries(PROBES.map(p => [p.id, p.g !== "udp"]));
   const geo = { "1.2.3.4": { cc: "US", city: "Austin", asn: 7922, org: "Comcast" }, "2001:db8::1": { cc: "US", city: "Austin", asn: 7922, org: "Comcast" } };
-  let F = findings(PROBES, groupExits(seen, geo, GROUP_OF, "off"), ok, "US");
-  assert.deepEqual(F.map(f => f.key), ["f_one", "f_rtc_none", "f_fail"]);
+  let F = findings(PROBES, groupExits(seen, geo, GROUP_OF, "off"), cfAll("US"), "US");
+  assert.deepEqual(F.route, { s: "ok", k: "one", v: { a: "D" } });
+  assert.equal(F.rtc.k, "none");
+  assert.deepEqual(F.v6, { s: "ok", k: "ok", v: { a: "D" } });
   // ChatGPT and Claude through a US server, the rest local
   const seen2 = seen.map(s => ["chatgpt", "claude"].includes(s.probe) ? { ip: "5.6.7.8", probe: s.probe } : s);
-  F = findings(PROBES, groupExits(seen2, { ...geo, "5.6.7.8": { cc: "US", city: "Ashburn", asn: 14618, org: "Amazon.com" } }, GROUP_OF, "off"), ok, "US");
-  assert.deepEqual(F.find(f => f.key === "f_dest").v, { list: ["chatgpt", "claude"], x: "P", y: "D" });
+  F = findings(PROBES, groupExits(seen2, { ...geo, "5.6.7.8": { cc: "US", city: "Ashburn", asn: 14618, org: "Amazon.com" } }, GROUP_OF, "off"), cfAll("US"), "US");
+  assert.deepEqual(F.except, { s: "info", k: "some", v: { groups: [{ x: "P", list: ["chatgpt", "claude"] }] } });
+  // no exits at all: every row is empty
+  assert.ok(Object.values(findings(PROBES, [], {}, "US")).every(r => r.s === "none"));
 });

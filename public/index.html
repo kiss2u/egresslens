@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"EgressLens","url":"https://egress.1ms.dog/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"See which IP address each website sees you as. 51 probes in mainland China and abroad, at AI services, over IPv4, IPv6 and WebRTC, find split routing and leaks. Runs in your browser.","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.c56c261033.css">
+<link rel="stylesheet" href="/assets/app.6eed745e5b.css">
 </head>
 <body>
 <div class="app">
@@ -72,15 +72,13 @@
         </div>
         <div class="col">
           <div class="sec-h"><span data-i="finds_h">Findings</span></div>
-          <ul id="finds"><li class="fd sk"><span class="blink" data-i="wait">Waiting for every probe…</span></li></ul>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">Routing</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">Exceptions</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">AI region</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">Time zone</span><span class="fr-v"><span class="bar"></span></span></li></ul>
         </div>
       </div>
       <div class="bar">
         <div class="prog" id="prog"><i></i></div>
-        <label class="auto"><input type="checkbox" id="auto" checked><span class="sw" aria-hidden="true"></span><span data-i="auto">Run on open</span></label>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
-          <button class="btn" id="copy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span data-i="copy">Copy</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">Run again</span></button>
         </div>
       </div>
@@ -109,10 +107,10 @@
 <details><summary>What is a WebRTC leak?</summary><p>WebRTC (video calls in the browser) finds your public address by asking a STUN server over UDP. Many proxies only carry TCP, so this UDP request leaves through your own line, and any web page can read the result without a permission prompt. If a STUN server sees your local address while websites see the proxy, the page reports a leak.</p></details>
 <details><summary>What is an IPv6 leak?</summary><p>If the proxy only handles IPv4 but your line also has IPv6, connections over IPv6 can skip the proxy. The IPv6-only probes show which exit IPv6 traffic really takes.</p></details>
 <details><summary>How are local and proxy exits told apart?</summary><p>By the network's owner: an address registered to a cloud or hosting company (Amazon, Google Cloud, Alibaba, DigitalOcean…) is labeled a proxy, the first one belonging to an ISP is your local line. A residential proxy or a VPN on an ISP network can't be told apart this way.</p></details>
-<details><summary>Is anything sent to this site?</summary><p>No. Your browser talks to each probe directly; this site only serves static files and never sees your results. Hide IPs before taking a screenshot; Copy includes the IPs only while they are shown.</p></details>
+<details><summary>Is anything sent to this site?</summary><p>No. Your browser talks to each probe directly; this site only serves static files and never sees your results. Hide IPs before taking a screenshot.</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"en","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.en.05a7c6ec60.js"></script>
-<script src="/assets/app.e28252faae.js" defer></script>
+<script src="/assets/l.en.0c46fc34bf.js"></script>
+<script src="/assets/app.193a60e0ce.js" defer></script>
 </body>
 </html>

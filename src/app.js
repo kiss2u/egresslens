@@ -9,7 +9,7 @@
   const t = (k, v) => { let s = L[k] ?? k; if (v) for (const x in v) s = s.split("{" + x + "}").join(v[x]); return s; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
-  const K = { theme: "egress:theme", lang: "egress:lang", mask: "egress:mask", auto: "egress:auto" };
+  const K = { theme: "egress:theme", lang: "egress:lang", mask: "egress:mask" };
   const country = cc => { try { return new Intl.DisplayNames([LANG], { type: "region" }).of(cc); } catch (e) { return cc; } };
   const flag = cc => /^[A-Z]{2}$/.test(cc || "") ? `<img class="flag" src="/flags/${cc.toLowerCase()}.svg" alt="" width="20" height="15">` : "";
   const list = a => a.join(t("join"));
@@ -102,7 +102,8 @@
     const of = exitOfProbe(S.exits);
     for (const p of PROBES) {
       const c = document.querySelector("#p-" + p.id + " .pl");
-      if (c) c.innerHTML = (of[p.id] || []).map(l => chip(l)).join("");
+      // the exit's label and its country's flag
+      if (c) c.innerHTML = (of[p.id] || []).map(l => chip(l) + flag((S.exits.find(e => e.letter === l) || {}).cc)).join("");
     }
   }
   const whereOf = e => [e.city, e.cc && country(e.cc)].filter(Boolean).join(", ") || "?";
@@ -126,8 +127,7 @@
     if (S.done && !E.length) { ul.innerHTML = `<li class="ex sk">${esc(t("no_net"))}</li>`; return; }
     ul.innerHTML = E.map(exCard).join("") + (S.done ? "" : slot().repeat(Math.max(0, 2 - E.length)));
   }
-  // While running, each probe group's heading in the list counts its answers, and the findings column holds five
-  // skeleton lines (about the size of the findings); the findings fade in over them once every probe is in.
+  // While running, each probe group's heading in the list counts its answers.
   function renderGroups() {
     for (const g of GROUPS) {
       const ids = PROBES.filter(p => p.g === g).map(p => p.id), d = ids.filter(id => S.ok[id] != null).length;
@@ -135,19 +135,26 @@
       if (el) el.textContent = S.gen ? `${d} / ${ids.length}` : "";
     }
   }
-  const skeleton = () => { const ul = $("#finds"); ul.classList.remove("in"); ul.innerHTML = `<li class="fd sk"><i></i><span></span></li>`.repeat(5); };
-  function renderFinds() {
+  // The check table: six rows drawn by the build, each a label and a value. While running a value is a skeleton bar;
+  // when every probe is in, each row gets its status mark and its value.
+  const ST = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
+  function renderChecks() {
     const isExit = x => S.exits.some(e => e.letter === x);
-    const ul = $("#finds");
-    ul.innerHTML = S.finds.map(f => {
-      const v = {};
-      for (const [k, x] of Object.entries(f.v)) v[k] = k === "list" ? esc(list(x.map(NAME_OF))) : isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
-      if (f.key === "f_fail") v.n = f.v.list.length;
-      // a warning's lead-in (up to the first colon) is set in bold
-      const txt = t(f.key, v).replace(/^([^:：<]{2,30}[:：])/, f.level === "warn" ? "<b>$1</b>" : "$1");
-      return `<li class="fd lv-${f.level}"><i></i><span>${txt}</span></li>`;
-    }).join("");
-    void ul.offsetWidth; ul.classList.add("in");
+    for (const row of CHECKS) {
+      const li = document.querySelector(`#finds [data-r="${row}"]`); if (!li) continue;
+      const st = li.querySelector(".st"), val = li.querySelector(".fr-v");
+      li.className = "fr";
+      if (!S.done) { li.classList.add("wait"); st.textContent = ""; val.innerHTML = "<span class=\"bar\"></span>"; continue; }
+      const f = S.finds[row], v = {};
+      for (const [k, x] of Object.entries(f.v)) {
+        if (k === "list") v[k] = esc(list(x.map(NAME_OF)));
+        else if (k === "groups") v[k] = x.map(g => t("v_except_some", { list: esc(list(g.list.map(NAME_OF))), x: exRef(g.x) })).join(" · ");
+        else if (k === "x" && f.v.c) v[k] = `${chip(x)} ${esc(country(f.v.c))}`;
+        else if (typeof x === "string") v[k] = isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
+      }
+      li.classList.add("st-" + f.s); st.textContent = ST[f.s];
+      val.innerHTML = f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "");
+    }
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
 
@@ -158,14 +165,14 @@
   const live = () => { if (raf) return; raf = requestAnimationFrame(() => {
     raf = 0; if (S.done) return;
     S.exits = groupExits(seenAll().filter(s => geoOf(S.geo, s.ip)), S.geo, GROUP_OF, S.warp);
-    renderExits(); renderChips(); renderGroups();
+    renderExits(); renderChips();
   }); };
   async function run() {
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
-    Object.assign(S, { res: {}, ok: {}, ms: {}, geo: {}, warp: "off", exits: [], finds: [], done: false });
-    renderExits(); renderGroups(); skeleton();
-    $("#run").disabled = true; $("#run").classList.add("busy"); $("#copy").disabled = true; $("#run span").textContent = t("running");
+    Object.assign(S, { res: {}, ok: {}, ms: {}, geo: {}, warp: "off", exits: [], finds: {}, done: false });
+    renderExits(); renderGroups(); renderChecks();
+    $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running");
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
     // this site's own Cloudflare trace says whether WARP carries the traffic (absent when self-hosted elsewhere)
     fetch("/cdn-cgi/trace", { cache: "no-store", signal: AbortSignal.timeout(5000) }).then(r => r.ok ? r.text() : "")
@@ -189,45 +196,21 @@
       for (const r of res) if (r.geo && (r.geo.cc || r.geo.asn) && !S.geo[r.ip]) S.geo[r.ip] = r.geo;
       // geo-aware answers first, so a lookup isn't spent on a network another probe is about to name
       setTimeout(() => { if (gen === S.gen) for (const r of res) lookup(r.ip); }, 1200);
-      renderRow(p); setProg(++d, PROBES.length); live();
+      renderRow(p); renderGroups(); setProg(++d, PROBES.length); live();
     }));
     if (gen !== S.gen) return;
     for (const { ip } of seenAll()) lookup(ip);
     await Promise.allSettled(lookups);
     if (gen !== S.gen) return;
     S.exits = groupExits(seenAll(), S.geo, GROUP_OF, S.warp);
-    S.finds = findings(PROBES, S.exits, S.ok, tzCc());
+    const cf = Object.fromEntries(PROBES.map(p => [p.id, ((S.res[p.id] || [])[0] || {}).cf]).filter(([, c]) => c));
+    S.finds = findings(PROBES, S.exits, cf, tzCc());
     S.done = true;
-    renderExits(); renderChips(); renderFinds(); setProg(PROBES.length, PROBES.length);
-    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#copy").disabled = !S.exits.length;
+    renderExits(); renderChips(); renderChecks(); setProg(PROBES.length, PROBES.length);
+    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun");
   }
 
-  /* ---------- copy as text ---------- */
-  function report() {
-    const lines = [`${t("name")} · ${new Date().toLocaleString(LANG)}`, ""];
-    for (const e of S.exits) lines.push(`${e.letter}  ${t("k_" + e.kind)}  ${whereOf(e)}${e.org ? " · " + e.org : ""}${e.asn ? " AS" + e.asn : ""}  ${e.ips.map(ipTxt).join(", ")}`);
-    lines.push("");
-    const tmp = document.createElement("div");
-    for (const li of $("#finds").children) { tmp.innerHTML = li.innerHTML; lines.push("- " + tmp.textContent.trim()); }
-    lines.push("");
-    const of = exitOfProbe(S.exits);
-    for (const g of GROUPS) {
-      lines.push(t("g_" + g));
-      for (const p of PROBES.filter(x => x.g === g)) lines.push(`  ${(of[p.id] || ["-"]).join("/").padEnd(3)} ${NAME_OF(p.id).padEnd(20)} ${S.ok[p.id] ? S.res[p.id].map(r => ipTxt(r.ip)).join(", ") : t("fail")}`);
-    }
-    return lines.join("\n") + "\n" + location.origin + location.pathname + "\n";
-  }
-  $("#copy").onclick = async () => {
-    const b = $("#copy"), lbl = b.querySelector("span");
-    try { await navigator.clipboard.writeText(report()); lbl.textContent = t("copied"); } catch (e) { lbl.textContent = t("copy_fail"); }
-    setTimeout(() => { lbl.textContent = t("copy"); }, 1600);
-  };
   $("#run").onclick = () => run();
-
-  /* ---------- run on open (remembered in this browser) ---------- */
-  const autoBox = $("#auto");
-  autoBox.checked = store.get(K.auto) !== "0";
-  autoBox.onchange = () => store.set(K.auto, autoBox.checked ? "1" : "0");
 
   /* ---------- questions: a dialog behind the ? button ---------- */
   const help = $("#help");
@@ -235,11 +218,5 @@
   help.addEventListener("click", e => { if (e.target === help || e.target.closest("[data-close]")) help.close(); });
 
   applyMask();
-  if (autoBox.checked) run();
-  else {
-    // waiting for Start: the placeholders say so, and the button reads Start until the first run
-    $("#exList").innerHTML = `<li class="ex sk">${esc(t("idle"))}</li>`;
-    skeleton();
-    $("#run span").textContent = t("start"); $("#run").disabled = false;
-  }
+  run();
 })();

@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Loupe IP","url":"https://egress.1ms.dog/fr/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Voyez quelle adresse IP chaque site voit. 51 sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.","inLanguage":"fr","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.c56c261033.css">
+<link rel="stylesheet" href="/assets/app.6eed745e5b.css">
 </head>
 <body>
 <div class="app">
@@ -72,15 +72,13 @@
         </div>
         <div class="col">
           <div class="sec-h"><span data-i="finds_h">Constats</span></div>
-          <ul id="finds"><li class="fd sk"><span class="blink" data-i="wait">En attente de toutes les sondes…</span></li></ul>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">Routage</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">Exceptions</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">Région IA</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">Fuseau</span><span class="fr-v"><span class="bar"></span></span></li></ul>
         </div>
       </div>
       <div class="bar">
         <div class="prog" id="prog"><i></i></div>
-        <label class="auto"><input type="checkbox" id="auto" checked><span class="sw" aria-hidden="true"></span><span data-i="auto">Lancer à l’ouverture</span></label>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
-          <button class="btn" id="copy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span data-i="copy">Copier</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">Relancer</span></button>
         </div>
       </div>
@@ -109,10 +107,10 @@
 <details><summary>Qu’est-ce qu’une fuite WebRTC ?</summary><p>WebRTC (les appels vidéo dans le navigateur) trouve votre adresse publique en interrogeant un serveur STUN en UDP. Beaucoup de proxies ne transportent que TCP : cette requête UDP part alors par votre propre ligne, et n’importe quelle page peut lire le résultat sans demander d’autorisation. Si un serveur STUN voit votre adresse locale alors que les sites voient le proxy, la page signale une fuite.</p></details>
 <details><summary>Qu’est-ce qu’une fuite IPv6 ?</summary><p>Si le proxy ne gère que l’IPv4 alors que votre ligne a aussi l’IPv6, les connexions IPv6 peuvent contourner le proxy. Les sondes uniquement IPv6 montrent par quelle sortie passe réellement le trafic IPv6.</p></details>
 <details><summary>Comment distinguer sortie locale et proxy ?</summary><p>Par le propriétaire du réseau : une adresse enregistrée au nom d’un hébergeur ou d’un cloud (Amazon, Google Cloud, Alibaba, DigitalOcean…) est marquée proxy ; la première qui appartient à un fournisseur d’accès est votre ligne. Un proxy résidentiel ou un VPN sur le réseau d’un FAI ne peuvent pas être distingués ainsi.</p></details>
-<details><summary>Quelque chose est-il envoyé à ce site ?</summary><p>Non. Votre navigateur parle directement à chaque sonde ; ce site ne sert que des fichiers statiques et ne voit jamais vos résultats. Masquez les IP avant une capture d’écran ; Copier n’inclut les IP que lorsqu’elles sont affichées.</p></details>
+<details><summary>Quelque chose est-il envoyé à ce site ?</summary><p>Non. Votre navigateur parle directement à chaque sonde ; ce site ne sert que des fichiers statiques et ne voit jamais vos résultats. Masquez les IP avant une capture d’écran.</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"fr","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.fr.bd14ceba75.js"></script>
-<script src="/assets/app.e28252faae.js" defer></script>
+<script src="/assets/l.fr.c9d6a23270.js"></script>
+<script src="/assets/app.193a60e0ce.js" defer></script>
 </body>
 </html>

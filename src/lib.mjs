@@ -105,38 +105,57 @@ function majority(ids, of) {
   const best = Object.entries(n).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0];
   return best ? best[0] : null;
 }
-// probes: the PROBES list; exits: groupExits(); ok: probe id → answered; tzCc: country of the browser's time zone.
-// Returns [{ key, level, v }]: level "ok" | "info" | "warn"; v holds the values the sentence needs (letters, ids, codes).
-export function findings(probes, exits, ok, tzCc) {
-  const F = [], of = exitOfProbe(exits), byL = Object.fromEntries(exits.map(e => [e.letter, e]));
+// Regions where neither OpenAI (ChatGPT) nor Anthropic (Claude) offers its service: the AI row flags an AI exit there.
+export const AI_BLOCKED = ["CN", "HK", "MO", "RU", "BY", "IR", "KP", "SY", "CU"];
+const AI_CHECK = ["chatgpt", "openai", "claude", "anthropic"];
+// The check table. probes: the PROBES list; exits: groupExits(); cf: probe id → its Cloudflare trace ({ loc } = the
+// country that site sees); tzCc: country of the browser's time zone.
+// Returns one row per check, always the same six: { route, except, ai, rtc, v6, tz }, each { s, k, v }:
+// s the status ("ok" | "warn" | "bad" | "info" | "none"), k the wording's variant, v the values it needs
+// (exit labels, probe ids, country codes).
+export function findings(probes, exits, cf, tzCc) {
+  const of = exitOfProbe(exits), byL = Object.fromEntries(exits.map(e => [e.letter, e]));
   const ids = g => probes.filter(p => p.g === g).map(p => p.id);
-  if (!exits.length) return [{ key: "f_none", level: "warn", v: {} }];
-  const cn = majority(ids("cn"), of), abroad = majority([...ids("intl"), ...ids("ai"), ...ids("web")], of);
-  if (exits.length === 1) F.push({ key: "f_one", level: "ok", v: { a: exits[0].letter } });
-  else if (cn && abroad && cn !== abroad) F.push({ key: "f_split", level: "info", v: { a: cn, b: abroad } });
-  // destinations whose exit is not the usual one abroad (a per-service rule, or a second proxy)
-  if (abroad) {
-    const odd = {};
-    for (const p of probes) if ((p.g === "ai" || p.g === "web") && of[p.id] && !of[p.id].includes(abroad)) (odd[of[p.id][0]] = odd[of[p.id][0]] || []).push(p.id);
-    for (const [l, list] of Object.entries(odd)) F.push({ key: "f_dest", level: "info", v: { list, x: l, y: abroad } });
+  const none = { s: "none", k: "none", v: {} };
+  if (!exits.length) return { route: none, except: none, ai: none, rtc: none, v6: none, tz: none };
+  const cn = majority(ids("cn"), of), abroad = majority([...ids("intl"), ...ids("ai"), ...ids("web")], of) || cn;
+  const R = {};
+  // routing: mainland sites vs. sites abroad
+  R.route = cn && cn !== abroad ? { s: "info", k: "split", v: { a: cn, b: abroad } } : { s: "ok", k: "one", v: { a: abroad } };
+  // exceptions: AI services and sites that take another exit than the rest of the world
+  const odd = {};
+  for (const p of probes) if ((p.g === "ai" || p.g === "web") && of[p.id] && !of[p.id].includes(abroad)) (odd[of[p.id][0]] = odd[of[p.id][0]] || []).push(p.id);
+  const groups = Object.entries(odd).map(([x, list]) => ({ x, list }));
+  R.except = groups.length ? { s: "info", k: "some", v: { groups } } : { s: "ok", k: "none", v: {} };
+  // AI region: the country ChatGPT and Claude see (their own trace), and whether they serve it
+  const seen = AI_CHECK.filter(id => cf[id] && /^[A-Z]{2}$/.test(cf[id].loc || ""));
+  if (!seen.length) R.ai = none;
+  else {
+    const bad = seen.filter(id => AI_BLOCKED.includes(cf[id].loc));
+    const x = majority(ids("ai"), of), e = x && byL[x];
+    R.ai = bad.length ? { s: "bad", k: "bad", v: { list: bad, c: cf[bad[0]].loc } }
+      : { s: "ok", k: "ok", v: { x, c: cf[seen[0]].loc, dc: !!(e && e.dc) } };
   }
-  // WebRTC: UDP sees an exit that no website abroad sees, while websites abroad go through a proxy
-  const udp = ids("udp").filter(id => of[id]), udpL = [...new Set(udp.flatMap(id => [...of[id]]))];
-  const webL = new Set([...ids("intl"), ...ids("ai"), ...ids("web")].filter(id => of[id]).flatMap(id => [...of[id]]));
+  // WebRTC: UDP sees an exit no website abroad sees, while websites abroad go through a proxy
+  const udp = ids("udp").filter(id => of[id]), udpL = [...new Set(udp.flatMap(id => of[id]))];
+  const webL = new Set([...ids("intl"), ...ids("ai"), ...ids("web")].filter(id => of[id]).flatMap(id => of[id]));
   const leaked = udpL.filter(l => !webL.has(l) && byL[l].kind === "local");
-  if (!udp.length) F.push({ key: "f_rtc_none", level: "info", v: {} });
-  else if (leaked.length && abroad && byL[abroad].kind !== "local") F.push({ key: "f_rtc_leak", level: "warn", v: { a: leaked[0] } });
-  else if (abroad && udpL.every(l => l === abroad)) F.push({ key: "f_rtc_ok", level: "ok", v: { a: abroad } });
-  // IPv6: the IPv6-only hosts see the local line while the rest of the world sees a proxy
+  const proxied = byL[abroad].kind !== "local";
+  R.rtc = !udp.length ? { s: "ok", k: "none", v: {} }
+    : leaked.length && proxied ? { s: "bad", k: "leak", v: { a: leaked[0] } }
+    : { s: "ok", k: proxied && udpL.every(l => byL[l].kind !== "local") ? "proxy" : "same", v: { a: udpL[0] } };
+  // IPv6: the IPv6-only hosts see the local line while IPv4 goes through a proxy
   const v4 = majority(probes.filter(p => p.g === "stack" && p.fam === 4).map(p => p.id), of);
   const v6 = majority(probes.filter(p => p.g === "stack" && p.fam === 6).map(p => p.id), of);
-  if (!exits.some(e => e.v6)) F.push({ key: "f_no_v6", level: "info", v: {} });
-  else if (v6 && v4 && v6 !== v4 && byL[v6].kind === "local" && byL[v4].kind !== "local") F.push({ key: "f_v6_leak", level: "warn", v: { a: v6 } });
-  // time zone: sites abroad can compare it with the exit's country
-  const main = abroad && byL[abroad];
-  if (tzCc && main && main.cc && main.cc !== tzCc && !(tzCc === "CN" && ["HK", "MO"].includes(main.cc))) F.push({ key: "f_tz", level: "info", v: { a: tzCc, b: main.cc } });
-  if (exits.some(e => e.warp)) F.push({ key: "f_warp", level: "info", v: {} });
-  const failed = probes.filter(p => ok[p.id] === false).map(p => p.id);
-  if (failed.length) F.push({ key: "f_fail", level: "info", v: { list: failed } });
-  return F;
+  R.v6 = !v6 && !exits.some(e => e.v6) ? { s: "info", k: "none", v: {} }
+    : v6 && v4 && v6 !== v4 && byL[v6].kind === "local" && byL[v4].kind !== "local" ? { s: "bad", k: "leak", v: { a: v6 } }
+    : { s: "ok", k: "ok", v: { a: v6 || exits.find(e => e.v6).letter } };
+  // time zone against the country sites abroad see (mainland China and Hong Kong/Macau count as one here)
+  const cc = byL[abroad].cc;
+  R.tz = !tzCc || !cc ? none
+    : cc === tzCc || (tzCc === "CN" && ["HK", "MO"].includes(cc)) ? { s: "ok", k: "ok", v: { a: cc } }
+    : { s: "warn", k: "bad", v: { a: tzCc, b: cc } };
+  return R;
 }
+// the rows in the order the page shows them
+export const CHECKS = ["route", "except", "ai", "rtc", "v6", "tz"];

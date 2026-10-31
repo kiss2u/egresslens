@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { transform } from "esbuild";
 import { PROBES, GROUPS } from "../src/probes.mjs";
+import { CHECKS } from "../src/lib.mjs";
 
 const SITE = (process.env.SITE_URL || "https://egress.1ms.dog").replace(/\/+$/, "");
 const pub = new URL("../public/", import.meta.url), src = new URL("../src/", import.meta.url);
@@ -63,7 +64,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h"]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -101,6 +102,8 @@ export async function build({ check = false } = {}) {
     const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(p.host)}">${esc(p.name)}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
       `<span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li>`;
     const groups = GROUPS.map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
+    // the check table's rows: label now, status and value once the probes are in
+    const checks = CHECKS.map(r => `<li class="fr" data-r="${r}"><i class="st"></i><span class="fr-l">${esc(T("r_" + r))}</span><span class="fr-v"><span class="bar"></span></span></li>`).join("");
     const faq = T("faq").map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
     const langOpts = langs.map(([l, , , nm]) => `<option value="${l}"${l === lang ? " selected" : ""}>${esc(nm)}</option>`).join("");
     const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
@@ -109,7 +112,7 @@ export async function build({ check = false } = {}) {
       .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", slug ? "" : " data-root")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
       .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(T("intro"), { n: N })))
-      .replace("{{groups}}", groups).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot")))
+      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot")))
       .replace("{{data}}", JSON.stringify({ lang, paths }).replace(/</g, "\\u003c"));
     if (/\{\{\w+\}\}/.test(html)) throw new Error("unfilled placeholder in " + path(slug) + ": " + /\{\{\w+\}\}/.exec(html)[0]);
     pages.push({ file: (slug ? slug + "/" : "") + "index.html", url, html });

@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"出口照妖鏡","url":"https://egress.1ms.dog/zh-tw/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"同時向中國大陸網站、海外 IP 查詢、ChatGPT/Claude 等 AI 服務、IPv4/IPv6 單棧站點和 WebRTC 共 51 個探測器詢問，找出你的每個出口，判斷分流規則和 WebRTC、IPv6 洩漏。全部在瀏覽器裡完成。","inLanguage":"zh-TW","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.c56c261033.css">
+<link rel="stylesheet" href="/assets/app.6eed745e5b.css">
 </head>
 <body>
 <div class="app">
@@ -72,15 +72,13 @@
         </div>
         <div class="col">
           <div class="sec-h"><span data-i="finds_h">檢測結論</span></div>
-          <ul id="finds"><li class="fd sk"><span class="blink" data-i="wait">等待所有探測器回應…</span></li></ul>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">分流</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">例外</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">AI 地區</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">時區</span><span class="fr-v"><span class="bar"></span></span></li></ul>
         </div>
       </div>
       <div class="bar">
         <div class="prog" id="prog"><i></i></div>
-        <label class="auto"><input type="checkbox" id="auto" checked><span class="sw" aria-hidden="true"></span><span data-i="auto">開啟即檢測</span></label>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
-          <button class="btn" id="copy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span data-i="copy">複製</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">重新檢測</span></button>
         </div>
       </div>
@@ -109,10 +107,10 @@
 <details><summary>什麼是 WebRTC 洩漏？</summary><p>WebRTC（瀏覽器裡的視訊通話）透過 UDP 向 STUN 伺服器詢問自己的公網位址。很多代理只轉發 TCP，這個 UDP 請求就會從你自己的線路出去，而且任何網頁都能讀到結果，不會跳出授權提示。如果 STUN 伺服器看到的是本地位址，網站看到的卻是代理，頁面就會回報洩漏。</p></details>
 <details><summary>什麼是 IPv6 洩漏？</summary><p>如果代理只處理 IPv4，而你的線路同時有 IPv6，走 IPv6 的連線可能會繞過代理。僅 IPv6 的探測器會顯示 IPv6 流量實際從哪個出口出去。</p></details>
 <details><summary>怎麼區分本地出口和代理出口？</summary><p>看網路歸屬：註冊在雲端服務商或機房（Amazon、Google Cloud、阿里雲、DigitalOcean 等）的位址標為代理，第一個屬於電信業者的位址是你的本地線路。住宅代理、電信業者網路上的 VPN 無法用這種方法區分。</p></details>
-<details><summary>檢測結果會傳到這個網站嗎？</summary><p>不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」；複製的內容只在顯示 IP 時才包含 IP。</p></details>
+<details><summary>檢測結果會傳到這個網站嗎？</summary><p>不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」。</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"zh-TW","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.zh-tw.bd1fe616ae.js"></script>
-<script src="/assets/app.e28252faae.js" defer></script>
+<script src="/assets/l.zh-tw.45e7ac2b65.js"></script>
+<script src="/assets/app.193a60e0ce.js" defer></script>
 </body>
 </html>

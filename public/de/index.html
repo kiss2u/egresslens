@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"IP-Lupe","url":"https://egress.1ms.dog/de/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Sieh, welche IP-Adresse jede Website von dir sieht. 51 Prüfpunkte in Festlandchina und im Ausland, bei KI-Diensten, über IPv4, IPv6 und WebRTC finden Split-Routing und Lecks. Läuft in deinem Browser.","inLanguage":"de","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.c56c261033.css">
+<link rel="stylesheet" href="/assets/app.6eed745e5b.css">
 </head>
 <body>
 <div class="app">
@@ -72,15 +72,13 @@
         </div>
         <div class="col">
           <div class="sec-h"><span data-i="finds_h">Ergebnis</span></div>
-          <ul id="finds"><li class="fd sk"><span class="blink" data-i="wait">Warte auf alle Prüfpunkte…</span></li></ul>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">Routing</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">Ausnahmen</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">KI-Region</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">Zeitzone</span><span class="fr-v"><span class="bar"></span></span></li></ul>
         </div>
       </div>
       <div class="bar">
         <div class="prog" id="prog"><i></i></div>
-        <label class="auto"><input type="checkbox" id="auto" checked><span class="sw" aria-hidden="true"></span><span data-i="auto">Beim Öffnen starten</span></label>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
-          <button class="btn" id="copy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span data-i="copy">Kopieren</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">Erneut prüfen</span></button>
         </div>
       </div>
@@ -109,10 +107,10 @@
 <details><summary>Was ist ein WebRTC-Leck?</summary><p>WebRTC (Videoanrufe im Browser) ermittelt deine öffentliche Adresse, indem es einen STUN-Server über UDP fragt. Viele Proxys leiten nur TCP weiter, deshalb geht diese UDP-Anfrage über deine eigene Leitung hinaus, und jede Seite kann das Ergebnis ohne Nachfrage lesen. Sieht ein STUN-Server deine lokale Adresse, während Websites den Proxy sehen, meldet die Seite ein Leck.</p></details>
 <details><summary>Was ist ein IPv6-Leck?</summary><p>Wenn der Proxy nur IPv4 verarbeitet, deine Leitung aber auch IPv6 hat, können IPv6-Verbindungen den Proxy umgehen. Die reinen IPv6-Prüfpunkte zeigen, über welchen Ausgang IPv6-Verkehr wirklich geht.</p></details>
 <details><summary>Wie werden lokale und Proxy-Ausgänge unterschieden?</summary><p>Am Netzbetreiber: Eine Adresse, die auf einen Cloud- oder Hosting-Anbieter registriert ist (Amazon, Google Cloud, Alibaba, DigitalOcean …), gilt als Proxy; die erste eines Internetanbieters ist deine Leitung. Ein Residential-Proxy oder ein VPN im Netz eines Providers lässt sich so nicht unterscheiden.</p></details>
-<details><summary>Wird etwas an diese Website gesendet?</summary><p>Nein. Dein Browser spricht direkt mit jedem Prüfpunkt; diese Website liefert nur statische Dateien und sieht deine Ergebnisse nie. Verbirg die IPs vor einem Screenshot; Kopieren enthält die IPs nur, solange sie angezeigt werden.</p></details>
+<details><summary>Wird etwas an diese Website gesendet?</summary><p>Nein. Dein Browser spricht direkt mit jedem Prüfpunkt; diese Website liefert nur statische Dateien und sieht deine Ergebnisse nie. Verbirg die IPs vor einem Screenshot.</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"de","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.de.e0c5765638.js"></script>
-<script src="/assets/app.e28252faae.js" defer></script>
+<script src="/assets/l.de.e7efe8d9e8.js"></script>
+<script src="/assets/app.193a60e0ce.js" defer></script>
 </body>
 </html>

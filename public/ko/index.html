@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"출구 IP 돋보기","url":"https://egress.1ms.dog/ko/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"중국 본토 사이트, 해외 IP 조회 서비스, ChatGPT·Claude 같은 AI 서비스, IPv4/IPv6 전용 호스트, WebRTC 등 51개 프로브에 동시에 물어 모든 출구와 분할 라우팅, WebRTC·IPv6 누출을 찾습니다. 브라우저에서만 실행됩니다.","inLanguage":"ko","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.c56c261033.css">
+<link rel="stylesheet" href="/assets/app.6eed745e5b.css">
 </head>
 <body>
 <div class="app">
@@ -72,15 +72,13 @@
         </div>
         <div class="col">
           <div class="sec-h"><span data-i="finds_h">결과</span></div>
-          <ul id="finds"><li class="fd sk"><span class="blink" data-i="wait">모든 프로브를 기다리는 중…</span></li></ul>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">분할</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">예외</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">AI 지역</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">시간대</span><span class="fr-v"><span class="bar"></span></span></li></ul>
         </div>
       </div>
       <div class="bar">
         <div class="prog" id="prog"><i></i></div>
-        <label class="auto"><input type="checkbox" id="auto" checked><span class="sw" aria-hidden="true"></span><span data-i="auto">열면 자동 시작</span></label>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
-          <button class="btn" id="copy" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg><span data-i="copy">복사</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">다시 확인</span></button>
         </div>
       </div>
@@ -109,10 +107,10 @@
 <details><summary>WebRTC 누출이란?</summary><p>WebRTC(브라우저 영상 통화)는 UDP로 STUN 서버에 자기 공인 주소를 묻습니다. TCP만 전달하는 프록시가 많아 이 UDP 요청은 내 회선으로 나가고, 그 결과는 어떤 페이지든 권한 요청 없이 읽을 수 있습니다. STUN 서버는 로컬 주소를, 웹사이트는 프록시를 본다면 누출로 표시합니다.</p></details>
 <details><summary>IPv6 누출이란?</summary><p>프록시가 IPv4만 처리하는데 회선에 IPv6도 있으면, IPv6 연결은 프록시를 건너뛸 수 있습니다. IPv6 전용 프로브가 IPv6 트래픽이 실제로 어느 출구로 나가는지 보여 줍니다.</p></details>
 <details><summary>로컬과 프록시 출구는 어떻게 구분하나요?</summary><p>네트워크 소유자로 판단합니다. 클라우드나 호스팅 업체(Amazon, Google Cloud, Alibaba, DigitalOcean 등)에 등록된 주소는 프록시, 처음 나오는 통신사 주소가 내 회선입니다. 주거용 프록시나 통신사 망 위의 VPN은 이 방법으로 구분할 수 없습니다.</p></details>
-<details><summary>이 사이트로 전송되는 것이 있나요?</summary><p>없습니다. 브라우저가 각 프로브에 직접 연결하고, 이 사이트는 정적 파일만 제공하므로 결과를 볼 수 없습니다. 스크린샷 전에 ‘IP 숨기기’를 누르세요. 복사 내용에는 IP가 보일 때만 IP가 들어갑니다.</p></details>
+<details><summary>이 사이트로 전송되는 것이 있나요?</summary><p>없습니다. 브라우저가 각 프로브에 직접 연결하고, 이 사이트는 정적 파일만 제공하므로 결과를 볼 수 없습니다. 스크린샷 전에 ‘IP 숨기기’를 누르세요.</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"ko","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.ko.a031016536.js"></script>
-<script src="/assets/app.e28252faae.js" defer></script>
+<script src="/assets/l.ko.b344b4e478.js"></script>
+<script src="/assets/app.193a60e0ce.js" defer></script>
 </body>
 </html>
