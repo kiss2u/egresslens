@@ -74,7 +74,7 @@ export async function build({ check = false } = {}) {
     const sName = `l.${lang.toLowerCase()}.${hash(sjs)}.js`;
     files["assets/" + sName] = sjs;
 
-    const url = SITE + path(slug), title = T("seo_title"), desc = fill(T("seo_desc"), { n: N });
+    const url = SITE + path(slug), title = T("name") + " · " + T("seo_title"), desc = fill(T("seo_desc"), { n: N });
     const alts = langs.map(([l, sl]) => `<link rel="alternate" hreflang="${l}" href="${SITE + path(sl)}">`).join("\n") +
       `\n<link rel="alternate" hreflang="x-default" href="${SITE}/">`;
     const graph = { "@context": "https://schema.org", "@type": "WebApplication", name: T("name"), url, applicationCategory: "UtilitiesApplication",

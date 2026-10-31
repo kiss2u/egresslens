@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）</title>
+<title>出口照妖镜 · 出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）</title>
 <meta name="description" content="同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。">
 <meta name="keywords" content="出口IP, 我的IP, IP查询, 分流检测, 代理检测, WebRTC泄露, IPv6泄露, ChatGPT IP, Claude IP, 节点检测">
 <meta http-equiv="Cache-Control" content="no-transform">
@@ -29,12 +29,12 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）">
+<meta property="og:title" content="出口照妖镜 · 出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）">
 <meta property="og:description" content="同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。">
 <meta property="og:url" content="https://egress.1ms.dog/zh-cn/">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"EgressLens","url":"https://egress.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"出口照妖镜","url":"https://egress.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/app.627250f19a.css">
 </head>
@@ -43,7 +43,7 @@
   <header class="top">
     <a class="brand" href="/zh-cn/" aria-current="page">
       <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms"></span>
-      <span class="brand-name" data-i="name">EgressLens</span>
+      <span class="brand-name" data-i="name">出口照妖镜</span>
     </a>
     <div class="top-acts">
       <label class="sel"><span class="sr" data-i="lang_label">语言</span>
@@ -115,7 +115,7 @@
 <details><summary>检测结果会发到这个网站吗？</summary><p>不会。浏览器直接连接每个探测器，本站只提供静态文件，看不到你的结果。截图前可以先点“隐藏 IP”；复制的内容只在显示 IP 时才包含 IP。</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.zh-cn.9f06370463.js"></script>
+<script src="/assets/l.zh-cn.95cbab2837.js"></script>
 <script src="/assets/app.7d4086fe77.js" defer></script>
 </body>
 </html>

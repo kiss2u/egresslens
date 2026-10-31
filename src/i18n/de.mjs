@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "IP-Lupe",
   lang_label: "Sprache",
   seo_title: "Ausgangs-IP-Test: jeder Ausgang, den dein Verkehr nimmt (Proxy, VPN, WebRTC, IPv6)",
   seo_desc: "Sieh, welche IP-Adresse jede Website von dir sieht. {n} Prüfpunkte in Festlandchina und im Ausland, bei KI-Diensten, über IPv4, IPv6 und WebRTC finden Split-Routing und Lecks. Läuft in deinem Browser.",

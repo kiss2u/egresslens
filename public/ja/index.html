@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>出口 IP チェック：サイトごとに見えている IP（分流、プロキシ、WebRTC・IPv6 漏れ）</title>
+<title>出口照魔鏡 · 出口 IP チェック：サイトごとに見えている IP（分流、プロキシ、WebRTC・IPv6 漏れ）</title>
 <meta name="description" content="中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 51 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。">
 <meta name="keywords" content="出口IP, IP確認, 自分のIP, プロキシ チェック, VPN 漏れ, WebRTC 漏れ, IPv6 漏れ, 分流, ChatGPT IP, Claude IP">
 <meta name="robots" content="index, follow">
@@ -26,12 +26,12 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="出口 IP チェック：サイトごとに見えている IP（分流、プロキシ、WebRTC・IPv6 漏れ）">
+<meta property="og:title" content="出口照魔鏡 · 出口 IP チェック：サイトごとに見えている IP（分流、プロキシ、WebRTC・IPv6 漏れ）">
 <meta property="og:description" content="中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 51 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。">
 <meta property="og:url" content="https://egress.1ms.dog/ja/">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"EgressLens","url":"https://egress.1ms.dog/ja/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 51 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"出口照魔鏡","url":"https://egress.1ms.dog/ja/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 51 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/app.627250f19a.css">
 </head>
@@ -40,7 +40,7 @@
   <header class="top">
     <a class="brand" href="/ja/" aria-current="page">
       <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms"></span>
-      <span class="brand-name" data-i="name">EgressLens</span>
+      <span class="brand-name" data-i="name">出口照魔鏡</span>
     </a>
     <div class="top-acts">
       <label class="sel"><span class="sr" data-i="lang_label">言語</span>
@@ -112,7 +112,7 @@
 <details><summary>このサイトに何か送られますか？</summary><p>いいえ。ブラウザが各プローブに直接接続します。このサイトは静的ファイルを配信するだけで、結果は届きません。スクリーンショットの前に「IP を隠す」を押してください。コピーには IP を表示しているときだけ IP が含まれます。</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"ja","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.ja.5a4eed5c22.js"></script>
+<script src="/assets/l.ja.c0303f14af.js"></script>
 <script src="/assets/app.7d4086fe77.js" defer></script>
 </body>
 </html>

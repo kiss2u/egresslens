@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "Lupa IP",
   lang_label: "Idioma",
   seo_title: "Test de IP de salida: cada salida que usa tu tráfico (proxy, VPN, WebRTC, IPv6)",
   seo_desc: "Mira qué IP ve cada sitio web. {n} sondas en China continental y en el extranjero, en servicios de IA, por IPv4, IPv6 y WebRTC, detectan el enrutamiento dividido y las fugas. Funciona en tu navegador.",

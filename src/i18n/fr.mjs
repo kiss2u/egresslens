@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "Loupe IP",
   lang_label: "Langue",
   seo_title: "Test d’IP de sortie : toutes les sorties de votre trafic (proxy, VPN, WebRTC, IPv6)",
   seo_desc: "Voyez quelle adresse IP chaque site voit. {n} sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.",

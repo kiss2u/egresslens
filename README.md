@@ -1,4 +1,4 @@
-# EgressLens
+# EgressLens (出口照妖镜)
 
 **English** · [简体中文](README.zh-CN.md)
 

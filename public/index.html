@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Egress IP test: every exit your traffic takes (proxy, VPN, WebRTC, IPv6)</title>
+<title>EgressLens · Egress IP test: every exit your traffic takes (proxy, VPN, WebRTC, IPv6)</title>
 <meta name="description" content="See which IP address each website sees you as. 51 probes in mainland China and abroad, at AI services, over IPv4, IPv6 and WebRTC, find split routing and leaks. Runs in your browser.">
 <meta name="keywords" content="egress ip, what is my ip, exit ip, proxy check, vpn leak test, webrtc leak, ipv6 leak, split routing, chatgpt ip, claude ip">
 <meta name="robots" content="index, follow">
@@ -26,7 +26,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Egress IP test: every exit your traffic takes (proxy, VPN, WebRTC, IPv6)">
+<meta property="og:title" content="EgressLens · Egress IP test: every exit your traffic takes (proxy, VPN, WebRTC, IPv6)">
 <meta property="og:description" content="See which IP address each website sees you as. 51 probes in mainland China and abroad, at AI services, over IPv4, IPv6 and WebRTC, find split routing and leaks. Runs in your browser.">
 <meta property="og:url" content="https://egress.1ms.dog/">
 <meta property="og:locale" content="en_US">

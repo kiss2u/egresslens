@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Test d’IP de sortie : toutes les sorties de votre trafic (proxy, VPN, WebRTC, IPv6)</title>
+<title>Loupe IP · Test d’IP de sortie : toutes les sorties de votre trafic (proxy, VPN, WebRTC, IPv6)</title>
 <meta name="description" content="Voyez quelle adresse IP chaque site voit. 51 sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.">
 <meta name="keywords" content="ip de sortie, quelle est mon ip, test proxy, fuite vpn, fuite webrtc, fuite ipv6, split tunneling, ip chatgpt, ip claude">
 <meta name="robots" content="index, follow">
@@ -26,12 +26,12 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Test d’IP de sortie : toutes les sorties de votre trafic (proxy, VPN, WebRTC, IPv6)">
+<meta property="og:title" content="Loupe IP · Test d’IP de sortie : toutes les sorties de votre trafic (proxy, VPN, WebRTC, IPv6)">
 <meta property="og:description" content="Voyez quelle adresse IP chaque site voit. 51 sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.">
 <meta property="og:url" content="https://egress.1ms.dog/fr/">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"EgressLens","url":"https://egress.1ms.dog/fr/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Voyez quelle adresse IP chaque site voit. 51 sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.","inLanguage":"fr","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Loupe IP","url":"https://egress.1ms.dog/fr/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Voyez quelle adresse IP chaque site voit. 51 sondes en Chine continentale et à l’étranger, sur des services d’IA, en IPv4, IPv6 et WebRTC, repèrent le routage partagé et les fuites. Tout se passe dans votre navigateur.","inLanguage":"fr","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/app.627250f19a.css">
 </head>
@@ -40,7 +40,7 @@
   <header class="top">
     <a class="brand" href="/fr/" aria-current="page">
       <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms"></span>
-      <span class="brand-name" data-i="name">EgressLens</span>
+      <span class="brand-name" data-i="name">Loupe IP</span>
     </a>
     <div class="top-acts">
       <label class="sel"><span class="sr" data-i="lang_label">Langue</span>
@@ -112,7 +112,7 @@
 <details><summary>Quelque chose est-il envoyé à ce site ?</summary><p>Non. Votre navigateur parle directement à chaque sonde ; ce site ne sert que des fichiers statiques et ne voit jamais vos résultats. Masquez les IP avant une capture d’écran ; Copier n’inclut les IP que lorsqu’elles sont affichées.</p></details>
 </dialog>
 <script type="application/json" id="data">{"lang":"fr","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.fr.bc911d0813.js"></script>
+<script src="/assets/l.fr.bd14ceba75.js"></script>
 <script src="/assets/app.7d4086fe77.js" defer></script>
 </body>
 </html>

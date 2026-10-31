@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "出口照魔鏡",
   lang_label: "言語",
   seo_title: "出口 IP チェック：サイトごとに見えている IP（分流、プロキシ、WebRTC・IPv6 漏れ）",
   seo_desc: "中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 {n} 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。",

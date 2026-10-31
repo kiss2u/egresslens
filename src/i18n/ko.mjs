@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "출구 IP 돋보기",
   lang_label: "언어",
   seo_title: "출구 IP 확인: 사이트마다 보이는 IP (분할 라우팅, 프록시, WebRTC·IPv6 누출)",
   seo_desc: "중국 본토 사이트, 해외 IP 조회 서비스, ChatGPT·Claude 같은 AI 서비스, IPv4/IPv6 전용 호스트, WebRTC 등 {n}개 프로브에 동시에 물어 모든 출구와 분할 라우팅, WebRTC·IPv6 누출을 찾습니다. 브라우저에서만 실행됩니다.",

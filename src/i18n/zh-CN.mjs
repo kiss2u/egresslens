@@ -1,5 +1,5 @@
 export default {
-  name: "EgressLens",
+  name: "出口照妖镜",
   lang_label: "语言",
   seo_title: "出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）",
   seo_desc: "同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 {n} 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。",
