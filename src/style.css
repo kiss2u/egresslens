@@ -248,3 +248,9 @@ select option:checked { background-color: var(--soft); }
   .fo-list.two { grid-template-columns: minmax(0, 1fr); }
   .fo-r { grid-template-columns: minmax(0, 8fr) minmax(0, 12fr) minmax(0, 6fr); }
 }
+/* links to other 1ms.dog tools under a landing page's rows, and an exit's AS number to ASN Lookup */
+.fo-r + .fo-links, .fo-links { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 18px; padding-top: 8px; border-top: 1px solid var(--line); }
+.fo-links:not(:has(a:not([hidden]))) { display: none; }
+.fo-links a.xl { font-size: 13px; color: var(--ink); text-decoration: none; }
+.fo-links a.xl:hover, .where a.asl:hover { text-decoration: underline; }
+.where a.asl { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--muted); }

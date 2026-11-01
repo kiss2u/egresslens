@@ -38,7 +38,7 @@
 <meta name="twitter:image" content="https://egress.1ms.dog/og/ja.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"出口照魔鏡","url":"https://egress.1ms.dog/ja/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"中国本土のサイト、海外の IP 確認サービス、ChatGPT や Claude などの AI サービス、IPv4/IPv6 専用ホスト、WebRTC の計 51 個のプローブに同時に問い合わせ、すべての出口と分流ルール、WebRTC・IPv6 の漏れを調べます。ブラウザだけで動作します。","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","inLanguage":"ja","mainEntity":[{"@type":"Question","name":"サイトによって見える IP が違うのはなぜ？","acceptedAnswer":{"@type":"Answer","text":"Clash、Surge、Shadowrocket、sing-box などのルール付きプロキシや VPN は宛先ごとに経路を選びます。中国のサイトは直接、AI サービスはあるサーバー、それ以外は別のサーバー、という具合です。1 つのサイトに聞くだけでは、そのサイトの経路しか分かりません。このページは数十の宛先に同時に問い合わせ、結果をネットワークごとにまとめます。"}},{"@type":"Question","name":"ChatGPT や Claude に見えている IP がなぜ分かる？","acceptedAnswer":{"@type":"Answer","text":"Cloudflare 配下のサイトは、自分のドメインの /cdn-cgi/trace で接続元のアドレスを返し、どのページからも読み取れるようにしています。ブラウザはいつもどおり、ルールが選んだ経路で chatgpt.com に接続し、chatgpt.com に見えたアドレスを読み取ります。"}},{"@type":"Question","name":"WebRTC 漏れとは？","acceptedAnswer":{"@type":"Answer","text":"WebRTC（ブラウザのビデオ通話）は UDP で STUN サーバーに自分のグローバルアドレスを尋ねます。TCP しか転送しないプロキシが多いため、この UDP 通信は自分の回線から出てしまい、その結果はどのページも許可なしに読み取れます。STUN サーバーにはローカルのアドレス、サイトにはプロキシが見えている場合、漏れとして表示します。"}},{"@type":"Question","name":"IPv6 漏れとは？","acceptedAnswer":{"@type":"Answer","text":"プロキシが IPv4 しか扱わず、回線に IPv6 もある場合、IPv6 の接続はプロキシを通らないことがあります。IPv6 専用のプローブで、IPv6 の通信が実際にどの出口から出ているかが分かります。"}},{"@type":"Question","name":"ローカルとプロキシはどう見分ける？","acceptedAnswer":{"@type":"Answer","text":"ネットワークの持ち主で判断します。クラウドやホスティング事業者（Amazon、Google Cloud、Alibaba、DigitalOcean など）のアドレスはプロキシ、最初の ISP のアドレスがあなたの回線です。住宅用プロキシや ISP 網上の VPN はこの方法では区別できません。"}},{"@type":"Question","name":"このサイトに何か送られますか？","acceptedAnswer":{"@type":"Answer","text":"いいえ。ブラウザが各プローブに直接接続します。このサイトは静的ファイルを配信するだけで、結果は届きません。スクリーンショットの前に「IP を隠す」を押してください。"}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.71980cc954.css">
+<link rel="stylesheet" href="/assets/app.bf716be0b1.css">
 </head>
 <body>
 <div class="app">
@@ -126,7 +126,7 @@
   <p class="share-note" data-i="share_note">画像とリンクはブラウザ内で作られ、IP アドレスは含みません。都市とプロバイダは初期設定で非表示です。</p>
 </dialog>
 <script type="application/json" id="data">{"lang":"ja","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"home":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"focus":""}</script>
-<script src="/assets/l.ja.ca7807fecd.js"></script>
-<script src="/assets/app.ae018260cd.js" defer></script>
+<script src="/assets/l.ja.c5c2f5490d.js"></script>
+<script src="/assets/app.dcb80ee5e9.js" defer></script>
 </body>
 </html>

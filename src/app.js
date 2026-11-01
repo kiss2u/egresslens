@@ -128,13 +128,20 @@
   // a host can announce an IP quality check with <meta name="ipqs" content="https://…">: each address links to it
   // (not while addresses are hidden)
   const IPQS = (document.querySelector('meta[name="ipqs"]') || {}).content || "";
+  // other 1ms.dog tools the host announces as <meta name="<tool>" content="https://…">; a link to one is shown only then.
+  // Their pages share this page's language folders.
+  const meta = n => (document.querySelector(`meta[name="${n}"]`) || {}).content || "";
+  const ASN = meta("asn"), IPV6 = meta("ipv6");
+  const toolHref = (base, at) => base + D.home[LANG] + at;
+  // an AS number links to its page on ASN Lookup
+  const asRef = n => ASN ? `<a class="asl" href="${esc(toolHref(ASN, "AS" + n))}" target="_blank" rel="noopener">AS${n}</a>` : "AS" + n;
   const ipQ = ip => IPQS && !masked() ? `<a class="ipq" href="${esc(IPQS)}/?ip=${encodeURIComponent(ip)}" target="_blank" rel="noopener">${esc(ip)}</a>` : esc(ipTxt(ip));
   const exCard = e => {
     // a shared result has no addresses: only which IP versions the exit has
     const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ipQ).join(" · ")}</span>`
       : S.shared && e["v" + f] ? `<span><em>IPv${f}</em>•••</span>` : "").join("");
     return `<li class="ex">${chip(e.letter, true)}<div class="ex-b">` +
-      `<div class="where">${flag(e.cc)}<b>${esc(whereOf(e))}</b>${e.org ? `<span class="m">${esc(e.org)}${e.asn ? " · AS" + e.asn : ""}</span>` : ""}</div>` +
+      `<div class="where">${flag(e.cc)}<b>${esc(whereOf(e))}</b>${e.org || e.asn ? `<span class="m">${esc(e.org)}${e.asn ? (e.org ? " · " : "") + asRef(e.asn) : ""}</span>` : ""}</div>` +
       `<div class="ips">${ips}</div></div></li>`;
   };
   const slot = () => `<li class="ex sk"><i class="lt big k-none">?</i><span class="blink">${esc(t("sniff"))}</span></li>`;
@@ -180,8 +187,19 @@
   // A landing page's lead panel (WebRTC leak test, what ChatGPT and Claude see): one row per probe it is about,
   // filled as each answers, and the verdict on top once every probe is in.
   const foEl = $("#focus");
+  // The IPv6 row links to the IPv6 test when there is no IPv6 exit, or IPv6 leaves by another exit than websites abroad
+  function linkChecks() {
+    if (!S.done || !IPV6) return;
+    const f = S.finds.v6, r = S.finds.route, li = document.querySelector('#finds [data-r="v6"] .fr-v');
+    if (!f || !li || li.querySelector(".v6l")) return;
+    const abroad = r && r.s !== "none" ? (r.k === "split" ? r.v.b : r.v.a) : null;
+    if (f.k === "none" || f.s === "bad" || (f.v.a && f.v.a !== abroad))
+      li.insertAdjacentHTML("beforeend", ` <a class="xl v6l" href="${esc(toolHref(IPV6, ""))}" target="_blank" rel="noopener">${esc(t("ipv6_link"))}</a>`);
+  }
   function renderFocus() {
+    linkChecks();
     if (!foEl) return;
+    for (const a of foEl.querySelectorAll("a[data-m]")) { const m = meta(a.dataset.m); if (m) { a.href = toolHref(m, a.dataset.at); a.hidden = false; } }
     const of = exitOfProbe(S.exits), ex = l => S.exits.find(e => e.letter === l);
     const place = cc => cc ? flag(cc) + `<span>${esc(country(cc))}</span>` : "";
     for (const li of foEl.querySelectorAll(".fo-r")) {

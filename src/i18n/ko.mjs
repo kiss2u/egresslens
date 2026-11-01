@@ -153,5 +153,8 @@ export default {
   fh_ai_ok: "ChatGPT와 Claude에 지원 지역으로 보임",
   fh_ai_none: "AI 서비스가 응답하지 않음",
   fh_web: "웹사이트에 보이는 출구",
+  ipv6_link: "IPv6 자세히 확인 →",
+  fp_link: "브라우저 지문 확인 →",
+  lat_link: "ChatGPT와 Claude 지연 시간 측정 →",
   foot: "오픈 소스, MIT 라이선스. 모두 브라우저에서 실행됩니다.",
 };

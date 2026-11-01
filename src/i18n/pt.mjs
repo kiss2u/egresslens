@@ -153,5 +153,8 @@ export default {
   fh_ai_ok: "ChatGPT e Claude veem uma região suportada",
   fh_ai_none: "Nenhum serviço de IA respondeu",
   fh_web: "Os sites veem",
+  ipv6_link: "Teste o IPv6 a fundo →",
+  fp_link: "Verifique a impressão digital do navegador →",
+  lat_link: "Latência do ChatGPT e do Claude →",
   foot: "Código aberto, licença MIT. Roda inteiramente no seu navegador.",
 };
