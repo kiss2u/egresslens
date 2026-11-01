@@ -28,8 +28,8 @@ AI 服务和常用网站读取的是各站点自己域名上的 Cloudflare `/cdn
 `public/` 已经提交到仓库，不改代码就不需要构建。
 
 ```bash
-git clone https://github.com/yt1988/egress
-cd egress
+git clone https://github.com/yt1988/egresslens
+cd egresslens
 npx wrangler login
 npx wrangler deploy        # 纯静态资源 Worker：没有脚本，免费且不计请求数
 ```

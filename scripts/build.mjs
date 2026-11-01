@@ -133,7 +133,7 @@ export async function build({ check = false } = {}) {
 
 - Page: ${SITE}/ (also ${langs.slice(1).map(([, s]) => "/" + s + "/").join(", ")})
 - Probes: ${GROUPS.map(g => `${en["g_" + g]}: ${PROBES.filter(p => p.g === g).map(p => p.host).join(", ")}`).join("; ")}
-- Source: https://github.com/yt1988/egress
+- Source: https://github.com/yt1988/egresslens
 `;
 
   // The only inline script is the pre-paint snippet, identical on every page: one hash covers the site.

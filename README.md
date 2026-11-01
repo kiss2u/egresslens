@@ -28,8 +28,8 @@ From the answers the page reports split routing (mainland sites vs. abroad), ser
 `public/` is committed, so nothing needs building unless you change the code.
 
 ```bash
-git clone https://github.com/yt1988/egress
-cd egress
+git clone https://github.com/yt1988/egresslens
+cd egresslens
 npx wrangler login
 npx wrangler deploy        # a static-assets Worker: no script, free and unmetered
 ```
