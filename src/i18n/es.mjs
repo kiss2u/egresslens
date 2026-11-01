@@ -76,15 +76,6 @@ export default {
     ["¿Se envía algo a este sitio?", "No. Tu navegador habla directamente con cada sonda; este sitio solo sirve archivos estáticos y nunca ve tus resultados. Oculta las IP antes de hacer una captura."],
   ],
   share: "Compartir",
-  share_h: "Compartir el resultado",
-  share_place: "Mostrar ciudad y red en la imagen y el enlace",
-  link_label: "Enlace del resultado",
-  copy_link: "Copiar enlace",
-  copy_img: "Copiar imagen",
-  dl_img: "Descargar imagen",
-  sys_share: "Más formas de compartir",
-  copied: "Copiado",
-  share_note: "La imagen y el enlace se crean en tu navegador y nunca llevan direcciones IP; la ciudad y la red quedan ocultas salvo que las actives.",
   shared_from: "Resultado desde {where} · {date}",
   test_mine: "Probar el mío",
   share_text: "Mi prueba de salida: {v}. ¿Está bien este enrutamiento?",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "Directo: todos los sitios ven la IP local",
   who_link: "Tu perfil completo y la prueba de camuflaje",
   unlock_link: "Qué IA desbloquea esta ruta",
-  lp_rtc: {
-    "nav": "Test de fuga WebRTC",
-    "title": "Test de fuga WebRTC: ¿tu VPN o proxy filtra tu IP real?",
-    "desc": "Test de fuga WebRTC gratis: cuatro servidores STUN por UDP comparados con lo que ven {n} sondas por HTTPS, para saber si tu VPN o proxy filtra tu IP real. Funciona en tu navegador.",
-    "kw": "test fuga webrtc, fuga webrtc, fuga de ip, test fuga vpn, ip real, stun, webrtc leak",
-    "h1": "Test de fuga WebRTC: ¿se ve tu IP real?",
-    "intro": "Las videollamadas del navegador preguntan tu dirección pública a servidores STUN por UDP, y muchos proxies solo llevan TCP. Se consulta a cuatro servidores STUN a la vez que a los sitios web, {n} sondas en total, para ver si WebRTC delata tu propia línea.",
-    "faq": [
-      [
-        "¿Qué comprueba este test de fuga WebRTC?",
-        "Pregunta tu dirección pública por UDP a cuatro servidores STUN (Cloudflare, Google, Twilio, Xiaomi), como hacen los sitios de videollamadas, y la compara con la salida que ven los sitios web por HTTPS. Si STUN ve tu línea local mientras los sitios ven el proxy, cualquier página puede leer tu IP real."
-      ],
-      [
-        "¿Cómo corrijo una fuga WebRTC?",
-        "Haz que el proxy lleve también UDP: activa el modo TUN o mejorado en Clash, sing-box, Surge o Shadowrocket, o usa el túnel completo de la VPN. Bloquear WebRTC en el navegador (la opción de uBlock Origin «Evitar que WebRTC filtre direcciones IP locales», o media.peerconnection.enabled = false en Firefox) también sirve, pero puede romper las videollamadas."
-      ],
-      [
-        "El resultado dice que UDP está bloqueado. ¿Es seguro?",
-        "Para WebRTC, sí: ningún servidor STUN respondió, así que una página no puede conocer tu dirección por esta vía. Las videollamadas pueden seguir funcionando a través de un servidor de retransmisión."
-      ],
-      [
-        "¿Cualquier VPN evita las fugas WebRTC?",
-        "Una VPN que tuneliza todo el tráfico, sí. Un proxy configurado solo en el navegador o el sistema (HTTP o SOCKS) suele llevar solo TCP, así que el UDP de WebRTC sale directo. Vuelve a comprobarlo tras cada cambio."
-      ]
-    ]
-  },
+  rtc_nav: "Test de fuga WebRTC",
   lp_ai: {
     "nav": "IP de ChatGPT y Claude",
     "title": "¿Qué IP ve ChatGPT? Comprueba la IP y la región que ven ChatGPT y Claude",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC filtra tu IP real",
-  fh_rtc_safe: "Sin fuga WebRTC",
-  fh_rtc_none: "Sin fuga WebRTC: UDP bloqueado",
   fh_ai_ok: "ChatGPT y Claude ven una región admitida",
   fh_ai_none: "Ningún servicio de IA respondió",
-  fh_web: "Los sitios ven",
   ipv6_link: "Prueba IPv6 a fondo",
-  fp_link: "Comprueba la huella de tu navegador",
   lat_link: "Latencia de ChatGPT y Claude",
   asn_title: "Ver esta red en la consulta de ASN",
   ipq_title: "Comprobar la calidad de esta IP",

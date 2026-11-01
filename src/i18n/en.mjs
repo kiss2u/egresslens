@@ -78,15 +78,6 @@ export default {
     ["Is anything sent to this site?", "No. Your browser talks to each probe directly; this site only serves static files and never sees your results. Hide IPs before taking a screenshot."],
   ],
   share: "Share",
-  share_h: "Share the result",
-  share_place: "Show city and network in the image and link",
-  link_label: "Result link",
-  copy_link: "Copy link",
-  copy_img: "Copy image",
-  dl_img: "Download image",
-  sys_share: "More ways to share",
-  copied: "Copied",
-  share_note: "The image and link are made in your browser and never contain IP addresses; city and network stay hidden unless you turn them on.",
   shared_from: "A result from {where} · {date}",
   test_mine: "Test my own",
   share_text: "My exit check: {v}. Does this routing look right?",
@@ -98,32 +89,7 @@ export default {
   vh_direct: "Direct: every website sees the local IP",
   who_link: "Your full profile and disguise check",
   unlock_link: "Which AI services this route unlocks",
-  lp_rtc: {
-    "nav": "WebRTC leak test",
-    "title": "WebRTC leak test: does your VPN or proxy expose your real IP?",
-    "desc": "Free WebRTC leak test. Four STUN servers over UDP are compared with what {n} probes over HTTPS see, to show whether your VPN or proxy leaks your real IP. Runs in your browser.",
-    "kw": "webrtc leak test, webrtc leak, vpn leak test, ip leak test, stun ip, real ip leak, proxy webrtc",
-    "h1": "WebRTC leak test: is your real IP exposed?",
-    "intro": "Video calls in the browser ask STUN servers for your public address over UDP, and many proxies only carry TCP. Four STUN servers are asked at the same time as websites, along {n} probes in all, to see whether WebRTC gives away your own line.",
-    "faq": [
-      [
-        "What does this WebRTC leak test check?",
-        "It asks four STUN servers (Cloudflare, Google, Twilio, Xiaomi) for your public address over UDP, the way video-call sites do, and compares the answer with the exit websites see over HTTPS. If STUN sees your local line while websites see the proxy, any page can read your real IP."
-      ],
-      [
-        "How do I fix a WebRTC leak?",
-        "Make the proxy carry UDP too: turn on TUN or enhanced mode in Clash, sing-box, Surge or Shadowrocket, or use the VPN's full-tunnel mode. Blocking WebRTC in the browser (uBlock Origin's setting \"Prevent WebRTC from leaking local IP addresses\", or media.peerconnection.enabled = false in Firefox) also works, but can break video calls."
-      ],
-      [
-        "The result says UDP is blocked. Is that safe?",
-        "For WebRTC, yes: no STUN server answered, so a page can't learn an address this way. Video calls may still work through a relay server."
-      ],
-      [
-        "Does every VPN stop WebRTC leaks?",
-        "A VPN that tunnels all traffic does. A proxy set only in the browser or the system (HTTP or SOCKS) usually carries TCP alone, so WebRTC's UDP leaves directly. Check again after every change to your setup."
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC leak test",
   lp_ai: {
     "nav": "ChatGPT & Claude IP",
     "title": "What IP does ChatGPT see? Check the IP and region ChatGPT and Claude see",
@@ -150,14 +116,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC leaks your real IP",
-  fh_rtc_safe: "No WebRTC leak",
-  fh_rtc_none: "No WebRTC leak: UDP is blocked",
   fh_ai_ok: "ChatGPT and Claude see a supported region",
   fh_ai_none: "No AI service answered",
-  fh_web: "Websites see",
   ipv6_link: "Check IPv6 in depth",
-  fp_link: "Check your browser fingerprint",
   lat_link: "ChatGPT and Claude latency",
   asn_title: "Look up this network on ASN Lookup",
   ipq_title: "Check this IP's quality",

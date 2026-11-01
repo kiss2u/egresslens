@@ -76,15 +76,6 @@ export default {
     ["このサイトに何か送られますか？", "いいえ。ブラウザが各プローブに直接接続します。このサイトは静的ファイルを配信するだけで、結果は届きません。スクリーンショットの前に「IP を隠す」を押してください。"],
   ],
   share: "共有",
-  share_h: "結果を共有",
-  share_place: "画像とリンクに都市とプロバイダを表示",
-  link_label: "結果のリンク",
-  copy_link: "リンクをコピー",
-  copy_img: "画像をコピー",
-  dl_img: "画像を保存",
-  sys_share: "ほかの方法で共有",
-  copied: "コピーしました",
-  share_note: "画像とリンクはブラウザ内で作られ、IP アドレスは含みません。都市とプロバイダは初期設定で非表示です。",
   shared_from: "{where}からの結果 · {date}",
   test_mine: "自分も調べる",
   share_text: "出口チェックの結果：{v}。この分流、合ってる？",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "直接接続：すべてのサイトにローカル IP が見えています",
   who_link: "全体像と偽装チェックを見る",
   unlock_link: "この回線で使える AI",
-  lp_rtc: {
-    "nav": "WebRTC リークテスト",
-    "title": "WebRTC リークテスト：VPN・プロキシで本当の IP が漏れていないか確認",
-    "desc": "無料の WebRTC リークテスト。UDP で 4 つの STUN サーバーに問い合わせ、{n} 個のプローブが HTTPS で見た出口と比べて、VPN やプロキシから本当の IP が漏れていないかを調べます。ブラウザ内で完結します。",
-    "kw": "WebRTC リーク, WebRTC 漏れ, WebRTC リークテスト, IP 漏れ チェック, VPN 漏れ, STUN, 本当のIP",
-    "h1": "WebRTC リークテスト：本当の IP は漏れていない？",
-    "intro": "ブラウザのビデオ通話は UDP で STUN サーバーにグローバル IP を問い合わせますが、多くのプロキシは TCP しか中継しません。4 つの STUN サーバーとさまざまなサイト、計 {n} 個のプローブに同時に問い合わせ、WebRTC から自分の回線が見えていないかを確認します。",
-    "faq": [
-      [
-        "この WebRTC リークテストは何を調べますか？",
-        "ビデオ通話サイトと同じように、UDP で 4 つの STUN サーバー（Cloudflare、Google、Twilio、Xiaomi）にグローバル IP を問い合わせ、サイトが HTTPS で見ている出口と比べます。STUN にはローカル回線が、サイトにはプロキシが見えている場合、どのページからでも本当の IP が読み取れます。"
-      ],
-      [
-        "WebRTC リークを直すには？",
-        "プロキシに UDP も中継させます。Clash、sing-box、Surge、Shadowrocket の TUN モードや拡張モード、または VPN のフルトンネルを使ってください。ブラウザで WebRTC を止める方法（uBlock Origin の「WebRTC によるローカル IP アドレスの漏洩を防止」、Firefox の media.peerconnection.enabled = false）もありますが、ビデオ通話が使えなくなることがあります。"
-      ],
-      [
-        "「UDP 不通」と出ました。安全ですか？",
-        "WebRTC については安全です。STUN サーバーが応答しないので、ページはこの方法で IP を知ることができません。ビデオ通話は中継サーバー経由で使える場合があります。"
-      ],
-      [
-        "VPN を使えば WebRTC リークは起きませんか？",
-        "すべての通信をトンネルする VPN なら起きません。ブラウザやシステムだけに設定したプロキシ（HTTP や SOCKS）は通常 TCP だけを中継するため、WebRTC の UDP は直接出ていきます。設定を変えたら再チェックしてください。"
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC リークテスト",
   lp_ai: {
     "nav": "ChatGPT・Claude から見える IP",
     "title": "ChatGPT の IP チェック：ChatGPT と Claude から見える IP と地域",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC で本当の IP が漏れています",
-  fh_rtc_safe: "WebRTC の漏れはありません",
-  fh_rtc_none: "WebRTC の漏れなし：UDP 不通",
   fh_ai_ok: "ChatGPT と Claude からは提供地域に見えています",
   fh_ai_none: "AI サービスが応答しませんでした",
-  fh_web: "サイトから見える出口",
   ipv6_link: "IPv6 を詳しく調べる",
-  fp_link: "ブラウザフィンガープリントを調べる",
   lat_link: "ChatGPT と Claude の遅延を測る",
   asn_title: "ASN 検索でこのネットワークを見る",
   ipq_title: "この IP の品質を調べる",

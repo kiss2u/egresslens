@@ -76,15 +76,6 @@ export default {
     ["Quelque chose est-il envoyé à ce site ?", "Non. Votre navigateur parle directement à chaque sonde ; ce site ne sert que des fichiers statiques et ne voit jamais vos résultats. Masquez les IP avant une capture d’écran."],
   ],
   share: "Partager",
-  share_h: "Partager le résultat",
-  share_place: "Afficher la ville et le réseau dans l’image et le lien",
-  link_label: "Lien du résultat",
-  copy_link: "Copier le lien",
-  copy_img: "Copier l’image",
-  dl_img: "Télécharger l’image",
-  sys_share: "Autres façons de partager",
-  copied: "Copié",
-  share_note: "L’image et le lien sont créés dans votre navigateur et ne contiennent jamais d’adresse IP ; la ville et le réseau restent masqués sauf si vous les activez.",
   shared_from: "Résultat depuis {where} · {date}",
   test_mine: "Tester le mien",
   share_text: "Mon test de sortie : {v}. Ce routage vous semble correct ?",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "Direct : tous les sites voient l’IP locale",
   who_link: "Votre profil complet et le test de camouflage",
   unlock_link: "Les IA accessibles par cette route",
-  lp_rtc: {
-    "nav": "Test de fuite WebRTC",
-    "title": "Test de fuite WebRTC : votre VPN ou proxy laisse-t-il fuir votre vraie IP ?",
-    "desc": "Test de fuite WebRTC gratuit : quatre serveurs STUN en UDP comparés à ce que voient {n} sondes en HTTPS, pour savoir si votre VPN ou proxy laisse fuir votre vraie IP. Tout se passe dans votre navigateur.",
-    "kw": "test fuite webrtc, fuite webrtc, fuite ip, test fuite vpn, vraie ip, stun, webrtc leak",
-    "h1": "Test de fuite WebRTC : votre vraie IP est-elle exposée ?",
-    "intro": "Les appels vidéo du navigateur demandent votre adresse publique à des serveurs STUN en UDP, et beaucoup de proxys ne transportent que le TCP. Quatre serveurs STUN sont interrogés en même temps que des sites web, {n} sondes en tout, pour voir si WebRTC trahit votre propre ligne.",
-    "faq": [
-      [
-        "Que vérifie ce test de fuite WebRTC ?",
-        "Il demande votre adresse publique en UDP à quatre serveurs STUN (Cloudflare, Google, Twilio, Xiaomi), comme le font les sites d’appels vidéo, et la compare à la sortie que voient les sites en HTTPS. Si STUN voit votre ligne locale alors que les sites voient le proxy, n’importe quelle page peut lire votre vraie IP."
-      ],
-      [
-        "Comment corriger une fuite WebRTC ?",
-        "Faites passer aussi l’UDP par le proxy : activez le mode TUN ou amélioré dans Clash, sing-box, Surge ou Shadowrocket, ou le tunnel complet de votre VPN. Bloquer WebRTC dans le navigateur (l’option d’uBlock Origin « Empêcher WebRTC de divulguer les adresses IP locales », ou media.peerconnection.enabled = false dans Firefox) fonctionne aussi, mais peut casser les appels vidéo."
-      ],
-      [
-        "Le résultat indique que l’UDP est bloqué. Est-ce sûr ?",
-        "Pour WebRTC, oui : aucun serveur STUN n’a répondu, une page ne peut donc pas connaître votre adresse par ce biais. Les appels vidéo peuvent encore passer par un serveur relais."
-      ],
-      [
-        "Un VPN empêche-t-il toujours les fuites WebRTC ?",
-        "Un VPN qui fait passer tout le trafic, oui. Un proxy réglé seulement dans le navigateur ou le système (HTTP ou SOCKS) ne transporte en général que le TCP, et l’UDP de WebRTC sort directement. Refaites le test après chaque changement."
-      ]
-    ]
-  },
+  rtc_nav: "Test de fuite WebRTC",
   lp_ai: {
     "nav": "IP vue par ChatGPT et Claude",
     "title": "Quelle IP voit ChatGPT ? Vérifiez l’IP et la région que voient ChatGPT et Claude",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC laisse fuir votre vraie IP",
-  fh_rtc_safe: "Pas de fuite WebRTC",
-  fh_rtc_none: "Pas de fuite WebRTC : UDP bloqué",
   fh_ai_ok: "ChatGPT et Claude voient une région prise en charge",
   fh_ai_none: "Aucun service d’IA n’a répondu",
-  fh_web: "Les sites voient",
   ipv6_link: "Tester IPv6 en détail",
-  fp_link: "Tester l’empreinte de votre navigateur",
   lat_link: "Latence de ChatGPT et Claude",
   asn_title: "Voir ce réseau dans la recherche ASN",
   ipq_title: "Vérifier la qualité de cette IP",

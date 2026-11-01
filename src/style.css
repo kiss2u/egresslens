@@ -195,19 +195,6 @@ select option:checked { background-color: var(--soft); }
 .shared svg { width: 14px; height: 14px; flex: none; }
 :root[data-shared] .shared { display: flex; }
 
-/* share dialog: the image, the switch for city and network, the link, then the actions */
-.share { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; display: none; flex-direction: column; gap: 12px; }
-.share[open] { display: flex; }
-.share-img { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--soft); min-height: 220px; }
-.share-img img { display: block; width: 100%; height: auto; }
-.share-img img:not([src]) { visibility: hidden; }
-.chk { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
-.chk input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
-.share-link { display: flex; gap: 8px; }
-.share-link input { flex: 1; min-width: 0; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); color: var(--fg); padding: 0 10px; font: 12.5px var(--f-num); }
-.share-acts { display: flex; gap: 8px; flex-wrap: wrap; }
-.share-acts .btn { flex: 1; }
-.share-note { font-size: 12px; color: var(--muted); }
 /* a link to another 1ms.dog tool, after the value it is about */
 .fr-v a.xl { color: var(--ink); font-weight: 400; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
 .fr-v a.xl:hover { text-decoration: underline; }
@@ -237,8 +224,6 @@ select option:checked { background-color: var(--soft); }
 .fo-x .flag { width: 18px; height: 13px; }
 .fo-m { font: 12px var(--f-num); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
 .fo-r.bad { color: var(--bad); } .fo-r.bad .fo-x span { color: var(--bad); font-weight: 600; }
-.focus .fo-who { font-size: 13px; color: var(--ink); text-decoration: none; align-self: flex-start; }
-.focus .fo-who:hover { text-decoration: underline; }
 /* the landing page's own check, in the table */
 .fr.focus .fr-l { color: var(--fg); font-weight: 600; }
 /* links between the main page and the landing pages */

@@ -76,15 +76,6 @@ export default {
     ["Wird etwas an diese Website gesendet?", "Nein. Dein Browser spricht direkt mit jedem Prüfpunkt; diese Website liefert nur statische Dateien und sieht deine Ergebnisse nie. Verbirg die IPs vor einem Screenshot."],
   ],
   share: "Teilen",
-  share_h: "Ergebnis teilen",
-  share_place: "Stadt und Netz in Bild und Link zeigen",
-  link_label: "Ergebnis-Link",
-  copy_link: "Link kopieren",
-  copy_img: "Bild kopieren",
-  dl_img: "Bild herunterladen",
-  sys_share: "Weitere Wege zum Teilen",
-  copied: "Kopiert",
-  share_note: "Bild und Link entstehen in deinem Browser und enthalten nie IP-Adressen; Stadt und Netz bleiben verborgen, außer du schaltest sie ein.",
   shared_from: "Ergebnis aus {where} · {date}",
   test_mine: "Meins testen",
   share_text: "Mein Ausgangs-Test: {v}. Stimmt dieses Routing?",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "Direkt: alle Websites sehen die lokale IP",
   who_link: "Dein ganzes Profil und der Tarn-Check",
   unlock_link: "Welche KI-Dienste diese Route freischaltet",
-  lp_rtc: {
-    "nav": "WebRTC-Leak-Test",
-    "title": "WebRTC-Leak-Test: verrät dein VPN oder Proxy deine echte IP?",
-    "desc": "Kostenloser WebRTC-Leak-Test: vier STUN-Server über UDP im Vergleich mit dem, was {n} Sonden über HTTPS sehen. So siehst du, ob dein VPN oder Proxy deine echte IP verrät. Läuft im Browser.",
-    "kw": "webrtc leak test, webrtc leck, ip leak test, vpn leak test, echte ip, stun, webrtc deaktivieren",
-    "h1": "WebRTC-Leak-Test: ist deine echte IP sichtbar?",
-    "intro": "Videoanrufe im Browser fragen STUN-Server über UDP nach deiner öffentlichen Adresse, und viele Proxys leiten nur TCP weiter. Vier STUN-Server werden zugleich mit Websites gefragt, {n} Sonden insgesamt, um zu sehen, ob WebRTC deine eigene Leitung verrät.",
-    "faq": [
-      [
-        "Was prüft dieser WebRTC-Leak-Test?",
-        "Er fragt vier STUN-Server (Cloudflare, Google, Twilio, Xiaomi) über UDP nach deiner öffentlichen Adresse, wie es Videoanruf-Seiten tun, und vergleicht die Antwort mit dem Ausgang, den Websites über HTTPS sehen. Sieht STUN deine lokale Leitung, Websites aber den Proxy, kann jede Seite deine echte IP lesen."
-      ],
-      [
-        "Wie behebe ich ein WebRTC-Leck?",
-        "Lass den Proxy auch UDP tragen: TUN- oder erweiterten Modus in Clash, sing-box, Surge oder Shadowrocket einschalten oder den Vollmodus des VPN nutzen. WebRTC im Browser zu sperren (uBlock Origin: „Verhindern, dass WebRTC lokale IP-Adressen preisgibt“, oder media.peerconnection.enabled = false in Firefox) hilft auch, kann aber Videoanrufe stören."
-      ],
-      [
-        "Das Ergebnis sagt, UDP ist blockiert. Ist das sicher?",
-        "Für WebRTC ja: Kein STUN-Server hat geantwortet, also kann eine Seite deine Adresse auf diesem Weg nicht erfahren. Videoanrufe laufen eventuell trotzdem über einen Relay-Server."
-      ],
-      [
-        "Verhindert jedes VPN WebRTC-Lecks?",
-        "Ein VPN, das den gesamten Verkehr tunnelt, schon. Ein Proxy, der nur im Browser oder im System eingestellt ist (HTTP oder SOCKS), leitet meist nur TCP weiter, und das UDP von WebRTC geht direkt hinaus. Teste nach jeder Änderung erneut."
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC-Leak-Test",
   lp_ai: {
     "nav": "IP bei ChatGPT und Claude",
     "title": "Welche IP sieht ChatGPT? IP und Region prüfen, die ChatGPT und Claude sehen",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC verrät deine echte IP",
-  fh_rtc_safe: "Kein WebRTC-Leck",
-  fh_rtc_none: "Kein WebRTC-Leck: UDP blockiert",
   fh_ai_ok: "ChatGPT und Claude sehen eine unterstützte Region",
   fh_ai_none: "Kein KI-Dienst hat geantwortet",
-  fh_web: "Websites sehen",
   ipv6_link: "IPv6 genauer prüfen",
-  fp_link: "Browser-Fingerabdruck prüfen",
   lat_link: "Latenz zu ChatGPT und Claude",
   asn_title: "Dieses Netz in der ASN-Abfrage ansehen",
   ipq_title: "Qualität dieser IP prüfen",

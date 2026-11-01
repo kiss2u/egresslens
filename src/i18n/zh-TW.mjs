@@ -76,15 +76,6 @@ export default {
     ["檢測結果會傳到這個網站嗎？", "不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」。"],
   ],
   share: "分享",
-  share_h: "分享檢測結果",
-  share_place: "在圖片和連結裡顯示城市和電信商",
-  link_label: "結果連結",
-  copy_link: "複製連結",
-  copy_img: "複製圖片",
-  dl_img: "下載圖片",
-  sys_share: "更多分享方式",
-  copied: "已複製",
-  share_note: "圖片和連結都在瀏覽器裡產生，不含 IP 位址；城市和電信商預設不顯示。",
   shared_from: "這是一份來自{where}的檢測結果 · {date}",
   test_mine: "測我自己的",
   share_text: "我的出口檢測結果：{v}。幫我看看這個分流對不對？",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "直連：所有網站看到的都是本地 IP",
   who_link: "看完整畫像和偽裝檢測",
   unlock_link: "這條線路能解鎖哪些 AI",
-  lp_rtc: {
-    "nav": "WebRTC 洩漏檢測",
-    "title": "WebRTC 洩漏檢測：代理和 VPN 有沒有暴露你的真實 IP",
-    "desc": "免費 WebRTC 洩漏檢測：經 UDP 詢問 4 個 STUN 伺服器，再和 {n} 個探測器經 HTTPS 看到的出口對比，判斷代理或 VPN 是否洩漏了你的真實 IP。全部在瀏覽器裡完成。",
-    "kw": "WebRTC洩漏, WebRTC洩漏檢測, 真實IP洩漏, 代理洩漏檢測, VPN洩漏, STUN, WebRTC檢測, IP洩漏",
-    "h1": "WebRTC 洩漏檢測：你的真實 IP 暴露了嗎？",
-    "intro": "瀏覽器裡的視訊通話會經 UDP 向 STUN 伺服器詢問你的公網位址，而很多代理只轉發 TCP。這裡同時詢問 4 個 STUN 伺服器和各類網站，共 {n} 個探測器，看 WebRTC 有沒有暴露你自己的線路。",
-    "faq": [
-      [
-        "WebRTC 洩漏檢測查的是什麼？",
-        "經 UDP 向 4 個 STUN 伺服器（Cloudflare、Google、Twilio、小米）詢問你的公網位址，和視訊通話網站的做法一樣，再和網站經 HTTPS 看到的出口對比。如果 STUN 看到的是本地線路，網站看到的卻是代理，任何網頁都能讀到你的真實 IP。"
-      ],
-      [
-        "WebRTC 洩漏怎麼修復？",
-        "讓代理也接管 UDP：在 Clash、sing-box、Surge、Shadowrocket 裡打開 TUN 或增強模式，或者使用 VPN 的全域通道模式。也可以在瀏覽器裡停用 WebRTC（uBlock Origin 的「防止 WebRTC 洩漏本機 IP 位址」，或 Firefox 的 media.peerconnection.enabled = false），但可能影響視訊通話。"
-      ],
-      [
-        "結果顯示 UDP 不通，這樣安全嗎？",
-        "對 WebRTC 來說是安全的：沒有 STUN 伺服器回應，網頁就無法用這種方式拿到位址。視訊通話仍可能透過中繼伺服器進行。"
-      ],
-      [
-        "用了 VPN 就不會有 WebRTC 洩漏嗎？",
-        "接管全部流量的 VPN 不會。只在瀏覽器或系統裡設定的代理（HTTP 或 SOCKS）通常只轉發 TCP，WebRTC 的 UDP 會直接出去。每次改了設定後都建議重新檢測。"
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC 洩漏檢測",
   lp_ai: {
     "nav": "ChatGPT/Claude 看到的 IP",
     "title": "ChatGPT IP 檢測：ChatGPT 和 Claude 看到的是哪個 IP、哪個地區",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC 洩漏了你的真實 IP",
-  fh_rtc_safe: "WebRTC 沒有洩漏",
-  fh_rtc_none: "WebRTC 沒有洩漏：UDP 不通",
   fh_ai_ok: "ChatGPT 和 Claude 看到的是支援的地區",
   fh_ai_none: "AI 服務都沒有回應",
-  fh_web: "網站看到",
   ipv6_link: "詳細測測 IPv6",
-  fp_link: "檢測瀏覽器指紋",
   lat_link: "測 ChatGPT 和 Claude 的延遲",
   asn_title: "在 ASN 查詢中查看這個網路",
   ipq_title: "查看這個 IP 的品質",

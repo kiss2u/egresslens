@@ -76,15 +76,6 @@ export default {
     ["Algo é enviado a este site?", "Não. Seu navegador fala direto com cada sonda; este site só serve arquivos estáticos e nunca vê seus resultados. Oculte os IPs antes de tirar uma captura."],
   ],
   share: "Compartilhar",
-  share_h: "Compartilhar o resultado",
-  share_place: "Mostrar cidade e rede na imagem e no link",
-  link_label: "Link do resultado",
-  copy_link: "Copiar link",
-  copy_img: "Copiar imagem",
-  dl_img: "Baixar imagem",
-  sys_share: "Mais formas de compartilhar",
-  copied: "Copiado",
-  share_note: "A imagem e o link são criados no seu navegador e nunca contêm endereços IP; cidade e rede ficam ocultas, a menos que você as ative.",
   shared_from: "Resultado de {where} · {date}",
   test_mine: "Testar o meu",
   share_text: "Meu teste de saída: {v}. Esse roteamento está certo?",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "Direto: todos os sites veem o IP local",
   who_link: "Seu perfil completo e o teste de disfarce",
   unlock_link: "Quais IAs esta rota libera",
-  lp_rtc: {
-    "nav": "Teste de vazamento WebRTC",
-    "title": "Teste de vazamento WebRTC: sua VPN ou proxy vaza seu IP real?",
-    "desc": "Teste de vazamento WebRTC grátis: quatro servidores STUN por UDP comparados com o que {n} sondas veem por HTTPS, para saber se sua VPN ou proxy vaza seu IP real. Roda no seu navegador.",
-    "kw": "teste vazamento webrtc, vazamento webrtc, vazamento de ip, teste vazamento vpn, ip real, stun, webrtc leak",
-    "h1": "Teste de vazamento WebRTC: seu IP real está exposto?",
-    "intro": "Chamadas de vídeo no navegador perguntam seu endereço público a servidores STUN por UDP, e muitos proxies só levam TCP. Quatro servidores STUN são consultados junto com sites, {n} sondas no total, para ver se o WebRTC entrega sua própria linha.",
-    "faq": [
-      [
-        "O que este teste de vazamento WebRTC verifica?",
-        "Ele pergunta seu endereço público por UDP a quatro servidores STUN (Cloudflare, Google, Twilio, Xiaomi), como fazem os sites de videochamada, e compara com a saída que os sites veem por HTTPS. Se o STUN vê sua linha local enquanto os sites veem o proxy, qualquer página pode ler seu IP real."
-      ],
-      [
-        "Como corrijo um vazamento WebRTC?",
-        "Faça o proxy levar UDP também: ative o modo TUN ou avançado no Clash, sing-box, Surge ou Shadowrocket, ou use o túnel completo da VPN. Bloquear o WebRTC no navegador (a opção do uBlock Origin \"Impedir que o WebRTC vaze endereços IP locais\", ou media.peerconnection.enabled = false no Firefox) também funciona, mas pode quebrar videochamadas."
-      ],
-      [
-        "O resultado diz que o UDP está bloqueado. É seguro?",
-        "Para o WebRTC, sim: nenhum servidor STUN respondeu, então uma página não consegue seu endereço por esse caminho. Videochamadas ainda podem funcionar por um servidor de retransmissão."
-      ],
-      [
-        "Qualquer VPN evita vazamentos WebRTC?",
-        "Uma VPN que tunela todo o tráfego, sim. Um proxy configurado só no navegador ou no sistema (HTTP ou SOCKS) costuma levar só TCP, e o UDP do WebRTC sai direto. Teste de novo após cada mudança."
-      ]
-    ]
-  },
+  rtc_nav: "Teste de vazamento WebRTC",
   lp_ai: {
     "nav": "IP visto por ChatGPT e Claude",
     "title": "Qual IP o ChatGPT vê? Confira o IP e a região que ChatGPT e Claude veem",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "O WebRTC vaza seu IP real",
-  fh_rtc_safe: "Sem vazamento WebRTC",
-  fh_rtc_none: "Sem vazamento WebRTC: UDP bloqueado",
   fh_ai_ok: "ChatGPT e Claude veem uma região suportada",
   fh_ai_none: "Nenhum serviço de IA respondeu",
-  fh_web: "Os sites veem",
   ipv6_link: "Teste o IPv6 a fundo",
-  fp_link: "Verifique a impressão digital do navegador",
   lat_link: "Latência do ChatGPT e do Claude",
   asn_title: "Ver esta rede na consulta de ASN",
   ipq_title: "Verificar a qualidade deste IP",

@@ -76,15 +76,6 @@ export default {
     ["이 사이트로 전송되는 것이 있나요?", "없습니다. 브라우저가 각 프로브에 직접 연결하고, 이 사이트는 정적 파일만 제공하므로 결과를 볼 수 없습니다. 스크린샷 전에 ‘IP 숨기기’를 누르세요."],
   ],
   share: "공유",
-  share_h: "결과 공유",
-  share_place: "이미지와 링크에 도시와 통신사 표시",
-  link_label: "결과 링크",
-  copy_link: "링크 복사",
-  copy_img: "이미지 복사",
-  dl_img: "이미지 저장",
-  sys_share: "다른 방법으로 공유",
-  copied: "복사됨",
-  share_note: "이미지와 링크는 브라우저에서 만들어지며 IP 주소는 들어가지 않습니다. 도시와 통신사는 기본으로 숨겨집니다.",
   shared_from: "{where}에서 공유한 결과 · {date}",
   test_mine: "내 출구도 확인",
   share_text: "출구 확인 결과: {v}. 이 분할 라우팅 맞나요?",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "직접 연결: 모든 사이트에 로컬 IP가 보임",
   who_link: "전체 프로필과 위장 점검 보기",
   unlock_link: "이 회선으로 되는 AI",
-  lp_rtc: {
-    "nav": "WebRTC 누출 테스트",
-    "title": "WebRTC 누출 테스트: VPN·프록시에서 실제 IP가 새는지 확인",
-    "desc": "무료 WebRTC 누출 테스트. UDP로 STUN 서버 4곳에 묻고, 프로브 {n}개가 HTTPS로 본 출구와 비교해 VPN이나 프록시에서 실제 IP가 새는지 확인합니다. 브라우저 안에서만 실행됩니다.",
-    "kw": "WebRTC 누출, WebRTC 누출 테스트, IP 누출 확인, VPN 누출, STUN, 실제 IP, 프록시 WebRTC",
-    "h1": "WebRTC 누출 테스트: 내 실제 IP가 드러났을까?",
-    "intro": "브라우저의 영상 통화는 UDP로 STUN 서버에 공인 IP를 묻는데, 많은 프록시는 TCP만 전달합니다. STUN 서버 4곳과 여러 사이트, 모두 {n}개의 프로브에 동시에 물어 WebRTC가 내 회선을 드러내는지 확인합니다.",
-    "faq": [
-      [
-        "이 WebRTC 누출 테스트는 무엇을 확인하나요?",
-        "영상 통화 사이트와 같은 방식으로 UDP를 통해 STUN 서버 4곳(Cloudflare, Google, Twilio, Xiaomi)에 공인 IP를 묻고, 웹사이트가 HTTPS로 보는 출구와 비교합니다. STUN에는 로컬 회선이, 웹사이트에는 프록시가 보인다면 어떤 웹페이지든 실제 IP를 읽을 수 있습니다."
-      ],
-      [
-        "WebRTC 누출은 어떻게 고치나요?",
-        "프록시가 UDP도 전달하게 하세요. Clash, sing-box, Surge, Shadowrocket의 TUN 모드나 향상 모드, 또는 VPN의 전체 터널 모드를 켜면 됩니다. 브라우저에서 WebRTC를 막는 방법(uBlock Origin의 'WebRTC의 로컬 IP 주소 누출 방지', Firefox의 media.peerconnection.enabled = false)도 있지만 영상 통화가 안 될 수 있습니다."
-      ],
-      [
-        "'UDP 차단'으로 나왔는데 안전한가요?",
-        "WebRTC에 대해서는 안전합니다. STUN 서버가 응답하지 않았으니 웹페이지가 이 방법으로 주소를 알 수 없습니다. 영상 통화는 중계 서버를 통해 될 수도 있습니다."
-      ],
-      [
-        "VPN을 쓰면 WebRTC 누출이 없나요?",
-        "모든 트래픽을 터널로 보내는 VPN이라면 없습니다. 브라우저나 시스템에만 설정한 프록시(HTTP, SOCKS)는 보통 TCP만 전달해서 WebRTC의 UDP는 그대로 나갑니다. 설정을 바꿀 때마다 다시 확인하세요."
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC 누출 테스트",
   lp_ai: {
     "nav": "ChatGPT·Claude가 보는 IP",
     "title": "ChatGPT IP 확인: ChatGPT와 Claude에 보이는 IP와 지역",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC로 실제 IP가 새고 있음",
-  fh_rtc_safe: "WebRTC 누출 없음",
-  fh_rtc_none: "WebRTC 누출 없음: UDP 차단",
   fh_ai_ok: "ChatGPT와 Claude에 지원 지역으로 보임",
   fh_ai_none: "AI 서비스가 응답하지 않음",
-  fh_web: "웹사이트에 보이는 출구",
   ipv6_link: "IPv6 자세히 확인",
-  fp_link: "브라우저 지문 확인",
   lat_link: "ChatGPT와 Claude 지연 시간 측정",
   asn_title: "ASN 조회에서 이 네트워크 보기",
   ipq_title: "이 IP의 품질 확인",

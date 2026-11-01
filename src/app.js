@@ -203,21 +203,18 @@
     if (f.k === "none" || f.s === "bad" || (f.v.a && f.v.a !== abroad))
       li.insertAdjacentHTML("beforeend", ` <a class="xl v6l" href="${esc(toolHref(IPV6, ""))}" target="_blank" rel="noopener">${esc(t("ipv6_link"))}${EXT}</a>`);
   }
+  // links the build leaves hidden: [data-m] names the tool's meta, [data-at] the path after the language folder
+  for (const a of document.querySelectorAll("a[data-m]")) { const m = meta(a.dataset.m); if (m) { a.href = toolHref(m, a.dataset.at); a.hidden = false; } }
   function renderFocus() {
     linkChecks();
     if (!foEl) return;
-    for (const a of foEl.querySelectorAll("a[data-m]")) { const m = meta(a.dataset.m); if (m) { a.href = toolHref(m, a.dataset.at); a.hidden = false; } }
     const of = exitOfProbe(S.exits), ex = l => S.exits.find(e => e.letter === l);
     const place = cc => cc ? flag(cc) + `<span>${esc(country(cc))}</span>` : "";
     for (const li of foEl.querySelectorAll(".fo-r")) {
       const id = li.dataset.p, x = li.querySelector(".fo-x"), m = li.querySelector(".fo-m");
       let bad = false;
       m.textContent = "";
-      if (id === "@web") {
-        // the exit websites abroad see, to hold the STUN rows against
-        const r = S.done && S.finds.route, a = r && r.s !== "none" ? (r.k === "split" ? r.v.b : r.v.a) : null;
-        x.innerHTML = a ? chip(a) + place(ex(a).cc) : `<span class="m blink">…</span>`;
-      } else if (S.ok[id] == null) x.innerHTML = S.gen ? `<span class="m blink">…</span>` : `<span class="m">–</span>`;
+      if (S.ok[id] == null) x.innerHTML = S.gen ? `<span class="m blink">…</span>` : `<span class="m">–</span>`;
       else if (!S.ok[id]) x.innerHTML = `<span class="m">${esc(t("fail"))}</span>`;
       else if (D.focus === "ai") {
         // the country the AI site itself sees (its Cloudflare trace), and the exit that took the request
@@ -237,15 +234,12 @@
     foEl.className = "focus";
     if (!S.done) { head.textContent = t("sniff"); st.textContent = ""; d.innerHTML = "<span class=\"bar\"></span>"; foEl.classList.add("wait"); return; }
     const f = S.finds[D.focus] || { s: "none" };
-    const k = D.focus === "rtc" ? (!S.exits.length ? "no_net" : f.s === "bad" ? "fh_rtc_leak" : f.k === "none" ? "fh_rtc_none" : "fh_rtc_safe")
-      : f.s === "bad" ? "vh_ai" : f.s === "ok" ? "fh_ai_ok" : "fh_ai_none";
+    const k = f.s === "bad" ? "vh_ai" : f.s === "ok" ? "fh_ai_ok" : "fh_ai_none";
     head.textContent = t(k); st.textContent = ST[f.s]; foEl.classList.add("st-" + f.s);
     // the detail is the check table's own value for this check, without its links
     const v = document.querySelector(`#finds [data-r="${D.focus}"] .fr-v`).cloneNode(true);
     v.querySelectorAll(".xl").forEach(a => a.remove());
     d.innerHTML = f.s === "none" ? "" : v.innerHTML;
-    const who = foEl.querySelector(".fo-who");
-    if (who && WHO) { who.href = WHO + D.home[LANG]; who.hidden = false; }
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
 
@@ -351,18 +345,7 @@
     history.replaceState(null, "", D.home[LANG]);
   }
 
-  /* ---------- share: an image drawn here, and a link that carries the result ---------- */
-  const shortener = (document.querySelector('meta[name="shortener"]') || {}).content || "";   // on 1ms.dog; absent when self-hosted
-  let shortFor = null;
-  async function shortLink(long) {
-    if (!shortener) return long;
-    if (shortFor && shortFor[0] === long) return shortFor[1];
-    try {
-      const r = await fetch(shortener, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: long }), signal: AbortSignal.timeout(5000) });
-      const j = await r.json(); if (j.url) { shortFor = [long, j.url]; return j.url; }
-    } catch (e) {}
-    return long;
-  }
+  /* ---------- share: the shared dialog (/assets/share/, copied verbatim from 1ms-shell), a link that carries the result ---------- */
   const verdict = () => verdictOf(S.finds, S.exits) || "split";
   // The link opens the verdict's own page (/<lang>/r/<verdict>/), whose preview card states the verdict;
   // the result itself is in the hash, which never reaches a server
@@ -375,53 +358,24 @@
     const hash = encodeShare({ ts: S.shared ? S.shared.ts : Date.now(), tz: S.shared ? S.shared.tz : tzCc(), exits: S.exits, rows, place: withPlace });
     return location.origin + D.home[LANG] + "r/" + verdict() + "/" + hash;
   }
-  const dlg = $("#shareDlg"), place = $("#sharePlace");
-  let shareBlob = null, shareSeq = 0;
-  async function refreshShare() {
-    const seq = ++shareSeq;
-    shareBlob = null; $("#copyImg").disabled = $("#dlImg").disabled = true;
-    const long = shareLink(place.checked);
-    $("#shareUrl").value = long;
-    drawCard(place.checked).then(c => {
-      if (seq !== shareSeq) return;
-      $("#shareImg").src = c.toDataURL("image/png");
-      c.toBlob(b => { if (seq === shareSeq) { shareBlob = b; $("#copyImg").disabled = $("#dlImg").disabled = false; } }, "image/png");
-    }).catch(() => {});
-    const url = await shortLink(long);
-    if (seq === shareSeq) $("#shareUrl").value = url;
-  }
-  $("#share").onclick = () => {
+  $("#share").onclick = async () => {
     if (!S.done || !S.exits.length) return;
-    $("#nativeShare").hidden = !navigator.share;
-    dlg.showModal ? dlg.showModal() : dlg.setAttribute("open", "");
-    refreshShare();
-  };
-  place.onchange = refreshShare;
-  dlg.addEventListener("click", e => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
-  const flash = (btn, k) => { const o = btn.textContent; btn.textContent = t(k); setTimeout(() => { btn.textContent = o; }, 1500); };
-  $("#copyLink").onclick = async e => { const b = e.currentTarget; try { await navigator.clipboard.writeText($("#shareUrl").value); flash(b, "copied"); } catch (x) { $("#shareUrl").select(); } };
-  $("#copyImg").onclick = async e => { const b = e.currentTarget; try { await navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob })]); flash(b, "copied"); } catch (x) {} };
-  $("#dlImg").onclick = () => { const a = document.createElement("a"); a.href = $("#shareImg").src; a.download = "egresslens.png"; a.click(); };
-  $("#nativeShare").onclick = async () => {
-    const text = t("share_text", { v: t("vh_" + verdict()) }), url = $("#shareUrl").value;
-    const file = shareBlob && new File([shareBlob], "egresslens.png", { type: "image/png" });
-    try { await navigator.share(file && navigator.canShare && navigator.canShare({ files: [file] }) ? { text, url, files: [file] } : { text, url }); } catch (e) {}
+    const { share } = await import("/assets/share/share.js");
+    share({
+      lang: LANG, name: t("name"), file: "egresslens", show: ["city", "isp"], never: ["ip"],
+      link: shareLink, home: location.origin + D.home[LANG], text: () => t("share_text", { v: t("vh_" + verdict()) }),
+      height: (m, kit) => measure(m, kit).H, draw: drawCard, ts: S.shared ? S.shared.ts : Date.now(),
+    }).open();
   };
 
-  // The card, in the page's theme: brand, the verdict, the exits (country; city and network only when the visitor
-  // turns them on; never addresses) and the check table as the page shows it, exit chips in their colors.
+  // The result on the card, in the page's theme: the verdict, the exits (country; city and network only when the
+  // visitor ticks the box; never addresses) and the check table as the page shows it, exit chips in their colors.
+  // The dialog draws the frame: logo, name, QR code and date.
   const img = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
-  const FF = "Geist, 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans', 'Malgun Gothic', sans-serif", FM = "'Geist Mono', Consolas, monospace";
-  async function drawCard(showPlace) {
-    const W = 1200, P = 56, VX = P + 210, VW = W - P - VX;
-    const css = getComputedStyle(document.documentElement), v = n => css.getPropertyValue("--" + n).trim(), dark = css.colorScheme === "dark";
-    const C = { bg: v("bg"), line: v("line"), fg: v("fg"), muted: v("muted"), ink: v("ink"), ok: v("ok"), bad: v("bad"), warn: v("e-p1") };
-    const colorOf = l => {
-      const e = S.exits.find(x => x.letter === l), n = +((/\d+$/.exec(l) || [1])[0]);
-      return !e ? C.muted : e.kind === "local" ? v(n === 2 ? "e-d2" : "e-d") : v("e-p" + (n >= 2 && n <= 4 ? n : 1));
-    };
-    const m = document.createElement("canvas").getContext("2d");
-    m.font = `700 44px ${FF}`;
+  const EH = 54;
+  function measure(m, kit) {
+    const { W, P, F } = kit, VW = W - P - (P + 210);
+    m.font = `700 44px ${F}`;
     const hLines = wrap(m, t("vh_" + verdict()), W - P * 2);
     // the check rows: each value as the page shows it, as tokens (a piece of text, or an exit chip)
     const rows = CHECKS.map(r => {
@@ -431,27 +385,30 @@
         if (n.nodeType === 1 && n.classList.contains("lt")) toks.push({ chip: n.textContent });
         else for (const w of (n.textContent || "").match(TOK) || []) toks.push({ w });
       }
-      return { label: li.querySelector(".fr-l").textContent, s: (S.finds[r] || {}).s || "none", lines: layout(m, toks, VW) };
+      return { label: li.querySelector(".fr-l").textContent, s: (S.finds[r] || {}).s || "none", lines: layout(m, kit, toks, VW) };
     });
-    const hTop = 170, eTop = hTop + hLines.length * 56 + 40, EH = 54, cTop = eTop + S.exits.length * EH + 20;
-    const H = cTop + rows.reduce((a, r) => a + 20 + r.lines.length * 34, 0) + 24 + 80;
-    const c = document.createElement("canvas"); c.width = W; c.height = H;
-    const x = c.getContext("2d");
-    x.fillStyle = C.bg; x.fillRect(0, 0, W, H);
+    const hTop = kit.top + 44, eTop = hTop + hLines.length * 56 + 40, cTop = eTop + S.exits.length * EH + 20;
+    return { hLines, rows, hTop, eTop, cTop, H: cTop + rows.reduce((a, r) => a + 20 + r.lines.length * 34, 0) + 24 + 70 };
+  }
+  async function drawCard(x, kit) {
+    const { W, P, F, v, dark, clip } = kit, VX = P + 210, { hLines, rows, hTop, eTop, cTop } = measure(x, kit);
+    const C = { line: v("line"), fg: v("fg"), muted: v("muted"), ok: v("ok"), bad: v("bad"), warn: v("e-p1") };
+    const colorOf = l => {
+      const e = S.exits.find(x => x.letter === l), n = +((/\d+$/.exec(l) || [1])[0]);
+      return !e ? C.muted : e.kind === "local" ? v(n === 2 ? "e-d2" : "e-d") : v("e-p" + (n >= 2 && n <= 4 ? n : 1));
+    };
     x.textBaseline = "alphabetic";
-    x.drawImage(await img(dark ? "/assets/logo-dark.svg" : "/assets/logo-light.svg"), P, 40, 150, 60);
-    x.fillStyle = C.ink; x.font = `700 30px ${FF}`; x.fillText(t("name"), P + 172, 82);
-    x.fillStyle = C.fg; x.font = `700 44px ${FF}`; hLines.forEach((l, i) => x.fillText(l, P, hTop + i * 56));
+    x.fillStyle = C.fg; x.font = `700 44px ${F}`; hLines.forEach((l, i) => x.fillText(l, P, hTop + i * 56));
     // exits
     let y = eTop;
     for (const e of S.exits) {
-      chipAt(x, e.letter, P, y - 30, 40, colorOf(e.letter));
+      chipAt(x, kit, e.letter, P, y - 30, 40, colorOf(e.letter));
       let xx = P + 56;
       if (e.cc) { try { x.drawImage(await img(`/flags/${e.cc.toLowerCase()}.svg`), xx, y - 22, 30, 22); xx += 42; } catch (er) {} }
-      const where = (showPlace ? [e.city, e.cc && country(e.cc)] : [e.cc ? country(e.cc) : ""]).filter(Boolean).join(", ") || "?";
-      x.fillStyle = C.fg; x.font = `600 24px ${FF}`; x.fillText(where, xx, y - 2); xx += x.measureText(where).width + 14;
-      x.fillStyle = C.muted; x.font = `400 20px ${FF}`;
-      x.fillText(clip(x, t(e.kind === "local" ? "k_local" : "k_proxy") + (showPlace && e.org ? " · " + e.org + (e.asn ? " · AS" + e.asn : "") : ""), W - P - xx), xx, y - 2);
+      const where = (kit.show ? [e.city, e.cc && country(e.cc)] : [e.cc ? country(e.cc) : ""]).filter(Boolean).join(", ") || "?";
+      x.fillStyle = C.fg; x.font = `600 24px ${F}`; x.fillText(where, xx, y - 2); xx += x.measureText(where).width + 14;
+      x.fillStyle = C.muted; x.font = `400 20px ${F}`;
+      x.fillText(clip(x, t(e.kind === "local" ? "k_local" : "k_proxy") + (kit.show && e.org ? " · " + e.org + (e.asn ? " · AS" + e.asn : "") : ""), W - P - xx), xx, y - 2);
       y += EH;
     }
     // the check table
@@ -464,33 +421,28 @@
       x.beginPath(); x.arc(cx, cy, 13, 0, Math.PI * 2);
       if (["ok", "bad", "warn"].includes(r.s)) { x.fillStyle = C[r.s]; x.fill(); x.fillStyle = dark ? "#111" : "#fff"; }
       else { x.strokeStyle = C.line; x.lineWidth = 2; x.stroke(); x.fillStyle = C.muted; }
-      x.font = `700 15px ${FF}`; x.textAlign = "center"; x.fillText(MARK[r.s] || "–", cx, cy + 5); x.textAlign = "left";
-      x.fillStyle = C.muted; x.font = `400 20px ${FF}`; x.fillText(clip(x, r.label, VX - P - 54), P + 40, y + 20);
+      x.font = `700 15px ${F}`; x.textAlign = "center"; x.fillText(MARK[r.s] || "–", cx, cy + 5); x.textAlign = "left";
+      x.fillStyle = C.muted; x.font = `400 20px ${F}`; x.fillText(clip(x, r.label, VX - P - 54), P + 40, y + 20);
       r.lines.forEach((line, i) => {
         let xx = VX;
         for (const tk of line) {
-          if (tk.chip) chipAt(x, tk.chip, xx + 2, y + i * 34 + 1, 26, colorOf(tk.chip));
-          else { x.fillStyle = r.s === "bad" ? C.bad : C.fg; x.font = `400 22px ${FF}`; x.fillText(tk.w, xx, y + 21 + i * 34); }
+          if (tk.chip) chipAt(x, kit, tk.chip, xx + 2, y + i * 34 + 1, 26, colorOf(tk.chip));
+          else { x.fillStyle = r.s === "bad" ? C.bad : C.fg; x.font = `400 22px ${F}`; x.fillText(tk.w, xx, y + 21 + i * 34); }
           xx += tk.wd;
         }
       });
       y += r.lines.length * 34;
     }
-    x.fillStyle = C.line; x.fillRect(P, H - 80, W - P * 2, 1);
-    x.fillStyle = C.ink; x.font = `600 26px ${FM}`; x.fillText(location.host, P, H - 32);
-    x.fillStyle = C.muted; x.font = `400 20px ${FF}`; x.textAlign = "right";
-    x.fillText(new Date(S.shared ? S.shared.ts : Date.now()).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }), W - P, H - 32); x.textAlign = "left";
-    return c;
+    x.fillStyle = C.line; x.fillRect(P, y, W - P * 2, 1);
   }
   // an exit chip on the card: the page's tinted square, the label in the exit's color
-  const chipW = (x, l, h) => { x.font = `700 ${Math.round(h * .46)}px ${FM}`; return Math.max(h, x.measureText(l).width + h * .5); };
-  function chipAt(x, l, x0, y0, h, col) {
-    const w = chipW(x, l, h);
-    x.fillStyle = col + "22"; roundRect(x, x0, y0, w, h, h * .26); x.fill();
+  const chipW = (x, kit, l, h) => { x.font = `700 ${Math.round(h * .46)}px ${kit.M}`; return Math.max(h, x.measureText(l).width + h * .5); };
+  function chipAt(x, kit, l, x0, y0, h, col) {
+    const w = chipW(x, kit, l, h);
+    x.fillStyle = col + "22"; kit.roundRect(x, x0, y0, w, h, h * .26); x.fill();
     x.strokeStyle = col + "55"; x.lineWidth = 1.5; x.stroke();
     x.fillStyle = col; x.textAlign = "center"; x.fillText(l, x0 + w / 2, y0 + h * .68); x.textAlign = "left";
   }
-  function roundRect(x, l, t0, w, h, r) { x.beginPath(); x.moveTo(l + r, t0); x.arcTo(l + w, t0, l + w, t0 + h, r); x.arcTo(l + w, t0 + h, l, t0 + h, r); x.arcTo(l, t0 + h, l, t0, r); x.arcTo(l, t0, l + w, t0, r); x.closePath(); }
   // words, or single CJK characters, with the space after them
   const TOK = /[　-鿿가-힯＀-￯]|[^\s　-鿿가-힯＀-￯]+\s*|\s+/g;
   function wrap(x, s, w) {
@@ -502,11 +454,11 @@
     return out;
   }
   // tokens into lines of width w, each token with its width (a chip: its square and a little space around it)
-  function layout(x, toks, w) {
+  function layout(x, kit, toks, w) {
     const lines = [[]]; let lw = 0;
     for (const tk of toks) {
-      if (tk.chip) tk.wd = chipW(x, tk.chip, 26) + 6;
-      else { x.font = `400 22px ${FF}`; tk.wd = x.measureText(tk.w).width; }
+      if (tk.chip) tk.wd = chipW(x, kit, tk.chip, 26) + 6;
+      else { x.font = `400 22px ${kit.F}`; tk.wd = x.measureText(tk.w).width; }
       if (lw && lw + tk.wd > w && !(tk.w && !tk.w.trim())) {
         lines.push([]); lw = 0;
         if (tk.w) { tk.w = tk.w.trimStart(); tk.wd = x.measureText(tk.w).width; }
@@ -515,7 +467,6 @@
     }
     return lines;
   }
-  function clip(x, s, w) { if (x.measureText(s).width <= w) return s; while (s.length > 1 && x.measureText(s + "…").width > w) s = s.slice(0, -1); return s + "…"; }
 
   applyMask();
   const shared = parseShare(location.hash, PROBES.map(p => p.id));

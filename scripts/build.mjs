@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds the static site in public/ from src/:
 //   index.html, <lang>/index.html                 the page per language
-//   <lang>/webrtc-leak/, <lang>/chatgpt-ip/        landing pages for one check each (LANDS): own title, text and questions
+//   <lang>/chatgpt-ip/                            landing page for one check (LANDS): own title, text and questions
 //   r/<verdict>/index.html, <lang>/r/<verdict>/    the same page for a shared result: its preview card states the verdict
 //                                                 (the result itself is in the link's hash; the og/ images: scripts/og.mjs)
 //   assets/app.<hash>.js, assets/app.<hash>.css   app code and styles, shared and cached by every page
@@ -24,7 +24,8 @@ const pub = new URL("../public/", import.meta.url), src = new URL("../src/", imp
 const EXT = '<svg class="xi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg>';
 // Landing pages: the same tool with one check up front. id: its strings (lp_<id>, an object per language) and the
 // check-table row it leads with; group: the probe group listed first; skip: the main page's question it answers itself.
-export const LANDS = [{ id: "rtc", slug: "webrtc-leak", group: "udp", skip: 2 }, { id: "ai", slug: "chatgpt-ip", group: "ai", skip: 1 }];
+// (The WebRTC leak test is who.1ms.dog's /webrtc-leak/; the 1ms.dog shell sends this tool's old /webrtc-leak/ there.)
+export const LANDS = [{ id: "ai", slug: "chatgpt-ip", group: "ai", skip: 1 }];
 export const LANGS = [["en", "", "en_US", "English"], ["zh-CN", "zh-cn", "zh_CN", "简体中文"], ["zh-TW", "zh-tw", "zh_TW", "繁體中文"],
   ["ja", "ja", "ja_JP", "日本語"], ["ko", "ko", "ko_KR", "한국어"], ["es", "es", "es_ES", "Español"], ["fr", "fr", "fr_FR", "Français"],
   ["de", "de", "de_DE", "Deutsch"], ["pt", "pt", "pt_BR", "Português"], ["ru", "ru", "ru_RU", "Русский"]];
@@ -73,7 +74,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", "fh_web", "fp_link", "lat_link", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "rtc_nav", "lat_link", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -100,23 +101,23 @@ export async function build({ check = false } = {}) {
     const focusOf = land => {
       if (!land) return "";
       const fr = (id, name) => `<li class="fo-r" data-p="${id}"><span class="fo-n">${esc(name)}</span><span class="fo-x"></span><span class="fo-m"></span></li>`;
-      const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "") +
+      const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") +
         // links to other 1ms.dog tools: [meta name, path after the language folder, text], shown once the host announces the tool
-        `<li class="fo-links">${(land.id === "rtc" ? [["who", "fingerprint/", "fp_link"]] : [["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]])
+        `<li class="fo-links">${[["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]]
           .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}${EXT}</a>`).join("")}</li>`;
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
-        `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +
-        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}${EXT}</a>` : "") + `</div>`;
+        `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list two">${rows}</ul></div>`;
     };
-    // links between the main page and the landing pages, in the footer
-    const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("");
+    // links between the main page and the landing pages, in the footer, then who's WebRTC leak test once the host announces it
+    const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("") +
+      `<a class="xl" data-m="who" data-at="webrtc-leak/" target="_blank" rel="noopener" hidden>${esc(T("rtc_nav"))}${EXT}</a>`;
     const page = (head, paths, root, land, v) => tpl
       .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(k === "h1" ? v.h1 : T(k)) + close)
       .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", root ? " data-root" : "")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
       .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(v.intro, { n: N }))).replace("{{focus}}", focusOf(land))
       .replace("{{groups}}", groupsOf(land && land.group)).replace("{{checks}}", checks).replace("{{faq}}", faqOf(v.faq)).replace("{{foot}}", esc(T("foot"))).replace("{{nav}}", navOf(land))
-      .replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close"))).replace("{{linkLabel}}", esc(T("link_label")))
+      .replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close")))
       .replace("{{data}}", JSON.stringify({ lang, paths, home, focus: land ? land.id : "" }).replace(/</g, "\\u003c"));
 
     // the main page, then one landing page per check (LANDS), each with its own words and its own language versions

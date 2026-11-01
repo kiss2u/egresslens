@@ -76,15 +76,6 @@ export default {
     ["检测结果会发到这个网站吗？", "不会。浏览器直接连接每个探测器，本站只提供静态文件，看不到你的结果。截图前可以先点“隐藏 IP”。"],
   ],
   share: "分享",
-  share_h: "分享检测结果",
-  share_place: "在图片和链接里显示城市和运营商",
-  link_label: "结果链接",
-  copy_link: "复制链接",
-  copy_img: "复制图片",
-  dl_img: "下载图片",
-  sys_share: "更多分享方式",
-  copied: "已复制",
-  share_note: "图片和链接都在浏览器里生成，不含 IP 地址；城市和运营商默认不显示。",
   shared_from: "这是一份来自{where}的检测结果 · {date}",
   test_mine: "测我自己的",
   share_text: "我的出口检测结果：{v}。帮我看看这个分流对不对？",
@@ -96,32 +87,7 @@ export default {
   vh_direct: "直连：所有网站看到的都是本地 IP",
   who_link: "看完整画像和伪装检测",
   unlock_link: "这条线路能解锁哪些 AI",
-  lp_rtc: {
-    "nav": "WebRTC 泄露检测",
-    "title": "WebRTC 泄露检测：代理和 VPN 有没有暴露你的真实 IP",
-    "desc": "免费 WebRTC 泄露检测：经 UDP 询问 4 个 STUN 服务器，再和 {n} 个探测器经 HTTPS 看到的出口对比，判断代理或 VPN 是否泄露了你的真实 IP。全部在浏览器里完成。",
-    "kw": "WebRTC泄露, WebRTC泄露检测, 真实IP泄露, 代理泄露检测, VPN泄露, STUN, WebRTC检测, IP泄露",
-    "h1": "WebRTC 泄露检测：你的真实 IP 暴露了吗？",
-    "intro": "浏览器里的视频通话会经 UDP 向 STUN 服务器询问你的公网地址，而很多代理只转发 TCP。这里同时询问 4 个 STUN 服务器和各类网站，共 {n} 个探测器，看 WebRTC 有没有暴露你自己的线路。",
-    "faq": [
-      [
-        "WebRTC 泄露检测查的是什么？",
-        "经 UDP 向 4 个 STUN 服务器（Cloudflare、Google、Twilio、小米）询问你的公网地址，和视频通话网站的做法一样，再和网站经 HTTPS 看到的出口对比。如果 STUN 看到的是本地线路，网站看到的却是代理，任何网页都能读到你的真实 IP。"
-      ],
-      [
-        "WebRTC 泄露怎么修复？",
-        "让代理也接管 UDP：在 Clash、sing-box、Surge、Shadowrocket 里打开 TUN 或增强模式，或者使用 VPN 的全局隧道模式。也可以在浏览器里禁用 WebRTC（uBlock Origin 的“防止 WebRTC 泄露本地 IP 地址”，或 Firefox 的 media.peerconnection.enabled = false），但可能影响视频通话。"
-      ],
-      [
-        "结果显示 UDP 不通，这样安全吗？",
-        "对 WebRTC 来说是安全的：没有 STUN 服务器回应，网页就无法用这种方式拿到地址。视频通话仍可能通过中继服务器进行。"
-      ],
-      [
-        "用了 VPN 就不会有 WebRTC 泄露吗？",
-        "接管全部流量的 VPN 不会。只在浏览器或系统里设置的代理（HTTP 或 SOCKS）通常只转发 TCP，WebRTC 的 UDP 会直接出去。每次改了配置后都建议重新检测。"
-      ]
-    ]
-  },
+  rtc_nav: "WebRTC 泄露检测",
   lp_ai: {
     "nav": "ChatGPT/Claude 看到的 IP",
     "title": "ChatGPT IP 检测：ChatGPT 和 Claude 看到的是哪个 IP、哪个地区",
@@ -148,14 +114,9 @@ export default {
       ]
     ]
   },
-  fh_rtc_leak: "WebRTC 泄露了你的真实 IP",
-  fh_rtc_safe: "WebRTC 没有泄露",
-  fh_rtc_none: "WebRTC 没有泄露：UDP 不通",
   fh_ai_ok: "ChatGPT 和 Claude 看到的是支持的地区",
   fh_ai_none: "AI 服务都没有响应",
-  fh_web: "网站看到",
   ipv6_link: "详细测测 IPv6",
-  fp_link: "检测浏览器指纹",
   lat_link: "测 ChatGPT 和 Claude 的延迟",
   asn_title: "在 ASN 查询中查看这个网络",
   ipq_title: "查看这个 IP 的质量",

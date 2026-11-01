@@ -47,9 +47,12 @@ test("share cards: every page has its og image, every verdict its result page an
   const { access } = await import("node:fs/promises");
   const { VERDICTS } = await import("../src/lib.mjs");
   const has = f => access(new URL("../public/" + f, import.meta.url)).then(() => true, () => false);
+  // the shared dialog (1ms-shell assets/share/), copied verbatim; 1ms-shell checks the copies match
+  for (const f of ["share.js", "share.css", "qr.js"]) assert.ok(await has("assets/share/" + f), f);
   for (const [l, slug] of LANGS) {
     const h = await page(slug);
     assert.match(h, /name="twitter:card" content="summary_large_image"/);
+    assert.doesNotMatch(h, /id="shareDlg"/, l + ": the shared dialog replaces its own");
     assert.ok(await has(`og/${l.toLowerCase()}.png`), l + ": og image");
     for (const v of VERDICTS) {
       const r = await readFile(new URL(`../public/${slug ? slug + "/" : ""}r/${v}/index.html`, import.meta.url), "utf8");
@@ -75,7 +78,6 @@ test("landing pages: their own words, canonical to themselves, every language li
       assert.match(h, new RegExp(`<link rel="canonical" href="https://egress\.1ms\.dog/${at.replace(/\//g, "\/")}">`), `${l} ${land.slug} canonical`);
       for (const [, s2] of LANGS) assert.ok(h.includes(`href="https://egress.1ms.dog/${s2 ? s2 + "/" : ""}${land.slug}/"`), `${l} ${land.slug} hreflang ${s2}`);
       assert.ok(h.includes(`data-focus="${land.id}"`), `${l} ${land.slug}: lead panel`);
-      if (land.id === "rtc") assert.ok(h.includes(`>${I[l].who_link}<svg class="xi"`) && h.includes(`data-m="who" data-at="fingerprint/"`), `${l}: links to the full profile and the fingerprint check`);
       if (land.id === "ai") assert.ok(h.includes(`data-m="home" data-at="chatgpt/"`) && h.includes(`>${I[l].lat_link}<svg class="xi"`), `${l}: link to the latency test`);
       assert.match(h, /"@type":"FAQPage"/);
       assert.ok(sitemap.includes(`<loc>https://egress.1ms.dog/${at}</loc>`), `${at} in the sitemap`);
