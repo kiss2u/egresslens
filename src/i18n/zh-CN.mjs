@@ -157,5 +157,7 @@ export default {
   ipv6_link: "详细测测 IPv6",
   fp_link: "检测浏览器指纹",
   lat_link: "测 ChatGPT 和 Claude 的延迟",
+  asn_title: "在 ASN 查询中查看这个网络",
+  ipq_title: "查看这个 IP 的质量",
   foot: "开源，MIT 许可。全部在你的浏览器里运行。",
 };
