@@ -154,5 +154,8 @@ export default {
   fh_ai_ok: "ChatGPT と Claude からは提供地域に見えています",
   fh_ai_none: "AI サービスが応答しませんでした",
   fh_web: "サイトから見える出口",
+  ipv6_link: "IPv6 を詳しく調べる →",
+  fp_link: "ブラウザフィンガープリントを調べる →",
+  lat_link: "ChatGPT と Claude の遅延を測る →",
   foot: "オープンソース、MIT ライセンス。すべてブラウザ内で動作します。",
 };

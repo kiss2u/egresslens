@@ -71,7 +71,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", "fh_web", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", "fh_web", "fp_link", "lat_link", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -98,11 +98,13 @@ export async function build({ check = false } = {}) {
     const focusOf = land => {
       if (!land) return "";
       const fr = (id, name) => `<li class="fo-r" data-p="${id}"><span class="fo-n">${esc(name)}</span><span class="fo-x"></span><span class="fo-m"></span></li>`;
-      const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "");
+      const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "") +
+        // links to other 1ms.dog tools: [meta name, path after the language folder, text], shown once the host announces the tool
+        `<li class="fo-links">${(land.id === "rtc" ? [["who", "fingerprint/", "fp_link"]] : [["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]])
+          .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}</a>`).join("")}</li>`;
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
         `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +
-        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}</a>` : "") +
-        (land.id === "ai" ? `<a class="xl fo-ul" target="_blank" rel="noopener" hidden>${esc(T("unlock_link"))}</a>` : "") + `</div>`;
+        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}</a>` : "") + `</div>`;
     };
     // links between the main page and the landing pages, in the footer
     const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("");
