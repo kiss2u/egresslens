@@ -95,6 +95,7 @@ export default {
   vh_proxy: "すべてのサイトが同じプロキシ出口",
   vh_direct: "直接接続：すべてのサイトにローカル IP が見えています",
   who_link: "全体像と偽装チェックを見る →",
+  unlock_link: "この回線で使える AI →",
   lp_rtc: {
     "nav": "WebRTC リークテスト",
     "title": "WebRTC リークテスト：VPN・プロキシで本当の IP が漏れていないか確認",

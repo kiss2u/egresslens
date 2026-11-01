@@ -237,8 +237,8 @@ select option:checked { background-color: var(--soft); }
 .fo-x .flag { width: 18px; height: 13px; }
 .fo-m { font: 12px var(--f-num); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
 .fo-r.bad { color: var(--bad); } .fo-r.bad .fo-x span { color: var(--bad); font-weight: 600; }
-.focus .fo-who { font-size: 13px; color: var(--ink); text-decoration: none; align-self: flex-start; }
-.focus .fo-who:hover { text-decoration: underline; }
+.focus .fo-who, .focus .fo-ul { font-size: 13px; color: var(--ink); text-decoration: none; align-self: flex-start; }
+.focus .fo-who:hover, .focus .fo-ul:hover { text-decoration: underline; }
 /* the landing page's own check, in the table */
 .fr.focus .fr-l { color: var(--fg); font-weight: 600; }
 /* links between the main page and the landing pages */

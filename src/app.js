@@ -156,6 +156,9 @@
   const ST = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
   // a host can announce its privacy check with <meta name="who" content="https://…">
   const WHO = (document.querySelector('meta[name="who"]') || {}).content || "";
+  // and its streaming & AI unlock check with <meta name="unlock" content="https://…">: it tests the visitor's own route, so not on a shared result
+  const UNLOCK = (document.querySelector('meta[name="unlock"]') || {}).content || "";
+  const unlockAi = () => UNLOCK + D.home[LANG] + "ai/";
   function renderChecks() {
     const isExit = x => S.exits.some(e => e.letter === x);
     for (const row of CHECKS) {
@@ -174,7 +177,9 @@
       li.classList.toggle("focus", row === D.focus);
       val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
-        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}</a>` : "");
+        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}</a>` : "") +
+        // the AI region: the unlock check tries each AI service from this route
+        (UNLOCK && row === "ai" && f.s !== "none" && !S.shared ? ` <a class="xl" href="${esc(unlockAi())}" target="_blank" rel="noopener">${esc(t("unlock_link"))}</a>` : "");
     }
   }
   // A landing page's lead panel (WebRTC leak test, what ChatGPT and Claude see): one row per probe it is about,
@@ -221,6 +226,8 @@
     d.innerHTML = f.s === "none" ? "" : v.innerHTML;
     const who = foEl.querySelector(".fo-who");
     if (who && WHO) { who.href = WHO + D.home[LANG]; who.hidden = false; }
+    const ul = foEl.querySelector(".fo-ul");
+    if (ul && UNLOCK && !S.shared) { ul.href = unlockAi(); ul.hidden = false; }
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
 

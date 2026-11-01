@@ -101,7 +101,8 @@ export async function build({ check = false } = {}) {
       const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "");
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
         `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +
-        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}</a>` : "") + `</div>`;
+        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}</a>` : "") +
+        (land.id === "ai" ? `<a class="xl fo-ul" target="_blank" rel="noopener" hidden>${esc(T("unlock_link"))}</a>` : "") + `</div>`;
     };
     // links between the main page and the landing pages, in the footer
     const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("");
