@@ -96,7 +96,7 @@ export default {
   vh_split: "Split routing works: sites use different exits",
   vh_proxy: "Every website sees the same proxy exit",
   vh_direct: "Direct: every website sees the local IP",
-  who_link: "Your full profile and disguise check →",
+  who_link: "Your full profile and disguise check",
   lp_rtc: {
     "nav": "WebRTC leak test",
     "title": "WebRTC leak test: does your VPN or proxy expose your real IP?",
@@ -155,8 +155,8 @@ export default {
   fh_ai_ok: "ChatGPT and Claude see a supported region",
   fh_ai_none: "No AI service answered",
   fh_web: "Websites see",
-  ipv6_link: "Check IPv6 in depth →",
-  fp_link: "Check your browser fingerprint →",
-  lat_link: "ChatGPT and Claude latency →",
+  ipv6_link: "Check IPv6 in depth",
+  fp_link: "Check your browser fingerprint",
+  lat_link: "ChatGPT and Claude latency",
   foot: "Open source, MIT license. Runs entirely in your browser.",
 };

@@ -134,8 +134,10 @@
   const ASN = meta("asn"), IPV6 = meta("ipv6");
   const toolHref = (base, at) => base + D.home[LANG] + at;
   // an AS number links to its page on ASN Lookup
-  const asRef = n => ASN ? `<a class="asl" href="${esc(toolHref(ASN, "AS" + n))}" target="_blank" rel="noopener">AS${n}</a>` : "AS" + n;
-  const ipQ = ip => IPQS && !masked() ? `<a class="ipq" href="${esc(IPQS)}/?ip=${encodeURIComponent(ip)}" target="_blank" rel="noopener">${esc(ip)}</a>` : esc(ipTxt(ip));
+  // a link to another 1ms.dog tool ends in the external-link icon (the shared tool contract: no arrows)
+  const EXT = '<svg class="xi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg>';
+  const asRef = n => ASN ? `<a class="asl" href="${esc(toolHref(ASN, "AS" + n))}" target="_blank" rel="noopener">AS${n}${EXT}</a>` : "AS" + n;
+  const ipQ = ip => IPQS && !masked() ? `<a class="ipq" href="${esc(IPQS)}/?ip=${encodeURIComponent(ip)}" target="_blank" rel="noopener">${esc(ip)}${EXT}</a>` : esc(ipTxt(ip));
   const exCard = e => {
     // a shared result has no addresses: only which IP versions the exit has
     const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ipQ).join(" · ")}</span>`
@@ -181,7 +183,7 @@
       li.classList.toggle("focus", row === D.focus);
       val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
-        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}</a>` : "");
+        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}${EXT}</a>` : "");
     }
   }
   // A landing page's lead panel (WebRTC leak test, what ChatGPT and Claude see): one row per probe it is about,
@@ -194,7 +196,7 @@
     if (!f || !li || li.querySelector(".v6l")) return;
     const abroad = r && r.s !== "none" ? (r.k === "split" ? r.v.b : r.v.a) : null;
     if (f.k === "none" || f.s === "bad" || (f.v.a && f.v.a !== abroad))
-      li.insertAdjacentHTML("beforeend", ` <a class="xl v6l" href="${esc(toolHref(IPV6, ""))}" target="_blank" rel="noopener">${esc(t("ipv6_link"))}</a>`);
+      li.insertAdjacentHTML("beforeend", ` <a class="xl v6l" href="${esc(toolHref(IPV6, ""))}" target="_blank" rel="noopener">${esc(t("ipv6_link"))}${EXT}</a>`);
   }
   function renderFocus() {
     linkChecks();

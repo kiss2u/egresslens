@@ -94,7 +94,7 @@ export default {
   vh_split: "Routage partagé actif : chaque site a sa sortie",
   vh_proxy: "Tous les sites voient la même sortie proxy",
   vh_direct: "Direct : tous les sites voient l’IP locale",
-  who_link: "Votre profil complet et le test de camouflage →",
+  who_link: "Votre profil complet et le test de camouflage",
   lp_rtc: {
     "nav": "Test de fuite WebRTC",
     "title": "Test de fuite WebRTC : votre VPN ou proxy laisse-t-il fuir votre vraie IP ?",
@@ -153,8 +153,8 @@ export default {
   fh_ai_ok: "ChatGPT et Claude voient une région prise en charge",
   fh_ai_none: "Aucun service d’IA n’a répondu",
   fh_web: "Les sites voient",
-  ipv6_link: "Tester IPv6 en détail →",
-  fp_link: "Tester l’empreinte de votre navigateur →",
-  lat_link: "Latence de ChatGPT et Claude →",
+  ipv6_link: "Tester IPv6 en détail",
+  fp_link: "Tester l’empreinte de votre navigateur",
+  lat_link: "Latence de ChatGPT et Claude",
   foot: "Open source, licence MIT. Tout s’exécute dans votre navigateur.",
 };

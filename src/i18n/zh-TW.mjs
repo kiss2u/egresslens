@@ -94,7 +94,7 @@ export default {
   vh_split: "分流生效：不同網站走不同出口",
   vh_proxy: "所有網站都走同一個代理出口",
   vh_direct: "直連：所有網站看到的都是本地 IP",
-  who_link: "看完整畫像和偽裝檢測 →",
+  who_link: "看完整畫像和偽裝檢測",
   lp_rtc: {
     "nav": "WebRTC 洩漏檢測",
     "title": "WebRTC 洩漏檢測：代理和 VPN 有沒有暴露你的真實 IP",
@@ -153,8 +153,8 @@ export default {
   fh_ai_ok: "ChatGPT 和 Claude 看到的是支援的地區",
   fh_ai_none: "AI 服務都沒有回應",
   fh_web: "網站看到",
-  ipv6_link: "詳細測測 IPv6 →",
-  fp_link: "檢測瀏覽器指紋 →",
-  lat_link: "測 ChatGPT 和 Claude 的延遲 →",
+  ipv6_link: "詳細測測 IPv6",
+  fp_link: "檢測瀏覽器指紋",
+  lat_link: "測 ChatGPT 和 Claude 的延遲",
   foot: "開源，MIT 授權。全部在你的瀏覽器裡執行。",
 };
