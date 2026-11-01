@@ -24,7 +24,8 @@
   };
   applyTheme(TH.includes(store.get(K.theme)) ? store.get(K.theme) : "system");
   thBtn.onclick = () => { const n = TH[(TH.indexOf(thBtn.dataset.th) + 1) % 3]; store.set(K.theme, n); applyTheme(n); };
-  $("#lang").onchange = e => { const l = e.target.value; store.set(K.lang, l); location.href = D.paths[l] + location.hash; };
+  // a shared result keeps its link (and its preview page) in the other language
+  $("#lang").onchange = e => { const l = e.target.value; store.set(K.lang, l); location.href = (S.shared ? D.paths : D.home)[l] + location.hash; };
 
   /* ---------- probes ---------- */
   const TZ_CC = Object.fromEntries(("Asia/Shanghai:CN Asia/Chongqing:CN Asia/Harbin:CN Asia/Urumqi:CN Asia/Hong_Kong:HK Asia/Macau:MO Asia/Taipei:TW Asia/Tokyo:JP " +
@@ -74,7 +75,8 @@
   }
 
   /* ---------- state and rendering ---------- */
-  const S = { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: [], odd: {}, done: false, gen: 0 };
+  // shared: a result from a link being shown (no addresses; nothing is tested until the visitor asks)
+  const S = { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: [], odd: {}, done: false, gen: 0, shared: null };
   const masked = () => store.get(K.mask) === "1";
   const ipTxt = ip => masked() ? maskIp(ip) : ip;
   const eye = $("#eye");
@@ -98,7 +100,7 @@
     ms.textContent = ""; co.textContent = ""; ip.title = "";
     if (S.ok[p.id] == null) { ip.textContent = S.gen ? t("wait") : "–"; return; }
     if (S.ok[p.id] === false) { ip.textContent = t("fail"); return; }
-    ip.textContent = res.map(r => ipTxt(r.ip)).join(" · ");
+    ip.textContent = S.shared ? "•••" : res.map(r => ipTxt(r.ip)).join(" · ");
     if (!masked()) ip.title = ip.textContent;
     if (S.ms[p.id] != null) ms.textContent = Math.round(S.ms[p.id]) + " ms";
     const cf = res[0] && res[0].cf;
@@ -127,7 +129,9 @@
   const IPQS = (document.querySelector('meta[name="ipqs"]') || {}).content || "";
   const ipQ = ip => IPQS && !masked() ? `<a class="ipq" href="${esc(IPQS)}/?ip=${encodeURIComponent(ip)}" target="_blank" rel="noopener">${esc(ip)}</a>` : esc(ipTxt(ip));
   const exCard = e => {
-    const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ipQ).join(" · ")}</span>` : "").join("");
+    // a shared result has no addresses: only which IP versions the exit has
+    const ips = [4, 6].map(f => [f, e.ips.filter(ip => fam(ip) === f)]).map(([f, l]) => l.length ? `<span><em>IPv${f}</em>${l.map(ipQ).join(" · ")}</span>`
+      : S.shared && e["v" + f] ? `<span><em>IPv${f}</em>•••</span>` : "").join("");
     return `<li class="ex">${chip(e.letter, true)}<div class="ex-b">` +
       `<div class="where">${flag(e.cc)}<b>${esc(whereOf(e))}</b>${e.org ? `<span class="m">${esc(e.org)}${e.asn ? " · AS" + e.asn : ""}</span>` : ""}</div>` +
       `<div class="ips">${ips}</div></div></li>`;
@@ -149,6 +153,8 @@
   // The check table: six rows drawn by the build, each a label and a value. While running a value is a skeleton bar;
   // when every probe is in, each row gets its status mark and its value.
   const ST = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
+  // a host can announce its privacy check with <meta name="who" content="https://…">
+  const WHO = (document.querySelector('meta[name="who"]') || {}).content || "";
   function renderChecks() {
     const isExit = x => S.exits.some(e => e.letter === x);
     for (const row of CHECKS) {
@@ -164,7 +170,9 @@
         else if (typeof x === "string") v[k] = isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
       }
       li.classList.add("st-" + f.s); st.textContent = ST[f.s];
-      val.innerHTML = f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "");
+      val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
+        // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
+        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}</a>` : "");
     }
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
@@ -179,11 +187,12 @@
     renderExits(); renderChips();
   }); };
   async function run() {
+    leaveShared();
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
     Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, done: false });
     renderExits(); renderGroups(); renderChecks();
-    $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running");
+    $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); $("#share").disabled = true;
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
     // this site's own Cloudflare trace says whether WARP carries the traffic (absent when self-hosted elsewhere)
     fetch("/cdn-cgi/trace", { cache: "no-store", signal: AbortSignal.timeout(5000) }).then(r => r.ok ? r.text() : "")
@@ -220,10 +229,11 @@
     S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
     renderExits(); renderChips(); renderChecks(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
-    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun");
+    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#share").disabled = !S.exits.length;
   }
 
-  $("#run").onclick = () => run();
+  // leaving a shared result's page (/r/…, whose title is the verdict) opens the language's own page, which tests at once
+  $("#run").onclick = () => { if (S.shared && location.pathname !== D.home[LANG]) location.href = D.home[LANG]; else run(); };
 
   /* ---------- a row's reason, on hover or focus ---------- */
   const tip = document.body.appendChild(Object.assign(document.createElement("div"), { className: "tip", role: "tooltip" }));
@@ -245,6 +255,198 @@
   $("#helpBtn").onclick = () => help.showModal ? help.showModal() : help.setAttribute("open", "");
   help.addEventListener("click", e => { if (e.target === help || e.target.closest("[data-close]")) help.close(); });
 
+  /* ---------- a shared result ---------- */
+  // Opening a result link shows that result, worked out again from what the link carries, and tests nothing until the
+  // visitor asks for their own (the run button). Format and parsing: src/lib.mjs.
+  function showShared(R) {
+    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, exits: R.exits, shared: R, done: true, gen: 0 });
+    for (const p of PROBES) {
+      const r = R.rows[p.id]; if (!r) continue;
+      S.ok[p.id] = !r.why; S.ms[p.id] = r.ms;
+      if (r.why) S.why[p.id] = r.why; else S.res[p.id] = [{ ip: "", cf: r.cf }];
+    }
+    const cf = Object.fromEntries(Object.entries(R.rows).filter(([, r]) => r.cf && !r.why).map(([id, r]) => [id, r.cf]));
+    S.finds = findings(PROBES, S.exits, cf, R.tz);
+    S.odd = oddProbes(PROBES, S.exits);
+    eye.hidden = true;
+    $("#sharedTxt").textContent = t("shared_from", { where: S.exits[0] ? whereOf(S.exits[0]) : "?", date: new Date(R.ts).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }) });
+    renderExits(); renderChips(); renderChecks(); renderGroups(); for (const p of PROBES) renderRow(p);
+    $("#run span").textContent = t("test_mine"); $("#run").disabled = false; $("#share").disabled = false;
+  }
+  function leaveShared() {
+    if (!S.shared) return;
+    S.shared = null; eye.hidden = false; document.documentElement.removeAttribute("data-shared");
+    history.replaceState(null, "", D.home[LANG]);
+  }
+
+  /* ---------- share: an image drawn here, and a link that carries the result ---------- */
+  const shortener = (document.querySelector('meta[name="shortener"]') || {}).content || "";   // on 1ms.dog; absent when self-hosted
+  let shortFor = null;
+  async function shortLink(long) {
+    if (!shortener) return long;
+    if (shortFor && shortFor[0] === long) return shortFor[1];
+    try {
+      const r = await fetch(shortener, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url: long }), signal: AbortSignal.timeout(5000) });
+      const j = await r.json(); if (j.url) { shortFor = [long, j.url]; return j.url; }
+    } catch (e) {}
+    return long;
+  }
+  const verdict = () => verdictOf(S.finds, S.exits) || "split";
+  // The link opens the verdict's own page (/<lang>/r/<verdict>/), whose preview card states the verdict;
+  // the result itself is in the hash, which never reaches a server
+  function shareLink(withPlace) {
+    const of = exitOfProbe(S.exits), rows = {};
+    for (const p of PROBES) {
+      if (S.ok[p.id] == null) continue;
+      rows[p.id] = S.ok[p.id] ? { l: of[p.id] || [], ms: S.ms[p.id], cf: ((S.res[p.id] || [])[0] || {}).cf } : { why: S.why[p.id] };
+    }
+    const hash = encodeShare({ ts: S.shared ? S.shared.ts : Date.now(), tz: S.shared ? S.shared.tz : tzCc(), exits: S.exits, rows, place: withPlace });
+    return location.origin + D.home[LANG] + "r/" + verdict() + "/" + hash;
+  }
+  const dlg = $("#shareDlg"), place = $("#sharePlace");
+  let shareBlob = null, shareSeq = 0;
+  async function refreshShare() {
+    const seq = ++shareSeq;
+    shareBlob = null; $("#copyImg").disabled = $("#dlImg").disabled = true;
+    const long = shareLink(place.checked);
+    $("#shareUrl").value = long;
+    drawCard(place.checked).then(c => {
+      if (seq !== shareSeq) return;
+      $("#shareImg").src = c.toDataURL("image/png");
+      c.toBlob(b => { if (seq === shareSeq) { shareBlob = b; $("#copyImg").disabled = $("#dlImg").disabled = false; } }, "image/png");
+    }).catch(() => {});
+    const url = await shortLink(long);
+    if (seq === shareSeq) $("#shareUrl").value = url;
+  }
+  $("#share").onclick = () => {
+    if (!S.done || !S.exits.length) return;
+    $("#nativeShare").hidden = !navigator.share;
+    dlg.showModal ? dlg.showModal() : dlg.setAttribute("open", "");
+    refreshShare();
+  };
+  place.onchange = refreshShare;
+  dlg.addEventListener("click", e => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
+  const flash = (btn, k) => { const o = btn.textContent; btn.textContent = t(k); setTimeout(() => { btn.textContent = o; }, 1500); };
+  $("#copyLink").onclick = async e => { const b = e.currentTarget; try { await navigator.clipboard.writeText($("#shareUrl").value); flash(b, "copied"); } catch (x) { $("#shareUrl").select(); } };
+  $("#copyImg").onclick = async e => { const b = e.currentTarget; try { await navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob })]); flash(b, "copied"); } catch (x) {} };
+  $("#dlImg").onclick = () => { const a = document.createElement("a"); a.href = $("#shareImg").src; a.download = "egresslens.png"; a.click(); };
+  $("#nativeShare").onclick = async () => {
+    const text = t("share_text", { v: t("vh_" + verdict()) }), url = $("#shareUrl").value;
+    const file = shareBlob && new File([shareBlob], "egresslens.png", { type: "image/png" });
+    try { await navigator.share(file && navigator.canShare && navigator.canShare({ files: [file] }) ? { text, url, files: [file] } : { text, url }); } catch (e) {}
+  };
+
+  // The card, in the page's theme: brand, the verdict, the exits (country; city and network only when the visitor
+  // turns them on; never addresses) and the check table as the page shows it, exit chips in their colors.
+  const img = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  const FF = "Geist, 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans', 'Malgun Gothic', sans-serif", FM = "'Geist Mono', Consolas, monospace";
+  async function drawCard(showPlace) {
+    const W = 1200, P = 56, VX = P + 210, VW = W - P - VX;
+    const css = getComputedStyle(document.documentElement), v = n => css.getPropertyValue("--" + n).trim(), dark = css.colorScheme === "dark";
+    const C = { bg: v("bg"), line: v("line"), fg: v("fg"), muted: v("muted"), ink: v("ink"), ok: v("ok"), bad: v("bad"), warn: v("e-p1") };
+    const colorOf = l => {
+      const e = S.exits.find(x => x.letter === l), n = +((/\d+$/.exec(l) || [1])[0]);
+      return !e ? C.muted : e.kind === "local" ? v(n === 2 ? "e-d2" : "e-d") : v("e-p" + (n >= 2 && n <= 4 ? n : 1));
+    };
+    const m = document.createElement("canvas").getContext("2d");
+    m.font = `700 44px ${FF}`;
+    const hLines = wrap(m, t("vh_" + verdict()), W - P * 2);
+    // the check rows: each value as the page shows it, as tokens (a piece of text, or an exit chip)
+    const rows = CHECKS.map(r => {
+      const li = document.querySelector(`#finds [data-r="${r}"]`), toks = [];
+      for (const n of li.querySelector(".fr-v").childNodes) {
+        if (n.nodeType === 1 && n.classList.contains("xl")) continue;          // links stay on the page
+        if (n.nodeType === 1 && n.classList.contains("lt")) toks.push({ chip: n.textContent });
+        else for (const w of (n.textContent || "").match(TOK) || []) toks.push({ w });
+      }
+      return { label: li.querySelector(".fr-l").textContent, s: (S.finds[r] || {}).s || "none", lines: layout(m, toks, VW) };
+    });
+    const hTop = 170, eTop = hTop + hLines.length * 56 + 40, EH = 54, cTop = eTop + S.exits.length * EH + 20;
+    const H = cTop + rows.reduce((a, r) => a + 20 + r.lines.length * 34, 0) + 24 + 80;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    x.fillStyle = C.bg; x.fillRect(0, 0, W, H);
+    x.textBaseline = "alphabetic";
+    x.drawImage(await img(dark ? "/assets/logo-dark.svg" : "/assets/logo-light.svg"), P, 40, 150, 60);
+    x.fillStyle = C.ink; x.font = `700 30px ${FF}`; x.fillText(t("name"), P + 172, 82);
+    x.fillStyle = C.fg; x.font = `700 44px ${FF}`; hLines.forEach((l, i) => x.fillText(l, P, hTop + i * 56));
+    // exits
+    let y = eTop;
+    for (const e of S.exits) {
+      chipAt(x, e.letter, P, y - 30, 40, colorOf(e.letter));
+      let xx = P + 56;
+      if (e.cc) { try { x.drawImage(await img(`/flags/${e.cc.toLowerCase()}.svg`), xx, y - 22, 30, 22); xx += 42; } catch (er) {} }
+      const where = (showPlace ? [e.city, e.cc && country(e.cc)] : [e.cc ? country(e.cc) : ""]).filter(Boolean).join(", ") || "?";
+      x.fillStyle = C.fg; x.font = `600 24px ${FF}`; x.fillText(where, xx, y - 2); xx += x.measureText(where).width + 14;
+      x.fillStyle = C.muted; x.font = `400 20px ${FF}`;
+      x.fillText(clip(x, t(e.kind === "local" ? "k_local" : "k_proxy") + (showPlace && e.org ? " · " + e.org + (e.asn ? " · AS" + e.asn : "") : ""), W - P - xx), xx, y - 2);
+      y += EH;
+    }
+    // the check table
+    y = cTop;
+    const MARK = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
+    for (const r of rows) {
+      x.fillStyle = C.line; x.fillRect(P, y, W - P * 2, 1);
+      y += 20;
+      const cx = P + 13, cy = y + 13;
+      x.beginPath(); x.arc(cx, cy, 13, 0, Math.PI * 2);
+      if (["ok", "bad", "warn"].includes(r.s)) { x.fillStyle = C[r.s]; x.fill(); x.fillStyle = dark ? "#111" : "#fff"; }
+      else { x.strokeStyle = C.line; x.lineWidth = 2; x.stroke(); x.fillStyle = C.muted; }
+      x.font = `700 15px ${FF}`; x.textAlign = "center"; x.fillText(MARK[r.s] || "–", cx, cy + 5); x.textAlign = "left";
+      x.fillStyle = C.muted; x.font = `400 20px ${FF}`; x.fillText(clip(x, r.label, VX - P - 54), P + 40, y + 20);
+      r.lines.forEach((line, i) => {
+        let xx = VX;
+        for (const tk of line) {
+          if (tk.chip) chipAt(x, tk.chip, xx + 2, y + i * 34 + 1, 26, colorOf(tk.chip));
+          else { x.fillStyle = r.s === "bad" ? C.bad : C.fg; x.font = `400 22px ${FF}`; x.fillText(tk.w, xx, y + 21 + i * 34); }
+          xx += tk.wd;
+        }
+      });
+      y += r.lines.length * 34;
+    }
+    x.fillStyle = C.line; x.fillRect(P, H - 80, W - P * 2, 1);
+    x.fillStyle = C.ink; x.font = `600 26px ${FM}`; x.fillText(location.host, P, H - 32);
+    x.fillStyle = C.muted; x.font = `400 20px ${FF}`; x.textAlign = "right";
+    x.fillText(new Date(S.shared ? S.shared.ts : Date.now()).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }), W - P, H - 32); x.textAlign = "left";
+    return c;
+  }
+  // an exit chip on the card: the page's tinted square, the label in the exit's color
+  const chipW = (x, l, h) => { x.font = `700 ${Math.round(h * .46)}px ${FM}`; return Math.max(h, x.measureText(l).width + h * .5); };
+  function chipAt(x, l, x0, y0, h, col) {
+    const w = chipW(x, l, h);
+    x.fillStyle = col + "22"; roundRect(x, x0, y0, w, h, h * .26); x.fill();
+    x.strokeStyle = col + "55"; x.lineWidth = 1.5; x.stroke();
+    x.fillStyle = col; x.textAlign = "center"; x.fillText(l, x0 + w / 2, y0 + h * .68); x.textAlign = "left";
+  }
+  function roundRect(x, l, t0, w, h, r) { x.beginPath(); x.moveTo(l + r, t0); x.arcTo(l + w, t0, l + w, t0 + h, r); x.arcTo(l + w, t0 + h, l, t0 + h, r); x.arcTo(l, t0 + h, l, t0, r); x.arcTo(l, t0, l + w, t0, r); x.closePath(); }
+  // words, or single CJK characters, with the space after them
+  const TOK = /[　-鿿가-힯＀-￯]|[^\s　-鿿가-힯＀-￯]+\s*|\s+/g;
+  function wrap(x, s, w) {
+    const out = []; let line = "";
+    for (const tok of s.match(TOK) || []) {
+      if (line && x.measureText(line + tok).width > w) { out.push(line.trimEnd()); line = tok.trimStart(); } else line += tok;
+    }
+    if (line.trim()) out.push(line.trimEnd());
+    return out;
+  }
+  // tokens into lines of width w, each token with its width (a chip: its square and a little space around it)
+  function layout(x, toks, w) {
+    const lines = [[]]; let lw = 0;
+    for (const tk of toks) {
+      if (tk.chip) tk.wd = chipW(x, tk.chip, 26) + 6;
+      else { x.font = `400 22px ${FF}`; tk.wd = x.measureText(tk.w).width; }
+      if (lw && lw + tk.wd > w && !(tk.w && !tk.w.trim())) {
+        lines.push([]); lw = 0;
+        if (tk.w) { tk.w = tk.w.trimStart(); tk.wd = x.measureText(tk.w).width; }
+      }
+      lines[lines.length - 1].push(tk); lw += tk.wd;
+    }
+    return lines;
+  }
+  function clip(x, s, w) { if (x.measureText(s).width <= w) return s; while (s.length > 1 && x.measureText(s + "…").width > w) s = s.slice(0, -1); return s + "…"; }
+
   applyMask();
-  run();
+  const shared = parseShare(location.hash, PROBES.map(p => p.id));
+  if (shared && shared.exits.length) showShared(shared);
+  else { document.documentElement.removeAttribute("data-shared"); run(); }
 })();

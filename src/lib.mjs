@@ -78,12 +78,13 @@ export function groupExits(seen, geo, groupOf, warp) {
     e.score = (gs.includes("cn") ? 2 : 0) + (gs.includes("udp") ? 1 : 0);
   }
   E.sort((a, b) => (a.dc || a.warp) - (b.dc || b.warp) || b.score - a.score || b.probes.length - a.probes.length || (a.key < b.key ? -1 : 1));
-  // Direct (D) or proxy (P): an exit on a datacenter network or WARP is a proxy, any other is the visitor's own line.
-  // The label is D or P alone, numbered D1, D2… only when there is more than one of that kind.
-  for (const e of E) {
-    e.kind = e.dc || e.warp ? "proxy" : "local";
-    for (const ip of e.ips) e.v6 = e.v6 || fam(ip) === 6, e.v4 = e.v4 || fam(ip) === 4;
-  }
+  for (const e of E) for (const ip of e.ips) e.v6 = e.v6 || fam(ip) === 6, e.v4 = e.v4 || fam(ip) === 4;
+  return labelExits(E);
+}
+// Direct (D) or proxy (P): an exit on a datacenter network or WARP is a proxy, any other is the visitor's own line.
+// The label is D or P alone, numbered D1, D2… only when there is more than one of that kind.
+export function labelExits(E) {
+  for (const e of E) e.kind = e.dc || e.warp ? "proxy" : "local";
   for (const [kind, ch] of [["local", "D"], ["proxy", "P"]]) {
     const of = E.filter(e => e.kind === kind);
     of.forEach((e, i) => { e.letter = of.length > 1 ? ch + (i + 1) : ch; });
@@ -180,3 +181,62 @@ export function oddProbes(probes, exits) {
 }
 // the rows in the order the page shows them
 export const CHECKS = ["route", "except", "ai", "rtc", "v6", "tz"];
+
+/* ---------- share links ---------- */
+// The headline of a result, for the share image and the link's preview card: "leak" (WebRTC or IPv6 skips the proxy),
+// "ai" (AI services see a region they don't serve), "split" (sites use different exits), "proxy" (everything through
+// one proxy) or "direct" (everything on the local line). null before there is a result.
+export const VERDICTS = ["leak", "ai", "split", "proxy", "direct"];
+export function verdictOf(finds, exits) {
+  if (!finds || !finds.route || finds.route.s === "none") return null;
+  if (finds.rtc.s === "bad" || finds.v6.s === "bad") return "leak";
+  if (finds.ai.s === "bad") return "ai";
+  if (finds.route.k === "split" || finds.except.k === "some") return "split";
+  const e = exits.find(x => x.letter === finds.route.v.a);
+  return e && e.kind === "proxy" ? "proxy" : "direct";
+}
+// A result in a link, without any IP address: per exit its country, city, network and flags; per probe the exits it
+// saw (or why it failed), its time and the Cloudflare colo and country it reported. The receiver works the findings
+// out again from these, so a shared result reads exactly like the sender's. Version 1:
+// #r=1|<unix time base36>|<time-zone country>|<exits>|<probes>
+//   exits:  cc~city~org~asn~flags joined by ","  (flags: d datacenter, w WARP, 4 / 6 has IPv4 / IPv6)
+//   probes: id:<seen>:<ms base36>:<colo>:<loc> joined by ",", where <seen> is the exits' indexes joined by ".", or
+//           "x" and why it failed (t timeout, h<status> http, n net, p parse, s stun)
+const enc = v => encodeURIComponent(String(v ?? "")).replace(/[~,|:.]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+const WHY = { timeout: "t", http: "h", net: "n", parse: "p", stun: "s" }, WHY_OF = Object.fromEntries(Object.entries(WHY).map(([k, v]) => [v, k]));
+// rows: probe id → { l: exit labels, ms, cf: { colo, loc } } or { why: { why, n } }; place: include city and network
+export function encodeShare({ ts, tz, exits, rows, place }) {
+  const ex = exits.map(e => [e.cc, place ? e.city : "", place ? e.org : "", place && e.asn || "",
+    (e.dc ? "d" : "") + (e.warp ? "w" : "") + (e.v4 ? "4" : "") + (e.v6 ? "6" : "")].map(enc).join("~")).join(",");
+  const at = Object.fromEntries(exits.map((e, i) => [e.letter, i]));
+  const rs = Object.entries(rows).map(([id, r]) => {
+    const w = r.why || {}, cf = r.cf || {};
+    const seen = r.l && r.l.length ? r.l.map(l => at[l]).join(".") : "x" + (WHY[w.why] || "n") + (w.why === "http" && w.n ? w.n : "");
+    return [id, seen, r.ms != null ? Math.round(r.ms).toString(36) : "", /^[A-Z0-9]{3}$/.test(cf.colo || "") ? cf.colo : "", /^[A-Z]{2}$/.test(cf.loc || "") ? cf.loc : ""].join(":");
+  }).join(",");
+  return "#r=1|" + Math.floor(ts / 1000).toString(36) + "|" + (/^[A-Z]{2}$/.test(tz || "") ? tz : "") + "|" + ex + "|" + rs;
+}
+// → { ts, tz, exits, rows } with the exits labeled as on the sender's page, or null when the hash isn't a result.
+// ids: the probe ids this page knows (a probe since removed is skipped).
+export function parseShare(h, ids) {
+  const m = /^#r=1\|([0-9a-z]+)\|([A-Z]{2})?\|([^|]*)\|(.*)$/.exec(h || "");
+  if (!m) return null;
+  const dec = v => { try { return decodeURIComponent(v); } catch (e) { return ""; } };
+  const exits = m[3] ? m[3].split(",").map((x, i) => {
+    const [cc = "", city = "", org = "", asn = "", f = ""] = x.split("~").map(dec);
+    return { key: "s" + i, ips: [], probes: [], cc: /^[A-Z]{2}$/.test(cc) ? cc : "", city: city.slice(0, 80), org: org.slice(0, 120), asn: +asn || null,
+      dc: f.includes("d"), warp: f.includes("w"), v4: f.includes("4"), v6: f.includes("6") };
+  }) : [];
+  const rows = {};
+  for (const p of m[4].split(",")) {
+    const [id, seen = "", ms = "", colo = "", loc = ""] = p.split(":");
+    if (!ids.includes(id) || !seen) continue;
+    const r = rows[id] = { ms: /^[0-9a-z]+$/.test(ms) ? parseInt(ms, 36) : null };
+    if (colo || loc) r.cf = { colo: /^[A-Z0-9]{3}$/.test(colo) ? colo : "", loc: /^[A-Z]{2}$/.test(loc) ? loc : "" };
+    if (seen[0] === "x") { r.why = { why: WHY_OF[seen[1]] || "net" }; if (+seen.slice(2)) r.why.n = +seen.slice(2); }
+    else for (const i of seen.split(".")) if (exits[+i] && !exits[+i].probes.includes(id)) exits[+i].probes.push(id);
+  }
+  labelExits(exits);
+  for (const [id, r] of Object.entries(rows)) if (!r.why) r.l = exits.filter(e => e.probes.includes(id)).map(e => e.letter);
+  return { ts: parseInt(m[1], 36) * 1000, tz: m[2] || "", exits, rows };
+}

@@ -42,3 +42,20 @@ test("no English left on other languages' pages (aria-label, title, alt)", async
     assert.deepEqual([...new Set(leaks)], [], l + ": untranslated");
   }
 });
+
+test("share cards: every page has its og image, every verdict its result page and image", async () => {
+  const { access } = await import("node:fs/promises");
+  const { VERDICTS } = await import("../src/lib.mjs");
+  const has = f => access(new URL("../public/" + f, import.meta.url)).then(() => true, () => false);
+  for (const [l, slug] of LANGS) {
+    const h = await page(slug);
+    assert.match(h, /name="twitter:card" content="summary_large_image"/);
+    assert.ok(await has(`og/${l.toLowerCase()}.png`), l + ": og image");
+    for (const v of VERDICTS) {
+      const r = await readFile(new URL(`../public/${slug ? slug + "/" : ""}r/${v}/index.html`, import.meta.url), "utf8");
+      assert.match(r, new RegExp(`og:image" content="[^"]+/og/${l.toLowerCase()}/${v}\.png"`));
+      assert.match(r, /name="robots" content="noindex/);
+      assert.ok(await has(`og/${l.toLowerCase()}/${v}.png`), `${l}: ${v} image`);
+    }
+  }
+});

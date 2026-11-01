@@ -51,6 +51,7 @@ npm run dev        # http://localhost:8787，带生产环境的响应头
 npm run build      # 修改 src/ 后重新生成 public/（public/ 要提交）
 npm test           # 检查 public/ 是否最新、页面约定和逻辑测试
 npm run verify     # 检查每个 HTTPS 探测器：无跳转、允许 CORS、能读出地址
+npm run og         # 改了标题后重新生成 public/og/ 里的链接预览图（要提交）
 ```
 
 新增探测器的要求：一次 GET、没有跳转、对任何来源允许 CORS，返回的客户端地址能被 `src/lib.mjs` 里的读取函数解析。请在同时有 IPv4 和 IPv6 的网络上运行 `npm run verify`。

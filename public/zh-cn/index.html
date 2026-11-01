@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
 <head>
 <meta charset="utf-8">
-<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();</script>
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(/^#r=/.test(location.hash))d.setAttribute("data-shared","");if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!==d.lang)location.replace(P[l]+location.hash)})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>出口照妖镜 · 出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）</title>
 <meta name="description" content="同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。">
@@ -29,14 +29,19 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
 <meta property="og:title" content="出口照妖镜 · 出口 IP 检测：查看每个网站看到的 IP（分流、代理、WebRTC、IPv6 泄露）">
 <meta property="og:description" content="同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。">
 <meta property="og:url" content="https://egress.1ms.dog/zh-cn/">
 <meta property="og:locale" content="zh_CN">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://egress.1ms.dog/og/zh-cn.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://egress.1ms.dog/og/zh-cn.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"出口照妖镜","url":"https://egress.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"同时向国内网站、国外 IP 查询、ChatGPT/Claude 等 AI 服务、IPv4/IPv6 单栈站点和 WebRTC 共 51 个探测器询问，找出你的每个出口，判断分流规则和 WebRTC、IPv6 泄露。全部在浏览器里完成。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.595b1499d5.css">
+<link rel="stylesheet" href="/assets/app.4aceb7278c.css">
 </head>
 <body>
 <div class="app">
@@ -65,6 +70,7 @@
   <main>
     <section class="hero card">
       <div class="hero-h">
+        <p class="shared" id="shared"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1a2.5 2.5 0 0 1-3.5-3.5l1-1"/></svg><span id="sharedTxt"></span></p>
         <h1 data-i="h1">不同的网站，看到的是你的哪个 IP？</h1>
         <p class="intro">带规则的代理和 VPN 会按网站选线路。51 个探测器分布在国内、国外、AI 服务、IPv4/IPv6 和 WebRTC，找出你的每一个出口。</p>
       </div>
@@ -82,6 +88,7 @@
         <div class="prog" id="prog"><i></i></div>
         <span class="prog-t" id="progTxt"></span>
         <div class="acts">
+          <button class="btn" id="share" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 8v5.5h9V8"/></svg><span data-i="share">分享</span></button>
           <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">重新检测</span></button>
         </div>
       </div>
@@ -112,8 +119,16 @@
 <details><summary>怎么区分本地出口和代理出口？</summary><p>看网络归属：注册在云服务商或机房（Amazon、Google Cloud、阿里云、DigitalOcean 等）的地址标为代理，第一个属于运营商的地址是你的本地线路。住宅代理、运营商网络上的 VPN 无法用这种方法区分。</p></details>
 <details><summary>检测结果会发到这个网站吗？</summary><p>不会。浏览器直接连接每个探测器，本站只提供静态文件，看不到你的结果。截图前可以先点“隐藏 IP”。</p></details>
 </dialog>
-<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
-<script src="/assets/l.zh-cn.2b25f91761.js"></script>
-<script src="/assets/app.59cfdd3867.js" defer></script>
+<dialog class="help share" id="shareDlg" aria-labelledby="shareH">
+  <div class="help-h"><h2 id="shareH" data-i="share_h">分享检测结果</h2><button class="icon-btn" type="button" data-close aria-label="关闭"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="share-img"><img id="shareImg" alt=""></div>
+  <label class="chk"><input type="checkbox" id="sharePlace"><span data-i="share_place">在图片和链接里显示城市和运营商</span></label>
+  <div class="share-link"><input id="shareUrl" readonly aria-label="结果链接"><button class="btn" id="copyLink" type="button" data-i="copy_link">复制链接</button></div>
+  <div class="share-acts"><button class="btn" id="copyImg" type="button" data-i="copy_img">复制图片</button><button class="btn" id="dlImg" type="button" data-i="dl_img">下载图片</button><button class="btn pri" id="nativeShare" type="button" data-i="sys_share" hidden>更多分享方式</button></div>
+  <p class="share-note" data-i="share_note">图片和链接都在浏览器里生成，不含 IP 地址；城市和运营商默认不显示。</p>
+</dialog>
+<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"home":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"}}</script>
+<script src="/assets/l.zh-cn.6cd3891be6.js"></script>
+<script src="/assets/app.a3579a1cc2.js" defer></script>
 </body>
 </html>

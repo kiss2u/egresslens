@@ -51,6 +51,7 @@ npm run dev        # http://localhost:8787, with the production headers
 npm run build      # regenerate public/ after changing src/ (commit public/)
 npm test           # public/ up to date, page contract, and the logic tests
 npm run verify     # check every HTTPS probe: no redirect, CORS, readable answer
+npm run og         # redraw the link-preview images in public/og/ after changing a headline (commit them)
 ```
 
 ```

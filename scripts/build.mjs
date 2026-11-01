@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Builds the static site in public/ from src/:
 //   index.html, <lang>/index.html                 the page per language
+//   r/<verdict>/index.html, <lang>/r/<verdict>/    the same page for a shared result: its preview card states the verdict
+//                                                 (the result itself is in the link's hash; the og/ images: scripts/og.mjs)
 //   assets/app.<hash>.js, assets/app.<hash>.css   app code and styles, shared and cached by every page
 //   assets/l.<lang>.<hash>.js                     the strings the browser code needs, per language
 //   sitemap.xml, robots.txt, llms.txt, _headers   SEO and security headers (CSP)
@@ -12,7 +14,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { transform } from "esbuild";
 import { PROBES, GROUPS } from "../src/probes.mjs";
-import { CHECKS } from "../src/lib.mjs";
+import { CHECKS, VERDICTS } from "../src/lib.mjs";
 
 const SITE = (process.env.SITE_URL || "https://egress.1ms.dog").replace(/\/+$/, "");
 const pub = new URL("../public/", import.meta.url), src = new URL("../src/", import.meta.url);
@@ -21,9 +23,10 @@ export const LANGS = [["en", "", "en_US", "English"], ["zh-CN", "zh-cn", "zh_CN"
   ["ja", "ja", "ja_JP", "日本語"], ["ko", "ko", "ko_KR", "한국어"], ["es", "es", "es_ES", "Español"], ["fr", "fr", "fr_FR", "Français"],
   ["de", "de", "de_DE", "Deutsch"], ["pt", "pt", "pt_BR", "Português"], ["ru", "ru", "ru_RU", "Русский"]];
 
-// Runs before first paint: apply the saved theme. On the English root, send visitors to their language's page
-// (a saved choice first, then the browser languages); crawlers and English readers stay.
-export const PREPAINT = `(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en")location.replace(P[l]+location.hash)})();`;
+// Runs before first paint: apply the saved theme, and mark a shared result (#r=…) so its line has its space at once.
+// On the English root and on every shared-result page, send visitors to their language's page (a saved choice first,
+// then the browser languages); crawlers and readers of the page's language stay.
+export const PREPAINT = `(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(/^#r=/.test(location.hash))d.setAttribute("data-shared","");if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!==d.lang)location.replace(P[l]+location.hash)})();`;
 
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const fill = (s, v) => { for (const k in v) s = s.split("{" + k + "}").join(v[k]); return s; };
@@ -64,7 +67,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -76,7 +79,7 @@ export async function build({ check = false } = {}) {
     const sName = `l.${lang.toLowerCase()}.${hash(sjs)}.js`;
     files["assets/" + sName] = sjs;
 
-    const url = SITE + path(slug), title = T("name") + " · " + T("seo_title"), desc = fill(T("seo_desc"), { n: N });
+    const url = SITE + path(slug), title = T("name") + " · " + T("seo_title"), desc = fill(T("seo_desc"), { n: N }), og = `${SITE}/og/${lang.toLowerCase()}.png`;
     const alts = langs.map(([l, sl]) => `<link rel="alternate" hreflang="${l}" href="${SITE + path(sl)}">`).join("\n") +
       `\n<link rel="alternate" hreflang="x-default" href="${SITE}/">`;
     const graph = { "@context": "https://schema.org", "@type": "WebApplication", name: T("name"), url, applicationCategory: "UtilitiesApplication",
@@ -92,9 +95,10 @@ export async function build({ check = false } = {}) {
       `<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">`,
       `<link rel="canonical" href="${url}">`, alts,
       `<link rel="icon" href="/favicon.ico" sizes="any">`, `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">`, `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`,
-      `<meta property="og:type" content="website">`, `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
+      `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="1ms.dog">`, `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
       `<meta property="og:url" content="${url}">`, `<meta property="og:locale" content="${locale}">`,
-      `<meta name="twitter:card" content="summary">`,
+      `<meta property="og:image" content="${og}">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`,
+      `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${og}">`,
       `<script type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>`,
     ].join("\n");
 
@@ -108,19 +112,38 @@ export async function build({ check = false } = {}) {
     const faq = T("faq").map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
     const langOpts = langs.map(([l, , , nm]) => `<option value="${l}"${l === lang ? " selected" : ""}>${esc(nm)}</option>`).join("");
     const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
-    let html = tpl
+    const page = (head, paths, root) => tpl
       .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(T(k)) + close)
-      .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", slug ? "" : " data-root")
+      .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", root ? " data-root" : "")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
       .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(T("intro"), { n: N })))
-      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot"))).replace("{{themeLabel}}", esc(T("th_system"))).replace("{{closeLabel}}", esc(T("close")))
-      .replace("{{data}}", JSON.stringify({ lang, paths }).replace(/</g, "\\u003c"));
+      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot"))).replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close"))).replace("{{linkLabel}}", esc(T("link_label")))
+      .replace("{{data}}", JSON.stringify({ lang, paths, home: Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)])) }).replace(/</g, "\\u003c"));
+    const html = page(head, paths, !slug);
     if (/\{\{\w+\}\}/.test(html)) throw new Error("unfilled placeholder in " + path(slug) + ": " + /\{\{\w+\}\}/.exec(html)[0]);
     pages.push({ file: (slug ? slug + "/" : "") + "index.html", url, html });
+    // A shared result opens /<lang>/r/<verdict>/#r=…: the same page, with a preview card that states the verdict.
+    // Not for search engines (noindex, canonical to the page); visitors are sent to their own language's copy.
+    for (const vd of VERDICTS) {
+      const rp = path(slug) + "r/" + vd + "/", rurl = SITE + rp, rtitle = T("vh_" + vd) + " · " + T("name"), rog = `${SITE}/og/${lang.toLowerCase()}/${vd}.png`;
+      const rhead = [
+        `<title>${esc(rtitle)}</title>`, `<meta name="description" content="${esc(T("r_desc"))}">`, `<meta name="robots" content="noindex, follow">`,
+        `<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">`, `<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">`,
+        `<link rel="canonical" href="${url}">`,
+        `<link rel="icon" href="/favicon.ico" sizes="any">`, `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">`,
+        `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="1ms.dog">`, `<meta property="og:title" content="${esc(rtitle)}">`,
+        `<meta property="og:description" content="${esc(T("r_desc"))}">`, `<meta property="og:url" content="${rurl}">`, `<meta property="og:locale" content="${locale}">`,
+        `<meta property="og:image" content="${rog}">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`,
+        `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${rog}">`,
+      ].join("\n");
+      const rpaths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl) + "r/" + vd + "/"]));
+      const rhtml = page(rhead, rpaths, true);
+      pages.push({ file: rp.slice(1) + "index.html", url: rurl, html: rhtml, shared: true });
+    }
   }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
-    pages.map(p => `  <url>\n    <loc>${p.url}</loc>\n` + langs.map(([l, s]) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE + path(s)}"/>`).join("\n") +
+    pages.filter(p => !p.shared).map(p => `  <url>\n    <loc>${p.url}</loc>\n` + langs.map(([l, s]) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE + path(s)}"/>`).join("\n") +
       `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>\n  </url>`).join("\n") + "\n</urlset>\n";
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`;
   const llms = `# Egress
@@ -162,6 +185,8 @@ export async function build({ check = false } = {}) {
   Cache-Control: public, max-age=31536000, immutable
 /flags/*
   Cache-Control: public, max-age=2592000
+/og/*
+  Cache-Control: public, max-age=604800
 /llms.txt
   Access-Control-Allow-Origin: *
   Content-Type: text/plain; charset=utf-8
@@ -183,7 +208,7 @@ export async function build({ check = false } = {}) {
   const old = (await readdir(new URL("assets/", pub))).filter(f => /^(app|l\.[a-z-]+)\.[0-9a-f]+\.(js|css)$/.test(f) && !files["assets/" + f]);
   if (check && old.length) stale.push(...old.map(f => f + " (old)"));
   else for (const f of old) await rm(new URL("assets/" + f, pub));
-  return { stale, pages: pages.length, sizes: { html: Math.max(...pages.map(p => p.html.length)), js: js.length, css: css.length } };
+  return { stale, pages: pages.filter(p => !p.shared).length, sizes: { html: Math.max(...pages.map(p => p.html.length)), js: js.length, css: css.length } };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

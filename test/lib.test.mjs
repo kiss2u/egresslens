@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet } from "../src/lib.mjs";
+import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet, encodeShare, parseShare, verdictOf } from "../src/lib.mjs";
 import { PROBES, GROUPS } from "../src/probes.mjs";
 
 const P = id => PROBES.find(p => p.id === id);
@@ -115,4 +115,26 @@ test("odd rows: probes on another exit than their kind, and a WebRTC leak", () =
   assert.deepEqual(O["stun-cf"], { k: "leak", x: "D" });
   assert.equal(O.chatgpt, undefined);
   assert.equal(O.ipip, undefined);
+});
+
+test("share link: no addresses, and the receiver reads the same findings", () => {
+  const { seen } = scenario();
+  const exits = groupExits(seen, BOTH(), GROUP_OF, "off"), of = exitOfProbe(exits), cf = cfAll("JP");
+  const rows = Object.fromEntries(PROBES.map(p => [p.id, of[p.id] ? { l: of[p.id], ms: 123.4, cf: cf[p.id] } : { why: { why: "http", n: 403 } }]));
+  const F = findings(PROBES, exits, cf, "CN");
+  assert.equal(verdictOf(F, exits), "leak");
+  for (const place of [false, true]) {
+    const h = encodeShare({ ts: 1.7e12, tz: "CN", exits, rows, place });
+    assert.match(h, /^#r=1\|/);
+    for (const ip of seen.map(s => s.ip)) assert.ok(!h.includes(encodeURIComponent(ip).replace(/[.:]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase())) && !h.includes(ip), "address in link: " + ip);
+    assert.equal(h.includes("Tokyo"), place);
+    const R = parseShare(h, PROBES.map(p => p.id));
+    assert.equal(R.tz, "CN");
+    assert.deepEqual(R.exits.map(e => [e.letter, e.kind, e.cc]), exits.map(e => [e.letter, e.kind, e.cc]));
+    const cf2 = Object.fromEntries(Object.entries(R.rows).filter(([, r]) => r.cf).map(([id, r]) => [id, r.cf]));
+    assert.deepEqual(findings(PROBES, R.exits, cf2, R.tz), F);
+    assert.deepEqual(oddProbes(PROBES, R.exits), oddProbes(PROBES, exits));
+  }
+  assert.equal(parseShare("#r=2|x", []), null);
+  assert.equal(parseShare("#nope", []), null);
 });
