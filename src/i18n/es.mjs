@@ -94,8 +94,8 @@ export default {
   vh_split: "Enrutamiento dividido activo: cada sitio usa su salida",
   vh_proxy: "Todos los sitios ven la misma salida proxy",
   vh_direct: "Directo: todos los sitios ven la IP local",
-  who_link: "Tu perfil completo y la prueba de camuflaje →",
-  unlock_link: "Qué IA desbloquea esta ruta →",
+  who_link: "Tu perfil completo y la prueba de camuflaje",
+  unlock_link: "Qué IA desbloquea esta ruta",
   lp_rtc: {
     "nav": "Test de fuga WebRTC",
     "title": "Test de fuga WebRTC: ¿tu VPN o proxy filtra tu IP real?",
@@ -154,8 +154,8 @@ export default {
   fh_ai_ok: "ChatGPT y Claude ven una región admitida",
   fh_ai_none: "Ningún servicio de IA respondió",
   fh_web: "Los sitios ven",
-  ipv6_link: "Prueba IPv6 a fondo →",
-  fp_link: "Comprueba la huella de tu navegador →",
-  lat_link: "Latencia de ChatGPT y Claude →",
+  ipv6_link: "Prueba IPv6 a fondo",
+  fp_link: "Comprueba la huella de tu navegador",
+  lat_link: "Latencia de ChatGPT y Claude",
   foot: "Código abierto, licencia MIT. Funciona por completo en tu navegador.",
 };

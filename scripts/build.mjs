@@ -20,6 +20,8 @@ import { CHECKS, VERDICTS } from "../src/lib.mjs";
 const SITE = (process.env.SITE_URL || "https://egress.1ms.dog").replace(/\/+$/, "");
 const pub = new URL("../public/", import.meta.url), src = new URL("../src/", import.meta.url);
 // language, URL folder, og:locale, name in its own language; the first is the root
+// the external-link icon that ends a link to another 1ms.dog tool (the shared tool contract: no arrows)
+const EXT = '<svg class="xi" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg>';
 // Landing pages: the same tool with one check up front. id: its strings (lp_<id>, an object per language) and the
 // check-table row it leads with; group: the probe group listed first; skip: the main page's question it answers itself.
 export const LANDS = [{ id: "rtc", slug: "webrtc-leak", group: "udp", skip: 2 }, { id: "ai", slug: "chatgpt-ip", group: "ai", skip: 1 }];
@@ -101,10 +103,10 @@ export async function build({ check = false } = {}) {
       const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "") +
         // links to other 1ms.dog tools: [meta name, path after the language folder, text], shown once the host announces the tool
         `<li class="fo-links">${(land.id === "rtc" ? [["who", "fingerprint/", "fp_link"]] : [["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]])
-          .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}</a>`).join("")}</li>`;
+          .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}${EXT}</a>`).join("")}</li>`;
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
         `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +
-        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}</a>` : "") + `</div>`;
+        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden>${esc(T("who_link"))}${EXT}</a>` : "") + `</div>`;
     };
     // links between the main page and the landing pages, in the footer
     const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("");

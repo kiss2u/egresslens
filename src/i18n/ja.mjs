@@ -94,8 +94,8 @@ export default {
   vh_split: "分流が有効：サイトごとに別の出口",
   vh_proxy: "すべてのサイトが同じプロキシ出口",
   vh_direct: "直接接続：すべてのサイトにローカル IP が見えています",
-  who_link: "全体像と偽装チェックを見る →",
-  unlock_link: "この回線で使える AI →",
+  who_link: "全体像と偽装チェックを見る",
+  unlock_link: "この回線で使える AI",
   lp_rtc: {
     "nav": "WebRTC リークテスト",
     "title": "WebRTC リークテスト：VPN・プロキシで本当の IP が漏れていないか確認",
@@ -154,8 +154,8 @@ export default {
   fh_ai_ok: "ChatGPT と Claude からは提供地域に見えています",
   fh_ai_none: "AI サービスが応答しませんでした",
   fh_web: "サイトから見える出口",
-  ipv6_link: "IPv6 を詳しく調べる →",
-  fp_link: "ブラウザフィンガープリントを調べる →",
-  lat_link: "ChatGPT と Claude の遅延を測る →",
+  ipv6_link: "IPv6 を詳しく調べる",
+  fp_link: "ブラウザフィンガープリントを調べる",
+  lat_link: "ChatGPT と Claude の遅延を測る",
   foot: "オープンソース、MIT ライセンス。すべてブラウザ内で動作します。",
 };

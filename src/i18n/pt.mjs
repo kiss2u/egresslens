@@ -94,8 +94,8 @@ export default {
   vh_split: "Roteamento dividido ativo: cada site usa sua saída",
   vh_proxy: "Todos os sites veem a mesma saída proxy",
   vh_direct: "Direto: todos os sites veem o IP local",
-  who_link: "Seu perfil completo e o teste de disfarce →",
-  unlock_link: "Quais IAs esta rota libera →",
+  who_link: "Seu perfil completo e o teste de disfarce",
+  unlock_link: "Quais IAs esta rota libera",
   lp_rtc: {
     "nav": "Teste de vazamento WebRTC",
     "title": "Teste de vazamento WebRTC: sua VPN ou proxy vaza seu IP real?",
@@ -154,8 +154,8 @@ export default {
   fh_ai_ok: "ChatGPT e Claude veem uma região suportada",
   fh_ai_none: "Nenhum serviço de IA respondeu",
   fh_web: "Os sites veem",
-  ipv6_link: "Teste o IPv6 a fundo →",
-  fp_link: "Verifique a impressão digital do navegador →",
-  lat_link: "Latência do ChatGPT e do Claude →",
+  ipv6_link: "Teste o IPv6 a fundo",
+  fp_link: "Verifique a impressão digital do navegador",
+  lat_link: "Latência do ChatGPT e do Claude",
   foot: "Código aberto, licença MIT. Roda inteiramente no seu navegador.",
 };
