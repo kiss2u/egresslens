@@ -156,5 +156,7 @@ export default {
   ipv6_link: "IPv6 genauer prüfen",
   fp_link: "Browser-Fingerabdruck prüfen",
   lat_link: "Latenz zu ChatGPT und Claude",
+  asn_title: "Dieses Netz in der ASN-Abfrage ansehen",
+  ipq_title: "Qualität dieser IP prüfen",
   foot: "Open Source, MIT-Lizenz. Läuft vollständig in deinem Browser.",
 };

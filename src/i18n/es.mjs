@@ -156,5 +156,7 @@ export default {
   ipv6_link: "Prueba IPv6 a fondo",
   fp_link: "Comprueba la huella de tu navegador",
   lat_link: "Latencia de ChatGPT y Claude",
+  asn_title: "Ver esta red en la consulta de ASN",
+  ipq_title: "Comprobar la calidad de esta IP",
   foot: "Código abierto, licencia MIT. Funciona por completo en tu navegador.",
 };

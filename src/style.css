@@ -255,5 +255,5 @@ select option:checked { background-color: var(--soft); }
 .fo-links a.xl:hover, .where a.asl:hover { text-decoration: underline; }
 .where a.asl { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--muted); }
 /* links to other 1ms.dog tools: the text, then the external-link icon at about the text's size */
-a.xl, a.asl, a.ipq { display: inline-flex; align-items: center; gap: 3px; }
+a.xl { display: inline-flex; align-items: center; gap: 3px; }
 svg.xi { width: .95em; height: .95em; flex: none; }
