@@ -95,5 +95,63 @@ export default {
   vh_proxy: "所有网站都走同一个代理出口",
   vh_direct: "直连：所有网站看到的都是本地 IP",
   who_link: "看完整画像和伪装检测 →",
+  lp_rtc: {
+    "nav": "WebRTC 泄露检测",
+    "title": "WebRTC 泄露检测：代理和 VPN 有没有暴露你的真实 IP",
+    "desc": "免费 WebRTC 泄露检测：经 UDP 询问 4 个 STUN 服务器，再和 {n} 个探测器经 HTTPS 看到的出口对比，判断代理或 VPN 是否泄露了你的真实 IP。全部在浏览器里完成。",
+    "kw": "WebRTC泄露, WebRTC泄露检测, 真实IP泄露, 代理泄露检测, VPN泄露, STUN, WebRTC检测, IP泄露",
+    "h1": "WebRTC 泄露检测：你的真实 IP 暴露了吗？",
+    "intro": "浏览器里的视频通话会经 UDP 向 STUN 服务器询问你的公网地址，而很多代理只转发 TCP。这里同时询问 4 个 STUN 服务器和各类网站，共 {n} 个探测器，看 WebRTC 有没有暴露你自己的线路。",
+    "faq": [
+      [
+        "WebRTC 泄露检测查的是什么？",
+        "经 UDP 向 4 个 STUN 服务器（Cloudflare、Google、Twilio、小米）询问你的公网地址，和视频通话网站的做法一样，再和网站经 HTTPS 看到的出口对比。如果 STUN 看到的是本地线路，网站看到的却是代理，任何网页都能读到你的真实 IP。"
+      ],
+      [
+        "WebRTC 泄露怎么修复？",
+        "让代理也接管 UDP：在 Clash、sing-box、Surge、Shadowrocket 里打开 TUN 或增强模式，或者使用 VPN 的全局隧道模式。也可以在浏览器里禁用 WebRTC（uBlock Origin 的“防止 WebRTC 泄露本地 IP 地址”，或 Firefox 的 media.peerconnection.enabled = false），但可能影响视频通话。"
+      ],
+      [
+        "结果显示 UDP 不通，这样安全吗？",
+        "对 WebRTC 来说是安全的：没有 STUN 服务器回应，网页就无法用这种方式拿到地址。视频通话仍可能通过中继服务器进行。"
+      ],
+      [
+        "用了 VPN 就不会有 WebRTC 泄露吗？",
+        "接管全部流量的 VPN 不会。只在浏览器或系统里设置的代理（HTTP 或 SOCKS）通常只转发 TCP，WebRTC 的 UDP 会直接出去。每次改了配置后都建议重新检测。"
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "ChatGPT/Claude 看到的 IP",
+    "title": "ChatGPT IP 检测：ChatGPT 和 Claude 看到的是哪个 IP、哪个地区",
+    "desc": "查看 ChatGPT、OpenAI、Claude、Anthropic 等 12 个 AI 服务看到的 IP 和国家，判断该地区是否受支持。共 {n} 个探测器，全部在浏览器里完成。",
+    "kw": "ChatGPT IP, ChatGPT IP检测, ChatGPT 地区, Claude IP, ChatGPT 不支持的地区, OpenAI IP, AI 分流, ChatGPT 节点",
+    "h1": "ChatGPT 和 Claude 看到的是你的哪个 IP？",
+    "intro": "带规则的代理常常给 AI 服务单独分配节点。ChatGPT、OpenAI、Claude、Anthropic 等 12 个 AI 网站会报告它们看到的地址和国家，同时列出 {n} 个探测器找到的所有出口。",
+    "faq": [
+      [
+        "怎么知道 ChatGPT 和 Claude 看到的是什么？",
+        "chatgpt.com、openai.com、claude.ai、anthropic.com 等 AI 网站都在 Cloudflare 后面，在自己的域名上提供 /cdn-cgi/trace，返回连到它的地址和 Cloudflare 判定的国家。浏览器按你的规则给每个网站选的线路去询问。"
+      ],
+      [
+        "哪些地区不受支持？",
+        "OpenAI 和 Anthropic 都不向中国大陆、香港、澳门、俄罗斯、白俄罗斯、伊朗、朝鲜、叙利亚和古巴提供服务。如果 AI 网站看到的是这些地区，注册和使用都可能被拦截。"
+      ],
+      [
+        "为什么 ChatGPT 看到的 IP 和其他网站不一样？",
+        "代理规则常把 AI 域名分到单独的节点。这个页面把每个 AI 服务的出口和其他网站放在一起，方便确认规则是否按你的意思生效。"
+      ],
+      [
+        "机房 IP 有影响吗？",
+        "云服务器和机房的地址被很多人共用，更容易遇到验证和限制。家庭宽带或移动网络的出口被标记的可能性更低。"
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC 泄露了你的真实 IP",
+  fh_rtc_safe: "WebRTC 没有泄露",
+  fh_rtc_none: "WebRTC 没有泄露：UDP 不通",
+  fh_ai_ok: "ChatGPT 和 Claude 看到的是支持的地区",
+  fh_ai_none: "AI 服务都没有响应",
+  fh_web: "网站看到",
   foot: "开源，MIT 许可。全部在你的浏览器里运行。",
 };

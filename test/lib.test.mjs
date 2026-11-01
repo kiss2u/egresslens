@@ -138,3 +138,13 @@ test("share link: no addresses, and the receiver reads the same findings", () =>
   assert.equal(parseShare("#r=2|x", []), null);
   assert.equal(parseShare("#nope", []), null);
 });
+
+test("WebRTC: a leak even when one site abroad is routed direct", () => {
+  const { seen } = scenario();
+  // www.cloudflare.com goes direct (sees the local line); the rest abroad through the proxy; STUN sees the local line
+  const seen2 = seen.map(s => s.probe === "cloudflare" ? { ip: LOCAL4, probe: s.probe } : s);
+  const exits = groupExits(seen2, BOTH(), GROUP_OF, "off");
+  const F = findings(PROBES, exits, cfAll("JP"), "CN");
+  assert.deepEqual(F.rtc, { s: "bad", k: "leak", v: { a: "D" } });
+  assert.equal(oddProbes(PROBES, exits)["stun-cf"].k, "leak");
+});

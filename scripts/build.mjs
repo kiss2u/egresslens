@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Builds the static site in public/ from src/:
 //   index.html, <lang>/index.html                 the page per language
+//   <lang>/webrtc-leak/, <lang>/chatgpt-ip/        landing pages for one check each (LANDS): own title, text and questions
 //   r/<verdict>/index.html, <lang>/r/<verdict>/    the same page for a shared result: its preview card states the verdict
 //                                                 (the result itself is in the link's hash; the og/ images: scripts/og.mjs)
 //   assets/app.<hash>.js, assets/app.<hash>.css   app code and styles, shared and cached by every page
@@ -19,6 +20,9 @@ import { CHECKS, VERDICTS } from "../src/lib.mjs";
 const SITE = (process.env.SITE_URL || "https://egress.1ms.dog").replace(/\/+$/, "");
 const pub = new URL("../public/", import.meta.url), src = new URL("../src/", import.meta.url);
 // language, URL folder, og:locale, name in its own language; the first is the root
+// Landing pages: the same tool with one check up front. id: its strings (lp_<id>, an object per language) and the
+// check-table row it leads with; group: the probe group listed first; skip: the main page's question it answers itself.
+export const LANDS = [{ id: "rtc", slug: "webrtc-leak", group: "udp", skip: 2 }, { id: "ai", slug: "chatgpt-ip", group: "ai", skip: 1 }];
 export const LANGS = [["en", "", "en_US", "English"], ["zh-CN", "zh-cn", "zh_CN", "简体中文"], ["zh-TW", "zh-tw", "zh_TW", "繁體中文"],
   ["ja", "ja", "ja_JP", "日本語"], ["ko", "ko", "ko_KR", "한국어"], ["es", "es", "es_ES", "Español"], ["fr", "fr", "fr_FR", "Français"],
   ["de", "de", "de_DE", "Deutsch"], ["pt", "pt", "pt_BR", "Português"], ["ru", "ru", "ru_RU", "Русский"]];
@@ -67,7 +71,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "link_label", "fh_web", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -79,49 +83,73 @@ export async function build({ check = false } = {}) {
     const sName = `l.${lang.toLowerCase()}.${hash(sjs)}.js`;
     files["assets/" + sName] = sjs;
 
-    const url = SITE + path(slug), title = T("name") + " · " + T("seo_title"), desc = fill(T("seo_desc"), { n: N }), og = `${SITE}/og/${lang.toLowerCase()}.png`;
-    const alts = langs.map(([l, sl]) => `<link rel="alternate" hreflang="${l}" href="${SITE + path(sl)}">`).join("\n") +
-      `\n<link rel="alternate" hreflang="x-default" href="${SITE}/">`;
-    const graph = { "@context": "https://schema.org", "@type": "WebApplication", name: T("name"), url, applicationCategory: "UtilitiesApplication",
-      operatingSystem: "Any", browserRequirements: "Requires JavaScript", description: desc, inLanguage: lang, isAccessibleForFree: true,
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
-    const head = [
-      `<title>${esc(title)}</title>`,
-      `<meta name="description" content="${esc(desc)}">`,
-      `<meta name="keywords" content="${esc(T("seo_kw"))}">`,
-      ...(lang === "zh-CN" ? [`<meta http-equiv="Cache-Control" content="no-transform">`, `<meta http-equiv="Cache-Control" content="no-siteapp">`, `<meta name="applicable-device" content="pc,mobile">`] : []),
-      `<meta name="robots" content="index, follow">`,
-      `<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">`,
-      `<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">`,
-      `<link rel="canonical" href="${url}">`, alts,
-      `<link rel="icon" href="/favicon.ico" sizes="any">`, `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">`, `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`,
-      `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="1ms.dog">`, `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
-      `<meta property="og:url" content="${url}">`, `<meta property="og:locale" content="${locale}">`,
-      `<meta property="og:image" content="${og}">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`,
-      `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${og}">`,
-      `<script type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>`,
-    ].join("\n");
-
     // every probe is in the HTML from the start (crawlers see what is checked; rows never move when results arrive)
     // one line per probe: name (host on hover), the address it saw, the exit label, Cloudflare colo, time
     const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(p.host)}">${esc(p.name)}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
       `<span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li>`;
-    const groups = GROUPS.map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
+    const groupsOf = first => [first, ...GROUPS.filter(g => g !== first)].filter(Boolean)
+      .map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
     // the check table's rows: label now, status and value once the probes are in
     const checks = CHECKS.map(r => `<li class="fr" data-r="${r}"><i class="st"></i><span class="fr-l">${esc(T("r_" + r))}</span><span class="fr-v"><span class="bar"></span></span></li>`).join("");
-    const faq = T("faq").map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
+    const faqOf = list => list.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n");
     const langOpts = langs.map(([l, , , nm]) => `<option value="${l}"${l === lang ? " selected" : ""}>${esc(nm)}</option>`).join("");
-    const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
-    const page = (head, paths, root) => tpl
-      .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(T(k)) + close)
+    const home = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
+    // a landing page's lead panel: its verdict, then one row per probe it is about, filled as they answer
+    const focusOf = land => {
+      if (!land) return "";
+      const fr = (id, name) => `<li class="fo-r" data-p="${id}"><span class="fo-n">${esc(name)}</span><span class="fo-x"></span><span class="fo-m"></span></li>`;
+      const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "");
+      return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
+        `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +
+        (land.id === "rtc" ? `<a class="xl fo-who" target="_blank" rel="noopener" hidden data-i="who_link"></a>` : "") + `</div>`;
+    };
+    // links between the main page and the landing pages, in the footer
+    const navOf = land => [null, ...LANDS].filter(x => x !== land).map(x => `<a href="${path(slug) + (x ? x.slug + "/" : "")}">${esc(x ? T("lp_" + x.id).nav : T("name"))}</a>`).join("");
+    const page = (head, paths, root, land, v) => tpl
+      .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(k === "h1" ? v.h1 : T(k)) + close)
       .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", root ? " data-root" : "")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
-      .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(T("intro"), { n: N })))
-      .replace("{{groups}}", groups).replace("{{checks}}", checks).replace("{{faq}}", faq).replace("{{foot}}", esc(T("foot"))).replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close"))).replace("{{linkLabel}}", esc(T("link_label")))
-      .replace("{{data}}", JSON.stringify({ lang, paths, home: Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)])) }).replace(/</g, "\\u003c"));
-    const html = page(head, paths, !slug);
-    if (/\{\{\w+\}\}/.test(html)) throw new Error("unfilled placeholder in " + path(slug) + ": " + /\{\{\w+\}\}/.exec(html)[0]);
-    pages.push({ file: (slug ? slug + "/" : "") + "index.html", url, html });
+      .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(v.intro, { n: N }))).replace("{{focus}}", focusOf(land))
+      .replace("{{groups}}", groupsOf(land && land.group)).replace("{{checks}}", checks).replace("{{faq}}", faqOf(v.faq)).replace("{{foot}}", esc(T("foot"))).replace("{{nav}}", navOf(land))
+      .replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close"))).replace("{{linkLabel}}", esc(T("link_label")))
+      .replace("{{data}}", JSON.stringify({ lang, paths, home, focus: land ? land.id : "" }).replace(/</g, "\\u003c"));
+
+    // the main page, then one landing page per check (LANDS), each with its own words and its own language versions
+    let url, og = `${SITE}/og/${lang.toLowerCase()}.png`;
+    for (const land of [null, ...LANDS]) {
+      const L = land ? T("lp_" + land.id) : null, sub = land ? land.slug + "/" : "";
+      const v = land ? { title: L.title, desc: L.desc, kw: L.kw, h1: L.h1, intro: L.intro, faq: [...L.faq, ...T("faq").filter((x, i) => i !== land.skip)] }
+        : { title: T("name") + " · " + T("seo_title"), desc: T("seo_desc"), kw: T("seo_kw"), h1: T("h1"), intro: T("intro"), faq: T("faq") };
+      const purl = SITE + path(slug) + sub, desc = fill(v.desc, { n: N }), paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl) + sub]));
+      const alts = langs.map(([l, sl]) => `<link rel="alternate" hreflang="${l}" href="${SITE + path(sl) + sub}">`).join("\n") +
+        `\n<link rel="alternate" hreflang="x-default" href="${SITE}/${sub}">`;
+      const graph = { "@context": "https://schema.org", "@graph": [
+        { "@type": "WebApplication", name: land ? L.h1 : T("name"), url: purl, applicationCategory: "UtilitiesApplication",
+          operatingSystem: "Any", browserRequirements: "Requires JavaScript", description: desc, inLanguage: lang, isAccessibleForFree: true,
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+        { "@type": "FAQPage", inLanguage: lang, mainEntity: v.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) }] };
+      const head = [
+        `<title>${esc(v.title)}</title>`,
+        `<meta name="description" content="${esc(desc)}">`,
+        `<meta name="keywords" content="${esc(v.kw)}">`,
+        ...(lang === "zh-CN" ? [`<meta http-equiv="Cache-Control" content="no-transform">`, `<meta http-equiv="Cache-Control" content="no-siteapp">`, `<meta name="applicable-device" content="pc,mobile">`] : []),
+        `<meta name="robots" content="index, follow">`,
+        `<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">`,
+        `<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">`,
+        `<link rel="canonical" href="${purl}">`, alts,
+        `<link rel="icon" href="/favicon.ico" sizes="any">`, `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">`, `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`,
+        `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="1ms.dog">`, `<meta property="og:title" content="${esc(v.title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
+        `<meta property="og:url" content="${purl}">`, `<meta property="og:locale" content="${locale}">`,
+        `<meta property="og:image" content="${land ? `${SITE}/og/${lang.toLowerCase()}/${land.slug}.png` : og}">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`,
+        `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${land ? `${SITE}/og/${lang.toLowerCase()}/${land.slug}.png` : og}">`,
+        `<script type="application/ld+json">${JSON.stringify(graph).replace(/</g, "\\u003c")}</script>`,
+      ].join("\n");
+      const html = page(head, paths, !slug, land, v);
+      if (/\{\{\w+\}\}/.test(html)) throw new Error("unfilled placeholder in " + path(slug) + sub + ": " + /\{\{\w+\}\}/.exec(html)[0]);
+      pages.push({ file: (slug ? slug + "/" : "") + sub + "index.html", url: purl, html, sub });
+      if (!land) url = purl;
+    }
+    const mainV = { h1: T("h1"), intro: T("intro"), faq: T("faq") };
     // A shared result opens /<lang>/r/<verdict>/#r=…: the same page, with a preview card that states the verdict.
     // Not for search engines (noindex, canonical to the page); visitors are sent to their own language's copy.
     for (const vd of VERDICTS) {
@@ -137,14 +165,14 @@ export async function build({ check = false } = {}) {
         `<meta name="twitter:card" content="summary_large_image">`, `<meta name="twitter:image" content="${rog}">`,
       ].join("\n");
       const rpaths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl) + "r/" + vd + "/"]));
-      const rhtml = page(rhead, rpaths, true);
+      const rhtml = page(rhead, rpaths, true, null, mainV);
       pages.push({ file: rp.slice(1) + "index.html", url: rurl, html: rhtml, shared: true });
     }
   }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
-    pages.filter(p => !p.shared).map(p => `  <url>\n    <loc>${p.url}</loc>\n` + langs.map(([l, s]) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE + path(s)}"/>`).join("\n") +
-      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>\n  </url>`).join("\n") + "\n</urlset>\n";
+    pages.filter(p => !p.shared).map(p => `  <url>\n    <loc>${p.url}</loc>\n` + langs.map(([l, s]) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE + path(s) + p.sub}"/>`).join("\n") +
+      `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/${p.sub}"/>\n  </url>`).join("\n") + "\n</urlset>\n";
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`;
   const llms = `# Egress
 
@@ -155,6 +183,7 @@ export async function build({ check = false } = {}) {
 > time-zone mismatches. Everything runs client-side; no results are sent to the site.
 
 - Page: ${SITE}/ (also ${langs.slice(1).map(([, s]) => "/" + s + "/").join(", ")})
+${LANDS.map(l => `- ${en["lp_" + l.id].nav}: ${SITE}/${l.slug}/ (same tool, this check first)`).join("\n")}
 - Probes: ${GROUPS.map(g => `${en["g_" + g]}: ${PROBES.filter(p => p.g === g).map(p => p.host).join(", ")}`).join("; ")}
 - Source: https://github.com/yt1988/egresslens
 `;

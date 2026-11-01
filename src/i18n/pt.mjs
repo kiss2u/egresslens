@@ -95,5 +95,63 @@ export default {
   vh_proxy: "Todos os sites veem a mesma saída proxy",
   vh_direct: "Direto: todos os sites veem o IP local",
   who_link: "Seu perfil completo e o teste de disfarce →",
+  lp_rtc: {
+    "nav": "Teste de vazamento WebRTC",
+    "title": "Teste de vazamento WebRTC: sua VPN ou proxy vaza seu IP real?",
+    "desc": "Teste de vazamento WebRTC grátis: quatro servidores STUN por UDP comparados com o que {n} sondas veem por HTTPS, para saber se sua VPN ou proxy vaza seu IP real. Roda no seu navegador.",
+    "kw": "teste vazamento webrtc, vazamento webrtc, vazamento de ip, teste vazamento vpn, ip real, stun, webrtc leak",
+    "h1": "Teste de vazamento WebRTC: seu IP real está exposto?",
+    "intro": "Chamadas de vídeo no navegador perguntam seu endereço público a servidores STUN por UDP, e muitos proxies só levam TCP. Quatro servidores STUN são consultados junto com sites, {n} sondas no total, para ver se o WebRTC entrega sua própria linha.",
+    "faq": [
+      [
+        "O que este teste de vazamento WebRTC verifica?",
+        "Ele pergunta seu endereço público por UDP a quatro servidores STUN (Cloudflare, Google, Twilio, Xiaomi), como fazem os sites de videochamada, e compara com a saída que os sites veem por HTTPS. Se o STUN vê sua linha local enquanto os sites veem o proxy, qualquer página pode ler seu IP real."
+      ],
+      [
+        "Como corrijo um vazamento WebRTC?",
+        "Faça o proxy levar UDP também: ative o modo TUN ou avançado no Clash, sing-box, Surge ou Shadowrocket, ou use o túnel completo da VPN. Bloquear o WebRTC no navegador (a opção do uBlock Origin \"Impedir que o WebRTC vaze endereços IP locais\", ou media.peerconnection.enabled = false no Firefox) também funciona, mas pode quebrar videochamadas."
+      ],
+      [
+        "O resultado diz que o UDP está bloqueado. É seguro?",
+        "Para o WebRTC, sim: nenhum servidor STUN respondeu, então uma página não consegue seu endereço por esse caminho. Videochamadas ainda podem funcionar por um servidor de retransmissão."
+      ],
+      [
+        "Qualquer VPN evita vazamentos WebRTC?",
+        "Uma VPN que tunela todo o tráfego, sim. Um proxy configurado só no navegador ou no sistema (HTTP ou SOCKS) costuma levar só TCP, e o UDP do WebRTC sai direto. Teste de novo após cada mudança."
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "IP visto por ChatGPT e Claude",
+    "title": "Qual IP o ChatGPT vê? Confira o IP e a região que ChatGPT e Claude veem",
+    "desc": "Veja o endereço IP e o país de onde ChatGPT, OpenAI, Claude, Anthropic e mais 8 serviços de IA veem você, e se essa região é suportada. {n} sondas, no seu navegador.",
+    "kw": "ip chatgpt, qual ip o chatgpt vê, ip claude, região chatgpt, chatgpt país não suportado, verificar ip openai, proxy ia",
+    "h1": "Qual IP e região o ChatGPT e o Claude veem?",
+    "intro": "Proxies com regras costumam mandar serviços de IA por um nó próprio. ChatGPT, OpenAI, Claude, Anthropic e mais 8 sites de IA informam o endereço e o país que veem, ao lado das saídas que {n} sondas encontram.",
+    "faq": [
+      [
+        "Como a página sabe o que o ChatGPT e o Claude veem?",
+        "chatgpt.com, openai.com, claude.ai, anthropic.com e os outros sites de IA ficam atrás da Cloudflare e respondem /cdn-cgi/trace no próprio domínio: o endereço que se conectou e o país em que a Cloudflare o coloca. Seu navegador pergunta a cada um pela rota que suas regras escolhem."
+      ],
+      [
+        "Quais regiões não são suportadas?",
+        "Nem a OpenAI nem a Anthropic atendem China continental, Hong Kong, Macau, Rússia, Belarus, Irã, Coreia do Norte, Síria ou Cuba. Se um site de IA vê uma delas, o cadastro ou o uso podem ser bloqueados."
+      ],
+      [
+        "Por que o ChatGPT vê um IP diferente dos outros sites?",
+        "As regras do proxy costumam mandar domínios de IA por um nó dedicado. Esta página mostra a saída de cada serviço de IA ao lado das outras, para você conferir se a regra faz o que queria."
+      ],
+      [
+        "Um IP de data center faz diferença?",
+        "Endereços de nuvem e hospedagem são compartilhados por muitos usuários e recebem mais verificações e limites. Uma saída em rede residencial ou móvel tem menos chance de ser marcada."
+      ]
+    ]
+  },
+  fh_rtc_leak: "O WebRTC vaza seu IP real",
+  fh_rtc_safe: "Sem vazamento WebRTC",
+  fh_rtc_none: "Sem vazamento WebRTC: UDP bloqueado",
+  fh_ai_ok: "ChatGPT e Claude veem uma região suportada",
+  fh_ai_none: "Nenhum serviço de IA respondeu",
+  fh_web: "Os sites veem",
   foot: "Código aberto, licença MIT. Roda inteiramente no seu navegador.",
 };

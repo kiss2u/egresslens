@@ -95,5 +95,63 @@ export default {
   vh_proxy: "すべてのサイトが同じプロキシ出口",
   vh_direct: "直接接続：すべてのサイトにローカル IP が見えています",
   who_link: "全体像と偽装チェックを見る →",
+  lp_rtc: {
+    "nav": "WebRTC リークテスト",
+    "title": "WebRTC リークテスト：VPN・プロキシで本当の IP が漏れていないか確認",
+    "desc": "無料の WebRTC リークテスト。UDP で 4 つの STUN サーバーに問い合わせ、{n} 個のプローブが HTTPS で見た出口と比べて、VPN やプロキシから本当の IP が漏れていないかを調べます。ブラウザ内で完結します。",
+    "kw": "WebRTC リーク, WebRTC 漏れ, WebRTC リークテスト, IP 漏れ チェック, VPN 漏れ, STUN, 本当のIP",
+    "h1": "WebRTC リークテスト：本当の IP は漏れていない？",
+    "intro": "ブラウザのビデオ通話は UDP で STUN サーバーにグローバル IP を問い合わせますが、多くのプロキシは TCP しか中継しません。4 つの STUN サーバーとさまざまなサイト、計 {n} 個のプローブに同時に問い合わせ、WebRTC から自分の回線が見えていないかを確認します。",
+    "faq": [
+      [
+        "この WebRTC リークテストは何を調べますか？",
+        "ビデオ通話サイトと同じように、UDP で 4 つの STUN サーバー（Cloudflare、Google、Twilio、Xiaomi）にグローバル IP を問い合わせ、サイトが HTTPS で見ている出口と比べます。STUN にはローカル回線が、サイトにはプロキシが見えている場合、どのページからでも本当の IP が読み取れます。"
+      ],
+      [
+        "WebRTC リークを直すには？",
+        "プロキシに UDP も中継させます。Clash、sing-box、Surge、Shadowrocket の TUN モードや拡張モード、または VPN のフルトンネルを使ってください。ブラウザで WebRTC を止める方法（uBlock Origin の「WebRTC によるローカル IP アドレスの漏洩を防止」、Firefox の media.peerconnection.enabled = false）もありますが、ビデオ通話が使えなくなることがあります。"
+      ],
+      [
+        "「UDP 不通」と出ました。安全ですか？",
+        "WebRTC については安全です。STUN サーバーが応答しないので、ページはこの方法で IP を知ることができません。ビデオ通話は中継サーバー経由で使える場合があります。"
+      ],
+      [
+        "VPN を使えば WebRTC リークは起きませんか？",
+        "すべての通信をトンネルする VPN なら起きません。ブラウザやシステムだけに設定したプロキシ（HTTP や SOCKS）は通常 TCP だけを中継するため、WebRTC の UDP は直接出ていきます。設定を変えたら再チェックしてください。"
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "ChatGPT・Claude から見える IP",
+    "title": "ChatGPT の IP チェック：ChatGPT と Claude から見える IP と地域",
+    "desc": "ChatGPT、OpenAI、Claude、Anthropic など 12 の AI サービスから見えている IP と国、その地域が提供対象かを確認します。プローブ {n} 個、ブラウザ内で完結。",
+    "kw": "ChatGPT IP, ChatGPT IP 確認, ChatGPT 地域, Claude IP, ChatGPT 対応地域, OpenAI IP, AI 分流",
+    "h1": "ChatGPT と Claude には、どの IP と地域が見えている？",
+    "intro": "ルール付きのプロキシは AI サービスだけ別のノードに流すことがよくあります。ChatGPT、OpenAI、Claude、Anthropic など 12 の AI サイトが見ている IP と国を、{n} 個のプローブが見つけた出口と並べて表示します。",
+    "faq": [
+      [
+        "ChatGPT や Claude から何が見えているか、どうやって分かるのですか？",
+        "chatgpt.com、openai.com、claude.ai、anthropic.com などの AI サイトは Cloudflare の背後にあり、自分のドメインで /cdn-cgi/trace に応答します。接続してきた IP と、Cloudflare が判定した国が返ります。ブラウザはルールが選んだ経路でそれぞれに問い合わせます。"
+      ],
+      [
+        "提供対象外の地域は？",
+        "OpenAI も Anthropic も、中国本土、香港、マカオ、ロシア、ベラルーシ、イラン、北朝鮮、シリア、キューバではサービスを提供していません。AI サイトからこれらの地域に見えていると、登録や利用が制限されることがあります。"
+      ],
+      [
+        "ChatGPT だけ別の IP に見えるのはなぜ？",
+        "プロキシのルールで AI 関連のドメインを専用ノードに振り分けていることが多いためです。このページでは AI サービスごとの出口をほかのサイトと並べて表示するので、ルールが意図どおり働いているか確認できます。"
+      ],
+      [
+        "データセンターの IP だと問題がありますか？",
+        "クラウドやホスティングの IP は多くの人に共有されており、認証や制限を受けやすくなります。家庭用回線やモバイル回線の出口は、そうした扱いを受けにくい傾向があります。"
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC で本当の IP が漏れています",
+  fh_rtc_safe: "WebRTC の漏れはありません",
+  fh_rtc_none: "WebRTC の漏れなし：UDP 不通",
+  fh_ai_ok: "ChatGPT と Claude からは提供地域に見えています",
+  fh_ai_none: "AI サービスが応答しませんでした",
+  fh_web: "サイトから見える出口",
   foot: "オープンソース、MIT ライセンス。すべてブラウザ内で動作します。",
 };

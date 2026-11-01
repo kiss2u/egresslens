@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-TW" data-paths="{&quot;en&quot;:&quot;/chatgpt-ip/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/chatgpt-ip/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/chatgpt-ip/&quot;,&quot;ja&quot;:&quot;/ja/chatgpt-ip/&quot;,&quot;ko&quot;:&quot;/ko/chatgpt-ip/&quot;,&quot;es&quot;:&quot;/es/chatgpt-ip/&quot;,&quot;fr&quot;:&quot;/fr/chatgpt-ip/&quot;,&quot;de&quot;:&quot;/de/chatgpt-ip/&quot;,&quot;pt&quot;:&quot;/pt/chatgpt-ip/&quot;,&quot;ru&quot;:&quot;/ru/chatgpt-ip/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("egress:theme");s=localStorage.getItem("egress:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(/^#r=/.test(location.hash))d.setAttribute("data-shared","");if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!==d.lang)location.replace(P[l]+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChatGPT IP 檢測：ChatGPT 和 Claude 看到的是哪個 IP、哪個地區</title>
+<meta name="description" content="查看 ChatGPT、OpenAI、Claude、Anthropic 等 12 個 AI 服務看到的 IP 和國家，判斷該地區是否受支援。共 51 個探測器，全部在瀏覽器裡完成。">
+<meta name="keywords" content="ChatGPT IP, ChatGPT IP檢測, ChatGPT 地區, Claude IP, ChatGPT 不支援的地區, OpenAI IP, AI 分流, ChatGPT 節點">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://egress.1ms.dog/zh-tw/chatgpt-ip/">
+<link rel="alternate" hreflang="en" href="https://egress.1ms.dog/chatgpt-ip/">
+<link rel="alternate" hreflang="zh-CN" href="https://egress.1ms.dog/zh-cn/chatgpt-ip/">
+<link rel="alternate" hreflang="zh-TW" href="https://egress.1ms.dog/zh-tw/chatgpt-ip/">
+<link rel="alternate" hreflang="ja" href="https://egress.1ms.dog/ja/chatgpt-ip/">
+<link rel="alternate" hreflang="ko" href="https://egress.1ms.dog/ko/chatgpt-ip/">
+<link rel="alternate" hreflang="es" href="https://egress.1ms.dog/es/chatgpt-ip/">
+<link rel="alternate" hreflang="fr" href="https://egress.1ms.dog/fr/chatgpt-ip/">
+<link rel="alternate" hreflang="de" href="https://egress.1ms.dog/de/chatgpt-ip/">
+<link rel="alternate" hreflang="pt" href="https://egress.1ms.dog/pt/chatgpt-ip/">
+<link rel="alternate" hreflang="ru" href="https://egress.1ms.dog/ru/chatgpt-ip/">
+<link rel="alternate" hreflang="x-default" href="https://egress.1ms.dog/chatgpt-ip/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="ChatGPT IP 檢測：ChatGPT 和 Claude 看到的是哪個 IP、哪個地區">
+<meta property="og:description" content="查看 ChatGPT、OpenAI、Claude、Anthropic 等 12 個 AI 服務看到的 IP 和國家，判斷該地區是否受支援。共 51 個探測器，全部在瀏覽器裡完成。">
+<meta property="og:url" content="https://egress.1ms.dog/zh-tw/chatgpt-ip/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://egress.1ms.dog/og/zh-tw/chatgpt-ip.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://egress.1ms.dog/og/zh-tw/chatgpt-ip.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"ChatGPT 和 Claude 看到的是你的哪個 IP？","url":"https://egress.1ms.dog/zh-tw/chatgpt-ip/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"查看 ChatGPT、OpenAI、Claude、Anthropic 等 12 個 AI 服務看到的 IP 和國家，判斷該地區是否受支援。共 51 個探測器，全部在瀏覽器裡完成。","inLanguage":"zh-TW","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","inLanguage":"zh-TW","mainEntity":[{"@type":"Question","name":"怎麼知道 ChatGPT 和 Claude 看到的是什麼？","acceptedAnswer":{"@type":"Answer","text":"chatgpt.com、openai.com、claude.ai、anthropic.com 等 AI 網站都在 Cloudflare 後面，在自己的網域上提供 /cdn-cgi/trace，回傳連到它的位址和 Cloudflare 判定的國家。瀏覽器按你的規則給每個網站選的線路去詢問。"}},{"@type":"Question","name":"哪些地區不受支援？","acceptedAnswer":{"@type":"Answer","text":"OpenAI 和 Anthropic 都不向中國大陸、香港、澳門、俄羅斯、白俄羅斯、伊朗、北韓、敘利亞和古巴提供服務。如果 AI 網站看到的是這些地區，註冊和使用都可能被攔截。"}},{"@type":"Question","name":"為什麼 ChatGPT 看到的 IP 和其他網站不一樣？","acceptedAnswer":{"@type":"Answer","text":"代理規則常把 AI 網域分到單獨的節點。這個頁面把每個 AI 服務的出口和其他網站放在一起，方便確認規則是否照你的意思生效。"}},{"@type":"Question","name":"機房 IP 有影響嗎？","acceptedAnswer":{"@type":"Answer","text":"雲端伺服器和機房的位址被很多人共用，更容易遇到驗證和限制。家用寬頻或行動網路的出口被標記的可能性較低。"}},{"@type":"Question","name":"為什麼不同網站看到的 IP 不一樣？","acceptedAnswer":{"@type":"Answer","text":"Clash、Surge、Shadowrocket、sing-box 這類帶規則的代理和 VPN 會依目的地選擇線路：中國大陸網站直連，AI 服務走一個節點，其他網站走另一個節點。只問一個網站，只能看到那一條線路。這個頁面同時詢問幾十個目的地，再依網路把結果歸成幾個出口。"}},{"@type":"Question","name":"什麼是 WebRTC 洩漏？","acceptedAnswer":{"@type":"Answer","text":"WebRTC（瀏覽器裡的視訊通話）透過 UDP 向 STUN 伺服器詢問自己的公網位址。很多代理只轉發 TCP，這個 UDP 請求就會從你自己的線路出去，而且任何網頁都能讀到結果，不會跳出授權提示。如果 STUN 伺服器看到的是本地位址，網站看到的卻是代理，頁面就會回報洩漏。"}},{"@type":"Question","name":"什麼是 IPv6 洩漏？","acceptedAnswer":{"@type":"Answer","text":"如果代理只處理 IPv4，而你的線路同時有 IPv6，走 IPv6 的連線可能會繞過代理。僅 IPv6 的探測器會顯示 IPv6 流量實際從哪個出口出去。"}},{"@type":"Question","name":"怎麼區分本地出口和代理出口？","acceptedAnswer":{"@type":"Answer","text":"看網路歸屬：註冊在雲端服務商或機房（Amazon、Google Cloud、阿里雲、DigitalOcean 等）的位址標為代理，第一個屬於電信業者的位址是你的本地線路。住宅代理、電信業者網路上的 VPN 無法用這種方法區分。"}},{"@type":"Question","name":"檢測結果會傳到這個網站嗎？","acceptedAnswer":{"@type":"Answer","text":"不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」。"}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.71980cc954.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/zh-tw/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms"></span>
+      <span class="brand-name" data-i="name">出口照妖鏡</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">語言</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW" selected>繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">常見問題</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/egresslens" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="主題：跟隨系統">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <div class="hero-h">
+        <p class="shared" id="shared"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1a2.5 2.5 0 0 1-3.5-3.5l1-1"/></svg><span id="sharedTxt"></span></p>
+        <h1 data-i="h1">ChatGPT 和 Claude 看到的是你的哪個 IP？</h1>
+        <p class="intro">帶規則的代理常常給 AI 服務單獨分配節點。ChatGPT、OpenAI、Claude、Anthropic 等 12 個 AI 網站會回報它們看到的位址和國家，同時列出 51 個探測器找到的所有出口。</p>
+      </div>
+      <div class="focus" id="focus" data-focus="ai"><div class="fo-h"><i class="st"></i><b class="fo-t">正在詢問探測器…</b></div><p class="fo-d"><span class="bar"></span></p><ul class="fo-list two"><li class="fo-r" data-p="chatgpt"><span class="fo-n">ChatGPT</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="openai"><span class="fo-n">OpenAI</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="sora"><span class="fo-n">Sora</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="claude"><span class="fo-n">Claude</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="anthropic"><span class="fo-n">Anthropic</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="grok"><span class="fo-n">Grok</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="perplexity"><span class="fo-n">Perplexity</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="copilot"><span class="fo-n">Copilot</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="mistral"><span class="fo-n">Mistral</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="poe"><span class="fo-n">Poe</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="characterai"><span class="fo-n">Character.AI</span><span class="fo-x"></span><span class="fo-m"></span></li><li class="fo-r" data-p="deepl"><span class="fo-n">DeepL</span><span class="fo-x"></span><span class="fo-m"></span></li></ul></div>
+      <div class="hero-b">
+        <div class="col">
+          <div class="sec-h"><span data-i="exits_h">你的出口</span><button class="mini" id="eye" type="button" data-i="hide">隱藏 IP</button></div>
+          <ul id="exList"><li class="ex sk"><span class="blink" data-i="sniff">正在詢問探測器…</span></li></ul>
+        </div>
+        <div class="col">
+          <div class="sec-h"><span data-i="finds_h">檢測結論</span></div>
+          <ul id="finds"><li class="fr" data-r="route"><i class="st"></i><span class="fr-l">分流</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="except"><i class="st"></i><span class="fr-l">例外</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="ai"><i class="st"></i><span class="fr-l">AI 地區</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="rtc"><i class="st"></i><span class="fr-l">WebRTC</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="v6"><i class="st"></i><span class="fr-l">IPv6</span><span class="fr-v"><span class="bar"></span></span></li><li class="fr" data-r="tz"><i class="st"></i><span class="fr-l">時區</span><span class="fr-v"><span class="bar"></span></span></li></ul>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="prog" id="prog"><i></i></div>
+        <span class="prog-t" id="progTxt"></span>
+        <div class="acts">
+          <button class="btn" id="share" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2M5 4.5 8 1.5l3 3M3.5 8v5.5h9V8"/></svg><span data-i="share">分享</span></button>
+          <button class="btn pri" id="run" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3h-3"/></svg><span data-i="rerun">重新檢測</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="probes card">
+      <h2 data-i="probes_h">全部探測器</h2>
+      <div class="pgroups">
+<div class="pg" data-g="ai"><h3>AI 服務<b class="pg-n"></b></h3><ul><li class="pr" id="p-chatgpt"><span class="pn" title="chatgpt.com">ChatGPT</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-openai"><span class="pn" title="openai.com">OpenAI</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-sora"><span class="pn" title="sora.com">Sora</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-claude"><span class="pn" title="claude.ai">Claude</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-anthropic"><span class="pn" title="anthropic.com">Anthropic</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-grok"><span class="pn" title="grok.com">Grok</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-perplexity"><span class="pn" title="perplexity.ai">Perplexity</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-copilot"><span class="pn" title="copilot.microsoft.com">Copilot</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-mistral"><span class="pn" title="mistral.ai">Mistral</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-poe"><span class="pn" title="poe.com">Poe</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-characterai"><span class="pn" title="character.ai">Character.AI</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-deepl"><span class="pn" title="deepl.com">DeepL</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+<div class="pg" data-g="cn"><h3>中國大陸網站<b class="pg-n"></b></h3><ul><li class="pr" id="p-ipip"><span class="pn" title="myip.ipip.net">IPIP.NET</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-iqiyi"><span class="pn" title="data.video.iqiyi.com">iQIYI</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipifycn"><span class="pn" title="api.ipify.cn">ipify.cn</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-dnspod4"><span class="pn" title="ipv4.ddnspod.com">DNSPod <span class="m">v4</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-dnspod6"><span class="pn" title="ipv6.ddnspod.com">DNSPod <span class="m">v6</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+<div class="pg" data-g="intl"><h3>IP 查詢服務<b class="pg-n"></b></h3><ul><li class="pr" id="p-ipsb"><span class="pn" title="api.ip.sb">IP.SB</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipinfo"><span class="pn" title="ipinfo.io">ipinfo.io</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipapico"><span class="pn" title="ipapi.co">ipapi.co</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipwho"><span class="pn" title="ipwho.is">ipwho.is</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-geojs"><span class="pn" title="get.geojs.io">GeoJS</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipleak"><span class="pn" title="ipleak.net">ipleak.net</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-identme"><span class="pn" title="ident.me">ident.me</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipguide"><span class="pn" title="ip.guide">ip.guide</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-icanhazip"><span class="pn" title="icanhazip.com">icanhazip</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-bdc"><span class="pn" title="api.bigdatacloud.net">BigDataCloud</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+<div class="pg" data-g="web"><h3>常用網站<b class="pg-n"></b></h3><ul><li class="pr" id="p-cloudflare"><span class="pn" title="www.cloudflare.com">Cloudflare</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-one"><span class="pn" title="one.one.one.one">1.1.1.1</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-gitlab"><span class="pn" title="gitlab.com">GitLab</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-npm"><span class="pn" title="registry.npmjs.org">npm</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-notion"><span class="pn" title="notion.so">Notion</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-linear"><span class="pn" title="linear.app">Linear</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-zoom"><span class="pn" title="zoom.us">Zoom</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-medium"><span class="pn" title="medium.com">Medium</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-coinbase"><span class="pn" title="coinbase.com">Coinbase</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-crunchyroll"><span class="pn" title="crunchyroll.com">Crunchyroll</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-patreon"><span class="pn" title="patreon.com">Patreon</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-shopify"><span class="pn" title="shopify.com">Shopify</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+<div class="pg" data-g="stack"><h3>僅 IPv4 / 僅 IPv6<b class="pg-n"></b></h3><ul><li class="pr" id="p-ipsb4"><span class="pn" title="api-ipv4.ip.sb">IP.SB <span class="m">v4</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipsb6"><span class="pn" title="api-ipv6.ip.sb">IP.SB <span class="m">v6</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-radar4"><span class="pn" title="ipv4-check-perf.radar.cloudflare.com">Cloudflare Radar <span class="m">v4</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-radar6"><span class="pn" title="ipv6-check-perf.radar.cloudflare.com">Cloudflare Radar <span class="m">v6</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipify4"><span class="pn" title="api4.ipify.org">ipify <span class="m">v4</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-ipify6"><span class="pn" title="api6.ipify.org">ipify <span class="m">v6</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-icanhaz4"><span class="pn" title="ipv4.icanhazip.com">icanhazip <span class="m">v4</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-icanhaz6"><span class="pn" title="ipv6.icanhazip.com">icanhazip <span class="m">v6</span></span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+<div class="pg" data-g="udp"><h3>WebRTC（UDP）<b class="pg-n"></b></h3><ul><li class="pr" id="p-stun-cf"><span class="pn" title="stun.cloudflare.com">Cloudflare</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-stun-google"><span class="pn" title="stun.l.google.com">Google</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-stun-twilio"><span class="pn" title="global.stun.twilio.com">Twilio</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li><li class="pr" id="p-stun-mi"><span class="pn" title="stun.miwifi.com">Xiaomi</span><span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li></ul></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot"><span>開源，MIT 授權。全部在你的瀏覽器裡執行。</span><nav class="foot-nav"><a href="/zh-tw/">出口照妖鏡</a><a href="/zh-tw/webrtc-leak/">WebRTC 洩漏檢測</a></nav><a href="https://github.com/yt1988/egresslens" target="_blank" rel="noopener noreferrer">GitHub</a></footer>
+</div>
+<dialog class="help" id="help" aria-labelledby="helpH">
+  <div class="help-h"><h2 id="helpH" data-i="faq_h">常見問題</h2><button class="icon-btn" type="button" data-close aria-label="關閉"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+<details><summary>怎麼知道 ChatGPT 和 Claude 看到的是什麼？</summary><p>chatgpt.com、openai.com、claude.ai、anthropic.com 等 AI 網站都在 Cloudflare 後面，在自己的網域上提供 /cdn-cgi/trace，回傳連到它的位址和 Cloudflare 判定的國家。瀏覽器按你的規則給每個網站選的線路去詢問。</p></details>
+<details><summary>哪些地區不受支援？</summary><p>OpenAI 和 Anthropic 都不向中國大陸、香港、澳門、俄羅斯、白俄羅斯、伊朗、北韓、敘利亞和古巴提供服務。如果 AI 網站看到的是這些地區，註冊和使用都可能被攔截。</p></details>
+<details><summary>為什麼 ChatGPT 看到的 IP 和其他網站不一樣？</summary><p>代理規則常把 AI 網域分到單獨的節點。這個頁面把每個 AI 服務的出口和其他網站放在一起，方便確認規則是否照你的意思生效。</p></details>
+<details><summary>機房 IP 有影響嗎？</summary><p>雲端伺服器和機房的位址被很多人共用，更容易遇到驗證和限制。家用寬頻或行動網路的出口被標記的可能性較低。</p></details>
+<details><summary>為什麼不同網站看到的 IP 不一樣？</summary><p>Clash、Surge、Shadowrocket、sing-box 這類帶規則的代理和 VPN 會依目的地選擇線路：中國大陸網站直連，AI 服務走一個節點，其他網站走另一個節點。只問一個網站，只能看到那一條線路。這個頁面同時詢問幾十個目的地，再依網路把結果歸成幾個出口。</p></details>
+<details><summary>什麼是 WebRTC 洩漏？</summary><p>WebRTC（瀏覽器裡的視訊通話）透過 UDP 向 STUN 伺服器詢問自己的公網位址。很多代理只轉發 TCP，這個 UDP 請求就會從你自己的線路出去，而且任何網頁都能讀到結果，不會跳出授權提示。如果 STUN 伺服器看到的是本地位址，網站看到的卻是代理，頁面就會回報洩漏。</p></details>
+<details><summary>什麼是 IPv6 洩漏？</summary><p>如果代理只處理 IPv4，而你的線路同時有 IPv6，走 IPv6 的連線可能會繞過代理。僅 IPv6 的探測器會顯示 IPv6 流量實際從哪個出口出去。</p></details>
+<details><summary>怎麼區分本地出口和代理出口？</summary><p>看網路歸屬：註冊在雲端服務商或機房（Amazon、Google Cloud、阿里雲、DigitalOcean 等）的位址標為代理，第一個屬於電信業者的位址是你的本地線路。住宅代理、電信業者網路上的 VPN 無法用這種方法區分。</p></details>
+<details><summary>檢測結果會傳到這個網站嗎？</summary><p>不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」。</p></details>
+</dialog>
+<dialog class="help share" id="shareDlg" aria-labelledby="shareH">
+  <div class="help-h"><h2 id="shareH" data-i="share_h">分享檢測結果</h2><button class="icon-btn" type="button" data-close aria-label="關閉"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="share-img"><img id="shareImg" alt=""></div>
+  <label class="chk"><input type="checkbox" id="sharePlace"><span data-i="share_place">在圖片和連結裡顯示城市和電信商</span></label>
+  <div class="share-link"><input id="shareUrl" readonly aria-label="結果連結"><button class="btn" id="copyLink" type="button" data-i="copy_link">複製連結</button></div>
+  <div class="share-acts"><button class="btn" id="copyImg" type="button" data-i="copy_img">複製圖片</button><button class="btn" id="dlImg" type="button" data-i="dl_img">下載圖片</button><button class="btn pri" id="nativeShare" type="button" data-i="sys_share" hidden>更多分享方式</button></div>
+  <p class="share-note" data-i="share_note">圖片和連結都在瀏覽器裡產生，不含 IP 位址；城市和電信商預設不顯示。</p>
+</dialog>
+<script type="application/json" id="data">{"lang":"zh-TW","paths":{"en":"/chatgpt-ip/","zh-CN":"/zh-cn/chatgpt-ip/","zh-TW":"/zh-tw/chatgpt-ip/","ja":"/ja/chatgpt-ip/","ko":"/ko/chatgpt-ip/","es":"/es/chatgpt-ip/","fr":"/fr/chatgpt-ip/","de":"/de/chatgpt-ip/","pt":"/pt/chatgpt-ip/","ru":"/ru/chatgpt-ip/"},"home":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"focus":"ai"}</script>
+<script src="/assets/l.zh-tw.b99eb40b12.js"></script>
+<script src="/assets/app.ae018260cd.js" defer></script>
+</body>
+</html>

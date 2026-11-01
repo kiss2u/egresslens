@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { LANGS, loadI18n } from "../scripts/build.mjs";
+import { LANGS, LANDS, loadI18n } from "../scripts/build.mjs";
 
 const I = await loadI18n();
 const page = async slug => readFile(new URL(`../public/${slug ? slug + "/" : ""}index.html`, import.meta.url), "utf8");
@@ -57,5 +57,29 @@ test("share cards: every page has its og image, every verdict its result page an
       assert.match(r, /name="robots" content="noindex/);
       assert.ok(await has(`og/${l.toLowerCase()}/${v}.png`), `${l}: ${v} image`);
     }
+  }
+});
+
+test("landing pages: their own words, canonical to themselves, every language linked, in the sitemap", async () => {
+  const sitemap = await readFile(new URL("../public/sitemap.xml", import.meta.url), "utf8");
+  const { access } = await import("node:fs/promises");
+  for (const land of LANDS) {
+    const titles = new Set();
+    for (const [l, slug] of LANGS) {
+      const L = I[l]["lp_" + land.id], at = (slug ? slug + "/" : "") + land.slug + "/";
+      for (const k of ["nav", "title", "desc", "kw", "h1", "intro"]) assert.equal(typeof L[k], "string", `${l} lp_${land.id}.${k}`);
+      assert.equal(L.faq.length, I.en["lp_" + land.id].faq.length, `${l} lp_${land.id}.faq`);
+      const h = await page(at.slice(0, -1));
+      assert.ok(h.includes(`<title>${L.title.replace(/&/g, "&amp;")}</title>`), l + " title");
+      assert.ok(h.includes(`>${L.h1.replace(/&/g, "&amp;")}</h1>`), l + " h1");
+      assert.match(h, new RegExp(`<link rel="canonical" href="https://egress\.1ms\.dog/${at.replace(/\//g, "\/")}">`), `${l} ${land.slug} canonical`);
+      for (const [, s2] of LANGS) assert.ok(h.includes(`href="https://egress.1ms.dog/${s2 ? s2 + "/" : ""}${land.slug}/"`), `${l} ${land.slug} hreflang ${s2}`);
+      assert.ok(h.includes(`data-focus="${land.id}"`), `${l} ${land.slug}: lead panel`);
+      assert.match(h, /"@type":"FAQPage"/);
+      assert.ok(sitemap.includes(`<loc>https://egress.1ms.dog/${at}</loc>`), `${at} in the sitemap`);
+      await access(new URL(`../public/og/${l.toLowerCase()}/${land.slug}.png`, import.meta.url));
+      titles.add(L.title);
+    }
+    assert.equal(titles.size, LANGS.length, land.slug + ": a title per language");
   }
 });

@@ -95,5 +95,63 @@ export default {
   vh_proxy: "모든 사이트가 같은 프록시 출구",
   vh_direct: "직접 연결: 모든 사이트에 로컬 IP가 보임",
   who_link: "전체 프로필과 위장 점검 보기 →",
+  lp_rtc: {
+    "nav": "WebRTC 누출 테스트",
+    "title": "WebRTC 누출 테스트: VPN·프록시에서 실제 IP가 새는지 확인",
+    "desc": "무료 WebRTC 누출 테스트. UDP로 STUN 서버 4곳에 묻고, 프로브 {n}개가 HTTPS로 본 출구와 비교해 VPN이나 프록시에서 실제 IP가 새는지 확인합니다. 브라우저 안에서만 실행됩니다.",
+    "kw": "WebRTC 누출, WebRTC 누출 테스트, IP 누출 확인, VPN 누출, STUN, 실제 IP, 프록시 WebRTC",
+    "h1": "WebRTC 누출 테스트: 내 실제 IP가 드러났을까?",
+    "intro": "브라우저의 영상 통화는 UDP로 STUN 서버에 공인 IP를 묻는데, 많은 프록시는 TCP만 전달합니다. STUN 서버 4곳과 여러 사이트, 모두 {n}개의 프로브에 동시에 물어 WebRTC가 내 회선을 드러내는지 확인합니다.",
+    "faq": [
+      [
+        "이 WebRTC 누출 테스트는 무엇을 확인하나요?",
+        "영상 통화 사이트와 같은 방식으로 UDP를 통해 STUN 서버 4곳(Cloudflare, Google, Twilio, Xiaomi)에 공인 IP를 묻고, 웹사이트가 HTTPS로 보는 출구와 비교합니다. STUN에는 로컬 회선이, 웹사이트에는 프록시가 보인다면 어떤 웹페이지든 실제 IP를 읽을 수 있습니다."
+      ],
+      [
+        "WebRTC 누출은 어떻게 고치나요?",
+        "프록시가 UDP도 전달하게 하세요. Clash, sing-box, Surge, Shadowrocket의 TUN 모드나 향상 모드, 또는 VPN의 전체 터널 모드를 켜면 됩니다. 브라우저에서 WebRTC를 막는 방법(uBlock Origin의 'WebRTC의 로컬 IP 주소 누출 방지', Firefox의 media.peerconnection.enabled = false)도 있지만 영상 통화가 안 될 수 있습니다."
+      ],
+      [
+        "'UDP 차단'으로 나왔는데 안전한가요?",
+        "WebRTC에 대해서는 안전합니다. STUN 서버가 응답하지 않았으니 웹페이지가 이 방법으로 주소를 알 수 없습니다. 영상 통화는 중계 서버를 통해 될 수도 있습니다."
+      ],
+      [
+        "VPN을 쓰면 WebRTC 누출이 없나요?",
+        "모든 트래픽을 터널로 보내는 VPN이라면 없습니다. 브라우저나 시스템에만 설정한 프록시(HTTP, SOCKS)는 보통 TCP만 전달해서 WebRTC의 UDP는 그대로 나갑니다. 설정을 바꿀 때마다 다시 확인하세요."
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "ChatGPT·Claude가 보는 IP",
+    "title": "ChatGPT IP 확인: ChatGPT와 Claude에 보이는 IP와 지역",
+    "desc": "ChatGPT, OpenAI, Claude, Anthropic 등 AI 서비스 12곳에 보이는 IP와 국가, 그리고 그 지역이 지원되는지 확인합니다. 프로브 {n}개, 브라우저 안에서만 실행됩니다.",
+    "kw": "ChatGPT IP, ChatGPT IP 확인, ChatGPT 지역, Claude IP, ChatGPT 지원 국가, OpenAI IP, AI 분할 라우팅",
+    "h1": "ChatGPT와 Claude에는 어떤 IP와 지역이 보일까?",
+    "intro": "규칙 기반 프록시는 AI 서비스만 따로 노드에 보내는 경우가 많습니다. ChatGPT, OpenAI, Claude, Anthropic 등 AI 사이트 12곳이 보는 주소와 국가를 프로브 {n}개가 찾은 출구와 함께 보여 줍니다.",
+    "faq": [
+      [
+        "ChatGPT와 Claude에 무엇이 보이는지 어떻게 아나요?",
+        "chatgpt.com, openai.com, claude.ai, anthropic.com 등의 AI 사이트는 Cloudflare 뒤에 있고 자기 도메인에서 /cdn-cgi/trace에 응답합니다. 접속한 주소와 Cloudflare가 판단한 국가가 돌아옵니다. 브라우저는 규칙이 고른 경로로 각 사이트에 묻습니다."
+      ],
+      [
+        "지원되지 않는 지역은 어디인가요?",
+        "OpenAI와 Anthropic 모두 중국 본토, 홍콩, 마카오, 러시아, 벨라루스, 이란, 북한, 시리아, 쿠바에는 서비스를 제공하지 않습니다. AI 사이트에 이 지역으로 보이면 가입이나 사용이 막힐 수 있습니다."
+      ],
+      [
+        "왜 ChatGPT에만 다른 IP가 보이나요?",
+        "프록시 규칙이 AI 도메인을 전용 노드로 보내는 경우가 많기 때문입니다. 이 페이지는 AI 서비스마다 출구를 다른 사이트와 나란히 보여 주므로 규칙이 의도대로 작동하는지 확인할 수 있습니다."
+      ],
+      [
+        "데이터센터 IP면 문제가 되나요?",
+        "클라우드와 호스팅 주소는 여러 사람이 함께 써서 인증이나 제한을 더 자주 받습니다. 가정용 회선이나 모바일 회선 출구는 그럴 가능성이 낮습니다."
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC로 실제 IP가 새고 있음",
+  fh_rtc_safe: "WebRTC 누출 없음",
+  fh_rtc_none: "WebRTC 누출 없음: UDP 차단",
+  fh_ai_ok: "ChatGPT와 Claude에 지원 지역으로 보임",
+  fh_ai_none: "AI 서비스가 응답하지 않음",
+  fh_web: "웹사이트에 보이는 출구",
   foot: "오픈 소스, MIT 라이선스. 모두 브라우저에서 실행됩니다.",
 };

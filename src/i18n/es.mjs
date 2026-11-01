@@ -95,5 +95,63 @@ export default {
   vh_proxy: "Todos los sitios ven la misma salida proxy",
   vh_direct: "Directo: todos los sitios ven la IP local",
   who_link: "Tu perfil completo y la prueba de camuflaje →",
+  lp_rtc: {
+    "nav": "Test de fuga WebRTC",
+    "title": "Test de fuga WebRTC: ¿tu VPN o proxy filtra tu IP real?",
+    "desc": "Test de fuga WebRTC gratis: cuatro servidores STUN por UDP comparados con lo que ven {n} sondas por HTTPS, para saber si tu VPN o proxy filtra tu IP real. Funciona en tu navegador.",
+    "kw": "test fuga webrtc, fuga webrtc, fuga de ip, test fuga vpn, ip real, stun, webrtc leak",
+    "h1": "Test de fuga WebRTC: ¿se ve tu IP real?",
+    "intro": "Las videollamadas del navegador preguntan tu dirección pública a servidores STUN por UDP, y muchos proxies solo llevan TCP. Se consulta a cuatro servidores STUN a la vez que a los sitios web, {n} sondas en total, para ver si WebRTC delata tu propia línea.",
+    "faq": [
+      [
+        "¿Qué comprueba este test de fuga WebRTC?",
+        "Pregunta tu dirección pública por UDP a cuatro servidores STUN (Cloudflare, Google, Twilio, Xiaomi), como hacen los sitios de videollamadas, y la compara con la salida que ven los sitios web por HTTPS. Si STUN ve tu línea local mientras los sitios ven el proxy, cualquier página puede leer tu IP real."
+      ],
+      [
+        "¿Cómo corrijo una fuga WebRTC?",
+        "Haz que el proxy lleve también UDP: activa el modo TUN o mejorado en Clash, sing-box, Surge o Shadowrocket, o usa el túnel completo de la VPN. Bloquear WebRTC en el navegador (la opción de uBlock Origin «Evitar que WebRTC filtre direcciones IP locales», o media.peerconnection.enabled = false en Firefox) también sirve, pero puede romper las videollamadas."
+      ],
+      [
+        "El resultado dice que UDP está bloqueado. ¿Es seguro?",
+        "Para WebRTC, sí: ningún servidor STUN respondió, así que una página no puede conocer tu dirección por esta vía. Las videollamadas pueden seguir funcionando a través de un servidor de retransmisión."
+      ],
+      [
+        "¿Cualquier VPN evita las fugas WebRTC?",
+        "Una VPN que tuneliza todo el tráfico, sí. Un proxy configurado solo en el navegador o el sistema (HTTP o SOCKS) suele llevar solo TCP, así que el UDP de WebRTC sale directo. Vuelve a comprobarlo tras cada cambio."
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "IP de ChatGPT y Claude",
+    "title": "¿Qué IP ve ChatGPT? Comprueba la IP y la región que ven ChatGPT y Claude",
+    "desc": "Mira la IP y el país desde los que te ven ChatGPT, OpenAI, Claude, Anthropic y otros 8 servicios de IA, y si esa región está admitida. {n} sondas, en tu navegador.",
+    "kw": "ip chatgpt, qué ip ve chatgpt, ip claude, región chatgpt, chatgpt país no disponible, comprobar ip openai, proxy ia",
+    "h1": "¿Qué IP y región ven ChatGPT y Claude?",
+    "intro": "Los proxies con reglas suelen mandar los servicios de IA por un nodo propio. ChatGPT, OpenAI, Claude, Anthropic y otros 8 sitios de IA indican la dirección y el país que ven, junto a las salidas que encuentran {n} sondas.",
+    "faq": [
+      [
+        "¿Cómo sabe qué ven ChatGPT y Claude?",
+        "chatgpt.com, openai.com, claude.ai, anthropic.com y los demás sitios de IA están detrás de Cloudflare y responden /cdn-cgi/trace en su propio dominio: la dirección que se conectó y el país en que Cloudflare la sitúa. Tu navegador pregunta a cada uno por la ruta que eligen tus reglas."
+      ],
+      [
+        "¿Qué regiones no están admitidas?",
+        "Ni OpenAI ni Anthropic dan servicio en China continental, Hong Kong, Macao, Rusia, Bielorrusia, Irán, Corea del Norte, Siria ni Cuba. Si un sitio de IA ve una de ellas, el registro o el uso pueden bloquearse."
+      ],
+      [
+        "¿Por qué ChatGPT ve otra IP que el resto de sitios?",
+        "Las reglas del proxy suelen mandar los dominios de IA por un nodo dedicado. Esta página muestra la salida de cada servicio de IA junto a las demás, para comprobar que la regla hace lo que querías."
+      ],
+      [
+        "¿Importa una IP de centro de datos?",
+        "Las direcciones de nube y hosting las comparten muchos usuarios y reciben más verificaciones y límites. Una salida en una red doméstica o móvil tiene menos probabilidades de ser marcada."
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC filtra tu IP real",
+  fh_rtc_safe: "Sin fuga WebRTC",
+  fh_rtc_none: "Sin fuga WebRTC: UDP bloqueado",
+  fh_ai_ok: "ChatGPT y Claude ven una región admitida",
+  fh_ai_none: "Ningún servicio de IA respondió",
+  fh_web: "Los sitios ven",
   foot: "Código abierto, licencia MIT. Funciona por completo en tu navegador.",
 };

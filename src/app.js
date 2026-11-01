@@ -84,6 +84,7 @@
     eye.textContent = t(masked() ? "show" : "hide"); eye.setAttribute("aria-pressed", masked());
     for (const p of PROBES) if (S.res[p.id]) renderRow(p);
     if (S.done) renderExits();
+    renderFocus();
   }
   eye.onclick = () => { store.set(K.mask, masked() ? "0" : "1"); applyMask(); };
 
@@ -170,10 +171,56 @@
         else if (typeof x === "string") v[k] = isExit(x) ? exRef(x) : /^[A-Z]{2}$/.test(x) ? esc(country(x)) : esc(x);
       }
       li.classList.add("st-" + f.s); st.textContent = ST[f.s];
+      li.classList.toggle("focus", row === D.focus);
       val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
         (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}</a>` : "");
     }
+  }
+  // A landing page's lead panel (WebRTC leak test, what ChatGPT and Claude see): one row per probe it is about,
+  // filled as each answers, and the verdict on top once every probe is in.
+  const foEl = $("#focus");
+  function renderFocus() {
+    if (!foEl) return;
+    const of = exitOfProbe(S.exits), ex = l => S.exits.find(e => e.letter === l);
+    const place = cc => cc ? flag(cc) + `<span>${esc(country(cc))}</span>` : "";
+    for (const li of foEl.querySelectorAll(".fo-r")) {
+      const id = li.dataset.p, x = li.querySelector(".fo-x"), m = li.querySelector(".fo-m");
+      let bad = false;
+      m.textContent = "";
+      if (id === "@web") {
+        // the exit websites abroad see, to hold the STUN rows against
+        const r = S.done && S.finds.route, a = r && r.s !== "none" ? (r.k === "split" ? r.v.b : r.v.a) : null;
+        x.innerHTML = a ? chip(a) + place(ex(a).cc) : `<span class="m blink">…</span>`;
+      } else if (S.ok[id] == null) x.innerHTML = S.gen ? `<span class="m blink">…</span>` : `<span class="m">–</span>`;
+      else if (!S.ok[id]) x.innerHTML = `<span class="m">${esc(t("fail"))}</span>`;
+      else if (D.focus === "ai") {
+        // the country the AI site itself sees (its Cloudflare trace), and the exit that took the request
+        const cf = (S.res[id][0] || {}).cf || {};
+        // the region list is OpenAI's and Anthropic's, so only their sites are marked
+        bad = ["chatgpt", "openai", "sora", "claude", "anthropic"].includes(id) && AI_BLOCKED.includes(cf.loc);
+        x.innerHTML = (of[id] || []).map(l => chip(l)).join("") + place(cf.loc);
+        m.textContent = cf.colo || "";
+      } else {
+        bad = !!(S.done && S.odd[id] && S.odd[id].k === "leak");
+        x.innerHTML = (of[id] || []).map(l => chip(l) + place(ex(l).cc)).join(" ");
+        m.textContent = S.shared ? "•••" : S.res[id].map(r => ipTxt(r.ip)).join(" · ");
+      }
+      li.classList.toggle("bad", bad);
+    }
+    const head = foEl.querySelector(".fo-t"), st = foEl.querySelector(".st"), d = foEl.querySelector(".fo-d");
+    foEl.className = "focus";
+    if (!S.done) { head.textContent = t("sniff"); st.textContent = ""; d.innerHTML = "<span class=\"bar\"></span>"; foEl.classList.add("wait"); return; }
+    const f = S.finds[D.focus] || { s: "none" };
+    const k = D.focus === "rtc" ? (!S.exits.length ? "no_net" : f.s === "bad" ? "fh_rtc_leak" : f.k === "none" ? "fh_rtc_none" : "fh_rtc_safe")
+      : f.s === "bad" ? "vh_ai" : f.s === "ok" ? "fh_ai_ok" : "fh_ai_none";
+    head.textContent = t(k); st.textContent = ST[f.s]; foEl.classList.add("st-" + f.s);
+    // the detail is the check table's own value for this check, without its links
+    const v = document.querySelector(`#finds [data-r="${D.focus}"] .fr-v`).cloneNode(true);
+    v.querySelectorAll(".xl").forEach(a => a.remove());
+    d.innerHTML = f.s === "none" ? "" : v.innerHTML;
+    const who = foEl.querySelector(".fo-who");
+    if (who && WHO) { who.href = WHO + D.home[LANG]; who.hidden = false; }
   }
   function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
 
@@ -184,14 +231,14 @@
   const live = () => { if (raf) return; raf = requestAnimationFrame(() => {
     raf = 0; if (S.done) return;
     S.exits = groupExits(seenAll().filter(s => geoOf(S.geo, s.ip)), S.geo, GROUP_OF, S.warp);
-    renderExits(); renderChips();
+    renderExits(); renderChips(); renderFocus();
   }); };
   async function run() {
     leaveShared();
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
     Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, done: false });
-    renderExits(); renderGroups(); renderChecks();
+    renderExits(); renderGroups(); renderChecks(); renderFocus();
     $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); $("#share").disabled = true;
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
     // this site's own Cloudflare trace says whether WARP carries the traffic (absent when self-hosted elsewhere)
@@ -228,7 +275,7 @@
     S.finds = findings(PROBES, S.exits, cf, tzCc());
     S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
-    renderExits(); renderChips(); renderChecks(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
+    renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
     $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#share").disabled = !S.exits.length;
   }
 
@@ -270,7 +317,7 @@
     S.odd = oddProbes(PROBES, S.exits);
     eye.hidden = true;
     $("#sharedTxt").textContent = t("shared_from", { where: S.exits[0] ? whereOf(S.exits[0]) : "?", date: new Date(R.ts).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }) });
-    renderExits(); renderChips(); renderChecks(); renderGroups(); for (const p of PROBES) renderRow(p);
+    renderExits(); renderChips(); renderChecks(); renderGroups(); renderFocus(); for (const p of PROBES) renderRow(p);
     $("#run span").textContent = t("test_mine"); $("#run").disabled = false; $("#share").disabled = false;
   }
   function leaveShared() {

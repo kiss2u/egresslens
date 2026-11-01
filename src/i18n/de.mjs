@@ -95,5 +95,63 @@ export default {
   vh_proxy: "Alle Websites sehen denselben Proxy-Ausgang",
   vh_direct: "Direkt: alle Websites sehen die lokale IP",
   who_link: "Dein ganzes Profil und der Tarn-Check →",
+  lp_rtc: {
+    "nav": "WebRTC-Leak-Test",
+    "title": "WebRTC-Leak-Test: verrät dein VPN oder Proxy deine echte IP?",
+    "desc": "Kostenloser WebRTC-Leak-Test: vier STUN-Server über UDP im Vergleich mit dem, was {n} Sonden über HTTPS sehen. So siehst du, ob dein VPN oder Proxy deine echte IP verrät. Läuft im Browser.",
+    "kw": "webrtc leak test, webrtc leck, ip leak test, vpn leak test, echte ip, stun, webrtc deaktivieren",
+    "h1": "WebRTC-Leak-Test: ist deine echte IP sichtbar?",
+    "intro": "Videoanrufe im Browser fragen STUN-Server über UDP nach deiner öffentlichen Adresse, und viele Proxys leiten nur TCP weiter. Vier STUN-Server werden zugleich mit Websites gefragt, {n} Sonden insgesamt, um zu sehen, ob WebRTC deine eigene Leitung verrät.",
+    "faq": [
+      [
+        "Was prüft dieser WebRTC-Leak-Test?",
+        "Er fragt vier STUN-Server (Cloudflare, Google, Twilio, Xiaomi) über UDP nach deiner öffentlichen Adresse, wie es Videoanruf-Seiten tun, und vergleicht die Antwort mit dem Ausgang, den Websites über HTTPS sehen. Sieht STUN deine lokale Leitung, Websites aber den Proxy, kann jede Seite deine echte IP lesen."
+      ],
+      [
+        "Wie behebe ich ein WebRTC-Leck?",
+        "Lass den Proxy auch UDP tragen: TUN- oder erweiterten Modus in Clash, sing-box, Surge oder Shadowrocket einschalten oder den Vollmodus des VPN nutzen. WebRTC im Browser zu sperren (uBlock Origin: „Verhindern, dass WebRTC lokale IP-Adressen preisgibt“, oder media.peerconnection.enabled = false in Firefox) hilft auch, kann aber Videoanrufe stören."
+      ],
+      [
+        "Das Ergebnis sagt, UDP ist blockiert. Ist das sicher?",
+        "Für WebRTC ja: Kein STUN-Server hat geantwortet, also kann eine Seite deine Adresse auf diesem Weg nicht erfahren. Videoanrufe laufen eventuell trotzdem über einen Relay-Server."
+      ],
+      [
+        "Verhindert jedes VPN WebRTC-Lecks?",
+        "Ein VPN, das den gesamten Verkehr tunnelt, schon. Ein Proxy, der nur im Browser oder im System eingestellt ist (HTTP oder SOCKS), leitet meist nur TCP weiter, und das UDP von WebRTC geht direkt hinaus. Teste nach jeder Änderung erneut."
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "IP bei ChatGPT und Claude",
+    "title": "Welche IP sieht ChatGPT? IP und Region prüfen, die ChatGPT und Claude sehen",
+    "desc": "Sieh, unter welcher IP-Adresse und in welchem Land dich ChatGPT, OpenAI, Claude, Anthropic und 8 weitere KI-Dienste sehen und ob die Region unterstützt wird. {n} Sonden, im Browser.",
+    "kw": "chatgpt ip, welche ip sieht chatgpt, claude ip, chatgpt region, chatgpt land nicht unterstützt, openai ip prüfen, ki proxy",
+    "h1": "Welche IP und Region sehen ChatGPT und Claude?",
+    "intro": "Proxys mit Regeln schicken KI-Dienste oft über einen eigenen Knoten. ChatGPT, OpenAI, Claude, Anthropic und 8 weitere KI-Seiten melden die Adresse und das Land, das sie sehen, neben den Ausgängen, die {n} Sonden finden.",
+    "faq": [
+      [
+        "Woher weiß die Seite, was ChatGPT und Claude sehen?",
+        "chatgpt.com, openai.com, claude.ai, anthropic.com und die anderen KI-Seiten stehen hinter Cloudflare und beantworten /cdn-cgi/trace auf ihrer eigenen Domain: die verbundene Adresse und das Land, dem Cloudflare sie zuordnet. Dein Browser fragt jede über die Route, die deine Regeln wählen."
+      ],
+      [
+        "Welche Regionen werden nicht unterstützt?",
+        "Weder OpenAI noch Anthropic bedienen Festlandchina, Hongkong, Macau, Russland, Belarus, Iran, Nordkorea, Syrien oder Kuba. Sieht eine KI-Seite eine dieser Regionen, können Anmeldung oder Nutzung gesperrt werden."
+      ],
+      [
+        "Warum sieht ChatGPT eine andere IP als andere Seiten?",
+        "Proxy-Regeln leiten KI-Domains oft über einen eigenen Knoten. Diese Seite zeigt den Ausgang jedes KI-Dienstes neben den anderen, damit du prüfen kannst, ob die Regel tut, was du willst."
+      ],
+      [
+        "Spielt eine Rechenzentrums-IP eine Rolle?",
+        "Cloud- und Hosting-Adressen teilen sich viele Nutzer; sie bekommen mehr Prüfungen und Limits. Ein Ausgang in einem Privat- oder Mobilfunknetz wird seltener markiert."
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC verrät deine echte IP",
+  fh_rtc_safe: "Kein WebRTC-Leck",
+  fh_rtc_none: "Kein WebRTC-Leck: UDP blockiert",
+  fh_ai_ok: "ChatGPT und Claude sehen eine unterstützte Region",
+  fh_ai_none: "Kein KI-Dienst hat geantwortet",
+  fh_web: "Websites sehen",
   foot: "Open Source, MIT-Lizenz. Läuft vollständig in deinem Browser.",
 };

@@ -211,3 +211,40 @@ select option:checked { background-color: var(--soft); }
 /* a link to another 1ms.dog tool, after the value it is about */
 .fr-v a.xl { color: var(--ink); font-weight: 400; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
 .fr-v a.xl:hover { text-decoration: underline; }
+
+/* a landing page's lead panel: the verdict for its one check, then one row per probe it is about. Rows are drawn by
+   the build and only their text changes; the verdict line keeps its height while running. */
+.focus { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.focus.st-bad { border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); background: color-mix(in srgb, var(--bad) 5%, transparent); }
+.focus.st-ok { border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
+.fo-h { display: flex; align-items: center; gap: 10px; min-height: 28px; }
+.fo-h .st { width: 22px; height: 22px; font-size: 13px; margin: 0; align-self: center; }
+.focus.st-ok .st { background: var(--ok); } .focus.st-bad .st { background: var(--bad); } .focus.st-warn .st { background: var(--e-p1); }
+.focus.st-info .st, .focus.st-none .st { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--muted); }
+.fo-t { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+.focus.st-bad .fo-t { color: var(--bad); }
+.focus.wait .fo-t { color: var(--muted); font-weight: 600; }
+.fo-d { min-height: 22px; font-size: 13.5px; line-height: 22px; color: var(--muted); }
+.fo-d .lt { vertical-align: middle; position: relative; top: -1px; margin: 0 1px; }
+.fo-d .bar { display: inline-block; width: 46%; height: 10px; border-radius: 5px; background: var(--soft); vertical-align: middle; animation: blink 1.4s ease-in-out infinite; }
+.fo-list { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 24px; }
+.fo-list.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fo-r { display: grid; grid-template-columns: minmax(0, 9fr) minmax(0, 11fr) minmax(0, 7fr); align-items: center; gap: 8px; height: 32px; border-top: 1px solid var(--line); font-size: 13px; }
+.fo-list.two .fo-r { grid-template-columns: minmax(0, 8fr) minmax(0, 12fr) 40px; }
+.fo-n { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fo-r[data-p="@web"] .fo-n { color: var(--muted); }
+.fo-x { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; overflow: hidden; }
+.fo-x .flag { width: 18px; height: 13px; }
+.fo-m { font: 12px var(--f-num); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+.fo-r.bad { color: var(--bad); } .fo-r.bad .fo-x span { color: var(--bad); font-weight: 600; }
+.focus .fo-who { font-size: 13px; color: var(--ink); text-decoration: none; align-self: flex-start; }
+.focus .fo-who:hover { text-decoration: underline; }
+/* the landing page's own check, in the table */
+.fr.focus .fr-l { color: var(--fg); font-weight: 600; }
+/* links between the main page and the landing pages */
+.foot { flex-wrap: wrap; }
+.foot-nav { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+@media (max-width: 760px) {
+  .fo-list.two { grid-template-columns: minmax(0, 1fr); }
+  .fo-r { grid-template-columns: minmax(0, 8fr) minmax(0, 12fr) minmax(0, 6fr); }
+}

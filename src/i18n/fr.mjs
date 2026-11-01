@@ -95,5 +95,63 @@ export default {
   vh_proxy: "Tous les sites voient la même sortie proxy",
   vh_direct: "Direct : tous les sites voient l’IP locale",
   who_link: "Votre profil complet et le test de camouflage →",
+  lp_rtc: {
+    "nav": "Test de fuite WebRTC",
+    "title": "Test de fuite WebRTC : votre VPN ou proxy laisse-t-il fuir votre vraie IP ?",
+    "desc": "Test de fuite WebRTC gratuit : quatre serveurs STUN en UDP comparés à ce que voient {n} sondes en HTTPS, pour savoir si votre VPN ou proxy laisse fuir votre vraie IP. Tout se passe dans votre navigateur.",
+    "kw": "test fuite webrtc, fuite webrtc, fuite ip, test fuite vpn, vraie ip, stun, webrtc leak",
+    "h1": "Test de fuite WebRTC : votre vraie IP est-elle exposée ?",
+    "intro": "Les appels vidéo du navigateur demandent votre adresse publique à des serveurs STUN en UDP, et beaucoup de proxys ne transportent que le TCP. Quatre serveurs STUN sont interrogés en même temps que des sites web, {n} sondes en tout, pour voir si WebRTC trahit votre propre ligne.",
+    "faq": [
+      [
+        "Que vérifie ce test de fuite WebRTC ?",
+        "Il demande votre adresse publique en UDP à quatre serveurs STUN (Cloudflare, Google, Twilio, Xiaomi), comme le font les sites d’appels vidéo, et la compare à la sortie que voient les sites en HTTPS. Si STUN voit votre ligne locale alors que les sites voient le proxy, n’importe quelle page peut lire votre vraie IP."
+      ],
+      [
+        "Comment corriger une fuite WebRTC ?",
+        "Faites passer aussi l’UDP par le proxy : activez le mode TUN ou amélioré dans Clash, sing-box, Surge ou Shadowrocket, ou le tunnel complet de votre VPN. Bloquer WebRTC dans le navigateur (l’option d’uBlock Origin « Empêcher WebRTC de divulguer les adresses IP locales », ou media.peerconnection.enabled = false dans Firefox) fonctionne aussi, mais peut casser les appels vidéo."
+      ],
+      [
+        "Le résultat indique que l’UDP est bloqué. Est-ce sûr ?",
+        "Pour WebRTC, oui : aucun serveur STUN n’a répondu, une page ne peut donc pas connaître votre adresse par ce biais. Les appels vidéo peuvent encore passer par un serveur relais."
+      ],
+      [
+        "Un VPN empêche-t-il toujours les fuites WebRTC ?",
+        "Un VPN qui fait passer tout le trafic, oui. Un proxy réglé seulement dans le navigateur ou le système (HTTP ou SOCKS) ne transporte en général que le TCP, et l’UDP de WebRTC sort directement. Refaites le test après chaque changement."
+      ]
+    ]
+  },
+  lp_ai: {
+    "nav": "IP vue par ChatGPT et Claude",
+    "title": "Quelle IP voit ChatGPT ? Vérifiez l’IP et la région que voient ChatGPT et Claude",
+    "desc": "Voyez l’adresse IP et le pays depuis lesquels ChatGPT, OpenAI, Claude, Anthropic et 8 autres services d’IA vous voient, et si cette région est prise en charge. {n} sondes, dans votre navigateur.",
+    "kw": "ip chatgpt, quelle ip voit chatgpt, ip claude, région chatgpt, chatgpt pays non pris en charge, vérifier ip openai, proxy ia",
+    "h1": "Quelle IP et quelle région ChatGPT et Claude voient-ils ?",
+    "intro": "Les proxys à règles envoient souvent les services d’IA par un nœud dédié. ChatGPT, OpenAI, Claude, Anthropic et 8 autres sites d’IA indiquent l’adresse et le pays qu’ils voient, à côté des sorties trouvées par {n} sondes.",
+    "faq": [
+      [
+        "Comment sait-on ce que voient ChatGPT et Claude ?",
+        "chatgpt.com, openai.com, claude.ai, anthropic.com et les autres sites d’IA sont derrière Cloudflare et répondent à /cdn-cgi/trace sur leur propre domaine : l’adresse qui s’est connectée et le pays où Cloudflare la place. Votre navigateur interroge chacun par la route que vos règles choisissent."
+      ],
+      [
+        "Quelles régions ne sont pas prises en charge ?",
+        "Ni OpenAI ni Anthropic ne servent la Chine continentale, Hong Kong, Macao, la Russie, la Biélorussie, l’Iran, la Corée du Nord, la Syrie ou Cuba. Si un site d’IA voit l’une d’elles, l’inscription ou l’utilisation peuvent être bloquées."
+      ],
+      [
+        "Pourquoi ChatGPT voit-il une autre IP que les autres sites ?",
+        "Les règles du proxy envoient souvent les domaines d’IA par un nœud dédié. Cette page affiche la sortie de chaque service d’IA à côté des autres, pour vérifier que la règle fait ce que vous vouliez."
+      ],
+      [
+        "Une IP de datacenter pose-t-elle problème ?",
+        "Les adresses de cloud et d’hébergement sont partagées par beaucoup d’utilisateurs et subissent plus de vérifications et de limites. Une sortie sur un réseau résidentiel ou mobile risque moins d’être signalée."
+      ]
+    ]
+  },
+  fh_rtc_leak: "WebRTC laisse fuir votre vraie IP",
+  fh_rtc_safe: "Pas de fuite WebRTC",
+  fh_rtc_none: "Pas de fuite WebRTC : UDP bloqué",
+  fh_ai_ok: "ChatGPT et Claude voient une région prise en charge",
+  fh_ai_none: "Aucun service d’IA n’a répondu",
+  fh_web: "Les sites voient",
   foot: "Open source, licence MIT. Tout s’exécute dans votre navigateur.",
 };

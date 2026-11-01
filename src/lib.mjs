@@ -138,10 +138,10 @@ export function findings(probes, exits, cf, tzCc) {
     R.ai = bad.length ? { s: "bad", k: "bad", v: { list: bad, c: cf[bad[0]].loc } }
       : { s: "ok", k: "ok", v: { x, c: cf[seen[0]].loc, dc: !!(e && e.dc) } };
   }
-  // WebRTC: UDP sees an exit no website abroad sees, while websites abroad go through a proxy
+  // WebRTC: UDP sees the local line while websites abroad (most of them) go through a proxy. A site routed direct
+  // seeing the local line too doesn't make it safe: any page, proxied or not, can read what STUN saw.
   const udp = ids("udp").filter(id => of[id]), udpL = [...new Set(udp.flatMap(id => of[id]))];
-  const webL = new Set([...ids("intl"), ...ids("ai"), ...ids("web")].filter(id => of[id]).flatMap(id => of[id]));
-  const leaked = udpL.filter(l => !webL.has(l) && byL[l].kind === "local");
+  const leaked = udpL.filter(l => byL[l].kind === "local");
   const proxied = byL[abroad].kind !== "local";
   R.rtc = !udp.length ? { s: "ok", k: "none", v: {} }
     : leaked.length && proxied ? { s: "bad", k: "leak", v: { a: leaked[0] } }
