@@ -95,6 +95,7 @@ export default {
   vh_proxy: "所有網站都走同一個代理出口",
   vh_direct: "直連：所有網站看到的都是本地 IP",
   who_link: "看完整畫像和偽裝檢測",
+  unlock_link: "這條線路能解鎖哪些 AI",
   lp_rtc: {
     "nav": "WebRTC 洩漏檢測",
     "title": "WebRTC 洩漏檢測：代理和 VPN 有沒有暴露你的真實 IP",

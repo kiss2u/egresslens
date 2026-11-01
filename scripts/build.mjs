@@ -102,7 +102,7 @@ export async function build({ check = false } = {}) {
       const fr = (id, name) => `<li class="fo-r" data-p="${id}"><span class="fo-n">${esc(name)}</span><span class="fo-x"></span><span class="fo-m"></span></li>`;
       const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") + (land.id === "rtc" ? fr("@web", T("fh_web")) : "") +
         // links to other 1ms.dog tools: [meta name, path after the language folder, text], shown once the host announces the tool
-        `<li class="fo-links">${(land.id === "rtc" ? [["who", "fingerprint/", "fp_link"]] : [["home", "chatgpt/", "lat_link"]])
+        `<li class="fo-links">${(land.id === "rtc" ? [["who", "fingerprint/", "fp_link"]] : [["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]])
           .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}${EXT}</a>`).join("")}</li>`;
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
         `<p class="fo-d"><span class="bar"></span></p><ul class="fo-list${land.id === "ai" ? " two" : ""}">${rows}</ul>` +

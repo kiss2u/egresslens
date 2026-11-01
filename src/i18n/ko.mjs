@@ -95,6 +95,7 @@ export default {
   vh_proxy: "모든 사이트가 같은 프록시 출구",
   vh_direct: "직접 연결: 모든 사이트에 로컬 IP가 보임",
   who_link: "전체 프로필과 위장 점검 보기",
+  unlock_link: "이 회선으로 되는 AI",
   lp_rtc: {
     "nav": "WebRTC 누출 테스트",
     "title": "WebRTC 누출 테스트: VPN·프록시에서 실제 IP가 새는지 확인",

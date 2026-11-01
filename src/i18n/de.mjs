@@ -95,6 +95,7 @@ export default {
   vh_proxy: "Alle Websites sehen denselben Proxy-Ausgang",
   vh_direct: "Direkt: alle Websites sehen die lokale IP",
   who_link: "Dein ganzes Profil und der Tarn-Check",
+  unlock_link: "Welche KI-Dienste diese Route freischaltet",
   lp_rtc: {
     "nav": "WebRTC-Leak-Test",
     "title": "WebRTC-Leak-Test: verrät dein VPN oder Proxy deine echte IP?",

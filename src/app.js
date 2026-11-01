@@ -166,6 +166,8 @@
   const ST = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
   // a host can announce its privacy check with <meta name="who" content="https://…">
   const WHO = (document.querySelector('meta[name="who"]') || {}).content || "";
+  // and its streaming & AI unlock check with <meta name="unlock" content="https://…">: it tests the visitor's own route, so not on a shared result
+  const UNLOCK = (document.querySelector('meta[name="unlock"]') || {}).content || "";
   function renderChecks() {
     const isExit = x => S.exits.some(e => e.letter === x);
     for (const row of CHECKS) {
@@ -184,7 +186,9 @@
       li.classList.toggle("focus", row === D.focus);
       val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
-        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}${EXT}</a>` : "");
+        (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}${EXT}</a>` : "") +
+        // the AI region: the unlock check tries each AI service from this route
+        (UNLOCK && row === "ai" && f.s !== "none" && !S.shared ? ` <a class="xl" href="${esc(toolHref(UNLOCK, "ai/"))}" target="_blank" rel="noopener">${esc(t("unlock_link"))}${EXT}</a>` : "");
     }
   }
   // A landing page's lead panel (WebRTC leak test, what ChatGPT and Claude see): one row per probe it is about,

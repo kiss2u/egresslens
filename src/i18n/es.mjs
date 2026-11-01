@@ -95,6 +95,7 @@ export default {
   vh_proxy: "Todos los sitios ven la misma salida proxy",
   vh_direct: "Directo: todos los sitios ven la IP local",
   who_link: "Tu perfil completo y la prueba de camuflaje",
+  unlock_link: "Qué IA desbloquea esta ruta",
   lp_rtc: {
     "nav": "Test de fuga WebRTC",
     "title": "Test de fuga WebRTC: ¿tu VPN o proxy filtra tu IP real?",
