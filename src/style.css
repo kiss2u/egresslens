@@ -252,3 +252,6 @@ svg.xi { width: .95em; height: .95em; flex: none; }
 :root[data-ms-embed] .app { max-width: none; padding: 0; gap: 0; }
 :root[data-ms-embed] .hero { border: 0; border-radius: 0; padding: 12px 12px 0; }
 :root[data-ms-embed] .bar { margin: 0 -12px; padding: 8px 12px 10px; }
+
+/* a result link that can't be read: the line that says so, and the button to test your own */
+:root[data-bad-link] .hero-b, :root[data-bad-link] .probes, :root[data-bad-link] #share { display: none; }

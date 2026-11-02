@@ -7,7 +7,7 @@ import { PROBES } from "../src/probes.mjs";
 import { readProbe } from "../src/lib.mjs";
 
 const origin = process.argv[2] || "https://egress.1ms.dog";
-const rows = await Promise.all(PROBES.filter(p => p.read !== "stun").map(async p => {
+const rows = await Promise.all(PROBES.filter(p => p.read !== "stun" && !p.self).map(async p => {
   const t0 = Date.now();
   try {
     const r = await fetch(p.url, { headers: { Origin: origin, "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36" }, redirect: "manual", signal: AbortSignal.timeout(10000) });

@@ -11,7 +11,7 @@
 | 分组 | 内容 |
 |---|---|
 | 国内网站 | IPIP.NET、爱奇艺、ipify.cn、DNSPod（IPv4 和 IPv6），分流规则通常让它们直连 |
-| IP 查询服务 | IP.SB、ipinfo.io、ipapi.co、ipwho.is、GeoJS、ipleak.net、ident.me、ip.guide、icanhazip、BigDataCloud |
+| IP 查询服务 | 本站（1ms.dog shell 的 `/_ms/me`，即 Cloudflare 看到的这次连接；自行部署时用 `/cdn-cgi/trace`）、IP.SB、ipinfo.io、ipapi.co、ipwho.is、GeoJS、ipleak.net、ident.me、ip.guide、icanhazip、BigDataCloud |
 | AI 服务 | ChatGPT、OpenAI、Sora、Claude、Anthropic、Grok、Perplexity、Copilot、Mistral、Poe、Character.AI、DeepL |
 | 常用网站 | Cloudflare、1.1.1.1、GitLab、npm、Notion、Linear、Zoom、Medium、Coinbase、Crunchyroll、Patreon、Shopify |
 | 仅 IPv4 / 仅 IPv6 | 单栈站点上的 IP.SB、Cloudflare Radar、ipify、icanhazip |

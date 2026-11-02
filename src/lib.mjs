@@ -36,6 +36,7 @@ export const READERS = {
   ipguide: b => { const a = (b.network || {}).autonomous_system || {}; return { ip: b.ip, geo: a.asn ? geo("", (b.location || {}).city, a.asn, a.organization || a.name) : null }; },
   radar: b => ({ ip: b.ip_address, geo: geo(b.country, b.city, b.asn, "") }),
   ipify: b => ({ ip: b.ip }),
+  me: b => ({ ip: b.ip, geo: geo(b.country, b.city, b.asn, b.org), cf: { colo: b.colo || "", loc: b.country || "", warp: "off" } }),
   bdc: b => ({ ip: b.ipString }),
 };
 // a reader's result, or null when the answer has no usable address (or the host has one IP version and it is not it)

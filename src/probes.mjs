@@ -8,6 +8,9 @@
 // url   what the browser fetches; for g "udp" a STUN server
 // read  how to read the answer (READERS in src/lib.mjs)
 // fam   4 or 6 when the host only has that IP version
+// self  this page's own host: the 1ms.dog shell's /_ms/me (Cloudflare's view of this connection: the fastest answer,
+//       and no third party), or this host's /cdn-cgi/trace where there is no shell. Its name and host come from the
+//       page (string self_name, the site's address).
 
 // group id → whether its probes stand for "abroad" when the page compares routes
 export const GROUPS = ["cn", "intl", "ai", "web", "stack", "udp"];
@@ -22,7 +25,8 @@ export const PROBES = [
   { id: "dnspod4", g: "cn", name: "DNSPod", host: "ipv4.ddnspod.com", url: "https://ipv4.ddnspod.com", read: "text", fam: 4 },
   { id: "dnspod6", g: "cn", name: "DNSPod", host: "ipv6.ddnspod.com", url: "https://ipv6.ddnspod.com", read: "text", fam: 6 },
 
-  // IP lookup services abroad
+  // IP lookup services abroad, this site first
+  { id: "self", g: "intl", name: "", host: "", url: "/_ms/me", read: "me", self: 1 },
   { id: "ipsb", g: "intl", name: "IP.SB", host: "api.ip.sb", url: "https://api.ip.sb/geoip", read: "ipsb" },
   { id: "ipinfo", g: "intl", name: "ipinfo.io", host: "ipinfo.io", url: "https://ipinfo.io/json", read: "ipinfo" },
   { id: "ipapico", g: "intl", name: "ipapi.co", host: "ipapi.co", url: "https://ipapi.co/json/", read: "ipapico" },

@@ -41,7 +41,7 @@
     .split(" ").map(p => p.split(":")));
   const tzCc = () => { try { return TZ_CC[Intl.DateTimeFormat().resolvedOptions().timeZone] || ""; } catch (e) { return ""; } };
   const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.g]));
-  const NAME_OF = id => { const p = PROBES.find(x => x.id === id); return p.g === "stack" ? p.name + " IPv" + p.fam : p.g === "udp" ? "STUN " + p.name : p.name; };
+  const NAME_OF = id => { const p = PROBES.find(x => x.id === id); return p.self ? t("self_name") : p.g === "stack" ? p.name + " IPv" + p.fam : p.g === "udp" ? "STUN " + p.name : p.name; };
 
   // A probe that gives no address says why, as { why, n }: "timeout", "http" (n = status), "net" (no connection:
   // blocked by the network, the proxy or an ad blocker), "parse" (an answer without a usable address), "stun".
@@ -50,6 +50,8 @@
     let r;
     try { r = await fetch(bust(p.url), { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: AbortSignal.timeout(7000) }); }
     catch (e) { throw fail(e && e.name === "TimeoutError" ? "timeout" : "net"); }
+    // this site without the 1ms.dog shell: its Cloudflare trace, if it has one
+    if (p.self && r.status === 404) return httpProbe({ ...p, url: "/cdn-cgi/trace", read: "trace", self: 0 });
     if (!r.ok) throw fail("http", r.status);
     let res = null;
     try { const text = await r.text(); res = readProbe(p, p.read === "text" || p.read === "trace" ? text : JSON.parse(text)); } catch (e) {}
@@ -327,7 +329,7 @@
     leaveShared();
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
-    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, nat: null, done: false });
+    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, nat: null, done: false, err: false });
     renderExits(); renderGroups(); renderChecks(); renderFocus();
     $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); $("#share").disabled = true;
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
@@ -344,6 +346,11 @@
     };
     const natP = natProbe();
     let d = 0; setProg(0, PROBES.length);
+    // Embedded: when the probes elsewhere all fail (an ad blocker takes them as a batch), say so at once rather than
+    // after every timeout, and send no result. This site's own probe doesn't count: blockers leave it alone.
+    let won = 0, lost = 0;
+    const blocked = () => { if (EMBED && !S.err && !won) { S.err = true; post({ type: "error", text: t("embed_blocked") }); } };
+    const blockT = EMBED && setTimeout(blocked, 15000);
     await Promise.all(PROBES.map(async p => {
       const t0 = performance.now();
       let res = [];
@@ -355,8 +362,10 @@
       for (const r of res) if (r.geo && (r.geo.cc || r.geo.asn) && !S.geo[r.ip]) S.geo[r.ip] = r.geo;
       // geo-aware answers first, so a lookup isn't spent on a network another probe is about to name
       setTimeout(() => { if (gen === S.gen) for (const r of res) lookup(r.ip); }, 1200);
+      if (!p.self) { if (res.length) won++; else if (++lost >= 12) blocked(); }
       renderRow(p); renderGroups(); setProg(++d, PROBES.length); live();
     }));
+    clearTimeout(blockT);
     if (gen !== S.gen) return;
     for (const { ip } of seenAll()) lookup(ip);
     await Promise.allSettled(lookups);
@@ -371,11 +380,12 @@
     S.done = true;
     renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
     $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#share").disabled = !S.exits.length;
-    if (EMBED) postResult();
+    if (EMBED && !won) blocked();
+    if (EMBED && !S.err) postResult();
   }
 
   // leaving a shared result's page (/r/…, whose title is the verdict) opens the language's own page, which tests at once
-  $("#run").onclick = () => { if (S.shared && location.pathname !== D.home[LANG]) location.href = D.home[LANG]; else run(); };
+  $("#run").onclick = () => { if ((S.shared || S.badLink) && location.pathname !== D.home[LANG]) location.href = D.home[LANG]; else run(); };
 
   /* ---------- a row's reason, on hover or focus ---------- */
   const tip = document.body.appendChild(Object.assign(document.createElement("div"), { className: "tip", role: "tooltip" }));
@@ -416,7 +426,8 @@
     $("#run span").textContent = t("test_mine"); $("#run").disabled = false; $("#share").disabled = false;
   }
   function leaveShared() {
-    if (!S.shared) return;
+    if (S.badLink) { S.badLink = false; document.documentElement.removeAttribute("data-bad-link"); }
+    else if (!S.shared) return;
     S.shared = null; eye.hidden = false; document.documentElement.removeAttribute("data-shared");
     history.replaceState(null, "", D.home[LANG]);
   }
@@ -547,5 +558,11 @@
   applyMask();
   const shared = parseShare(location.hash, PROBES.map(p => p.id));
   if (shared && shared.exits.length && !EMBED) showShared(shared);
+  else if (/^#r=/.test(location.hash) && !EMBED) {
+    // a result link that is cut short or from a format this page doesn't know: say so, and test only when asked
+    S.badLink = true; document.documentElement.setAttribute("data-bad-link", "");
+    $("#sharedTxt").textContent = t("bad_link");
+    $("#run span").textContent = t("test_mine"); $("#run").disabled = false;
+  }
   else { document.documentElement.removeAttribute("data-shared"); run(); }
 })();

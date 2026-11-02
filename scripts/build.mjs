@@ -88,7 +88,9 @@ export async function build({ check = false } = {}) {
 
     // every probe is in the HTML from the start (crawlers see what is checked; rows never move when results arrive)
     // one line per probe: name (host on hover), the address it saw, the exit label, Cloudflare colo, time
-    const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(p.host)}">${esc(p.name)}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
+    // this site's own probe is named in the page's language, at the site's address
+    const nameOf = p => p.self ? T("self_name") : p.name, hostOf = p => p.self ? new URL(SITE).host : p.host;
+    const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(hostOf(p))}">${esc(nameOf(p))}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
       `<span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li>`;
     const groupsOf = first => [first, ...GROUPS.filter(g => g !== first)].filter(Boolean)
       .map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
@@ -192,7 +194,7 @@ export async function build({ check = false } = {}) {
 
 - Page: ${SITE}/ (also ${langs.slice(1).map(([, s]) => "/" + s + "/").join(", ")})
 ${LANDS.map(l => `- ${en["lp_" + l.id].nav}: ${SITE}/${l.slug}/ (same tool, this check first)`).join("\n")}
-- Probes: ${GROUPS.map(g => `${en["g_" + g]}: ${PROBES.filter(p => p.g === g).map(p => p.host).join(", ")}`).join("; ")}
+- Probes: ${GROUPS.map(g => `${en["g_" + g]}: ${PROBES.filter(p => p.g === g).map(p => p.self ? new URL(SITE).host : p.host).join(", ")}`).join("; ")}
 - Source: https://github.com/yt1988/egresslens
 `;
 

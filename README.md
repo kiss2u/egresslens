@@ -11,7 +11,7 @@ Which IP addresses does the internet see you as? Rule-based proxies and VPNs pic
 | Group | What it shows |
 |---|---|
 | Sites in mainland China | IPIP.NET, iQIYI, ipify.cn, DNSPod (IPv4 and IPv6): the route rules usually send direct |
-| IP lookup services | IP.SB, ipinfo.io, ipapi.co, ipwho.is, GeoJS, ipleak.net, ident.me, ip.guide, icanhazip, BigDataCloud |
+| IP lookup services | this site (the 1ms.dog shell's `/_ms/me`, Cloudflare's view of the connection; `/cdn-cgi/trace` when self-hosted), IP.SB, ipinfo.io, ipapi.co, ipwho.is, GeoJS, ipleak.net, ident.me, ip.guide, icanhazip, BigDataCloud |
 | AI services | ChatGPT, OpenAI, Sora, Claude, Anthropic, Grok, Perplexity, Copilot, Mistral, Poe, Character.AI, DeepL |
 | Popular sites | Cloudflare, 1.1.1.1, GitLab, npm, Notion, Linear, Zoom, Medium, Coinbase, Crunchyroll, Patreon, Shopify |
 | IPv4 only / IPv6 only | IP.SB, Cloudflare Radar, ipify, icanhazip on single-stack hosts |

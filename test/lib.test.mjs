@@ -11,12 +11,16 @@ test("probes: unique ids, known groups and readers, https or stun", () => {
   for (const p of PROBES) {
     assert.ok(!ids.has(p.id), "duplicate " + p.id); ids.add(p.id);
     assert.ok(GROUPS.includes(p.g), p.id);
-    assert.ok(p.read === "stun" ? p.url.startsWith("stun:") : p.url.startsWith("https://"), p.id);
-    assert.ok(p.host && p.name, p.id);
+    // this site's own probe asks the page's host, under the name the page gives it
+    assert.ok(p.self ? p.url === "/_ms/me" : p.read === "stun" ? p.url.startsWith("stun:") : p.url.startsWith("https://"), p.id);
+    assert.ok(p.self || (p.host && p.name), p.id);
   }
 });
 
 test("readers", () => {
+  // the shell's /_ms/me: Cloudflare's view of this connection
+  assert.deepEqual(readProbe(PROBES.find(p => p.self), { ip: "203.0.113.9", family: 4, country: "JP", city: "Tokyo", asn: 16509, org: "Amazon.com, Inc.", colo: "NRT" }),
+    { ip: "203.0.113.9", geo: { cc: "JP", city: "Tokyo", asn: 16509, org: "Amazon.com, Inc." }, cf: { colo: "NRT", loc: "JP", warp: "off" } });
   assert.deepEqual(readProbe(P("ipip"), { ret: "ok", data: { ip: "114.254.73.157", location: [] } }), { ip: "114.254.73.157" });
   assert.equal(readProbe(P("iqiyi"), { t: "CNC|BeiJing-114.254.73.157" }).ip, "114.254.73.157");
   assert.equal(readProbe(P("icanhazip"), "2406:da14::1\n").ip, "2406:da14::1");
