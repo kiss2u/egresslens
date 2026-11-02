@@ -77,4 +77,7 @@ export const PROBES = [
   { id: "stun-google", g: "udp", name: "Google", host: "stun.l.google.com", url: "stun:stun.l.google.com:19302", read: "stun" },
   { id: "stun-twilio", g: "udp", name: "Twilio", host: "global.stun.twilio.com", url: "stun:global.stun.twilio.com:3478", read: "stun" },
   { id: "stun-mi", g: "udp", name: "Xiaomi", host: "stun.miwifi.com", url: "stun:stun.miwifi.com:3478", read: "stun" },
+  // two more that answer from mainland China, where Google's answers only over IPv6: the NAT type needs two over IPv4
+  { id: "stun-bili", g: "udp", name: "Bilibili", host: "stun.chat.bilibili.com", url: "stun:stun.chat.bilibili.com:3478", read: "stun" },
+  { id: "stun-hitv", g: "udp", name: "Mango TV", host: "stun.hitv.com", url: "stun:stun.hitv.com:3478", read: "stun" },
 ];

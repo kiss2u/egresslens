@@ -49,6 +49,8 @@ export function readProbe(probe, body) {
 }
 // ICE candidate line → the server-reflexive address (what the STUN server saw), or null
 export const srflxOf = line => { const p = String(line || "").split(" "); return / typ srflx /.test(line) && isIp(p[4]) ? p[4] : null; };
+// … with its port: { ip, port }, or null
+export const srflxAt = line => { const ip = srflxOf(line); return ip && { ip, port: +String(line).split(" ")[5] }; };
 
 /* ---------- exits ---------- */
 export const DC_RE = /amazon|google|microsoft|azure|digitalocean|vultr|choopa|constant company|linode|akamai|ovh|hetzner|oracle|alibaba|aliyun|tencent|huawei|m247|datacamp|cloudflare|leaseweb|contabo|hostinger|it7|racknerd|colocrossing|psychz|zenlayer|g-core|gcore|hostwinds|scaleway|ionos|kamatera|upcloud|bandwagon|dmit|cogent|quadranet|servers\.com|packet|equinix|fastly|cdn77|datapacket|tzulo|hostdare|greencloud|nexeon|frantech|buyvm|hosting|vps|data ?cent|mullvad|proton|nord|express ?vpn|surfshark|private internet|ucloud|kingsoft|baidu cloud|bytedance|volcano/i;
@@ -111,14 +113,15 @@ export const AI_BLOCKED = ["CN", "HK", "MO", "RU", "BY", "IR", "KP", "SY", "CU"]
 const AI_CHECK = ["chatgpt", "openai", "claude", "anthropic"];
 // The check table. probes: the PROBES list; exits: groupExits(); cf: probe id → its Cloudflare trace ({ loc } = the
 // country that site sees); tzCc: country of the browser's time zone.
-// Returns one row per check, always the same six: { route, except, ai, rtc, v6, tz }, each { s, k, v }:
+// nat: natOf(), or nothing (a shared result from before the NAT row).
+// Returns one row per check, always the same seven: { route, except, ai, rtc, nat, v6, tz }, each { s, k, v }:
 // s the status ("ok" | "warn" | "bad" | "info" | "none"), k the wording's variant, v the values it needs
 // (exit labels, probe ids, country codes).
-export function findings(probes, exits, cf, tzCc) {
+export function findings(probes, exits, cf, tzCc, nat) {
   const of = exitOfProbe(exits), byL = Object.fromEntries(exits.map(e => [e.letter, e]));
   const ids = g => probes.filter(p => p.g === g).map(p => p.id);
   const none = { s: "none", k: "none", v: {} };
-  if (!exits.length) return { route: none, except: none, ai: none, rtc: none, v6: none, tz: none };
+  if (!exits.length) return { route: none, except: none, ai: none, rtc: none, nat: none, v6: none, tz: none };
   const cn = majority(ids("cn"), of), abroad = majority([...ids("intl"), ...ids("ai"), ...ids("web")], of) || cn;
   const R = {};
   // routing: mainland sites vs. sites abroad
@@ -146,6 +149,9 @@ export function findings(probes, exits, cf, tzCc) {
   R.rtc = !udp.length ? { s: "ok", k: "none", v: {} }
     : leaked.length && proxied ? { s: "bad", k: "leak", v: { a: leaked[0] } }
     : { s: "ok", k: proxied && udpL.every(l => byL[l].kind !== "local") ? "proxy" : "same", v: { a: udpL[0] } };
+  // NAT type (natOf). STUN sees the UDP exit, so behind a proxy (a TUN-mode client too) it is the proxy's NAT.
+  R.nat = !nat ? none : nat.k === "none" ? { s: "info", k: "none", v: {} }
+    : { s: nat.k === "cone" ? "ok" : "warn", k: nat.k, v: { ...(nat.multi && { multi: true }), ...(udpL.some(l => byL[l].kind === "proxy") && { px: true }) } };
   // IPv6: the IPv6-only hosts see the local line while IPv4 goes through a proxy
   const v4 = majority(probes.filter(p => p.g === "stack" && p.fam === 4).map(p => p.id), of);
   const v6 = majority(probes.filter(p => p.g === "stack" && p.fam === 6).map(p => p.id), of);
@@ -180,7 +186,23 @@ export function oddProbes(probes, exits) {
   return out;
 }
 // the rows in the order the page shows them
-export const CHECKS = ["route", "except", "ai", "rtc", "v6", "tz"];
+export const CHECKS = ["route", "except", "ai", "rtc", "nat", "v6", "tz"];
+
+// NAT type, from one peer connection that asks every STUN server at once from one socket. The browser merges
+// candidates with the same address and port: one public port for every server is a cone NAT (the mapping doesn't
+// depend on the destination; one of NAT1–3, which a browser can't tell apart), a port per server is symmetric (NAT4).
+// A server that didn't answer looks just like one merged, so a cone needs two servers that each saw that address on
+// their own connection. cands: the shared connection's srflx candidates ({ ip, port }); seen: probe id → addresses
+// that server saw on its own; exits: groupExits().
+// → { k: "cone" | "sym" | "none" (can't tell), multi: one exit with several public IPv4 addresses (carrier-grade
+// NAT or several lines) }
+export function natOf(cands, seen, exits) {
+  const v4 = cands.filter(c => fam(c.ip) === 4), ips = [...new Set(v4.map(c => c.ip))];
+  const ports = ip => new Set(v4.filter(c => c.ip === ip).map(c => c.port)).size;
+  const servers = ip => Object.values(seen).filter(l => l.includes(ip)).length;
+  const k = ips.some(ip => ports(ip) > 1) ? "sym" : ips.some(ip => servers(ip) >= 2) ? "cone" : "none";
+  return { k, multi: exits.some(e => ips.filter(ip => e.ips.includes(ip)).length > 1) };
+}
 
 /* ---------- share links ---------- */
 // The headline of a result, for the share image and the link's preview card: "leak" (WebRTC or IPv6 skips the proxy),
@@ -198,14 +220,17 @@ export function verdictOf(finds, exits) {
 // A result in a link, without any IP address: per exit its country, city, network and flags; per probe the exits it
 // saw (or why it failed), its time and the Cloudflare colo and country it reported. The receiver works the findings
 // out again from these, so a shared result reads exactly like the sender's. Version 1:
-// #r=1|<unix time base36>|<time-zone country>|<exits>|<probes>
+// #r=1|<unix time base36>|<time-zone country>|<exits>|<probes>[|<nat>]
 //   exits:  cc~city~org~asn~flags joined by ","  (flags: d datacenter, w WARP, 4 / 6 has IPv4 / IPv6)
 //   probes: id:<seen>:<ms base36>:<colo>:<loc> joined by ",", where <seen> is the exits' indexes joined by ".", or
 //           "x" and why it failed (t timeout, h<status> http, n net, p parse, s stun)
+//   nat:    "n", then c cone, s symmetric or u can't tell, then m when one exit has several addresses (absent in links
+//           from before the NAT row)
 const enc = v => encodeURIComponent(String(v ?? "")).replace(/[~,|:.]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase());
 const WHY = { timeout: "t", http: "h", net: "n", parse: "p", stun: "s" }, WHY_OF = Object.fromEntries(Object.entries(WHY).map(([k, v]) => [v, k]));
 // rows: probe id → { l: exit labels, ms, cf: { colo, loc } } or { why: { why, n } }; place: include city and network
-export function encodeShare({ ts, tz, exits, rows, place }) {
+const NAT = { cone: "c", sym: "s", none: "u" }, NAT_OF = Object.fromEntries(Object.entries(NAT).map(([k, v]) => [v, k]));
+export function encodeShare({ ts, tz, exits, rows, place, nat }) {
   const ex = exits.map(e => [e.cc, place ? e.city : "", place ? e.org : "", place && e.asn || "",
     (e.dc ? "d" : "") + (e.warp ? "w" : "") + (e.v4 ? "4" : "") + (e.v6 ? "6" : "")].map(enc).join("~")).join(",");
   const at = Object.fromEntries(exits.map((e, i) => [e.letter, i]));
@@ -214,12 +239,13 @@ export function encodeShare({ ts, tz, exits, rows, place }) {
     const seen = r.l && r.l.length ? r.l.map(l => at[l]).join(".") : "x" + (WHY[w.why] || "n") + (w.why === "http" && w.n ? w.n : "");
     return [id, seen, r.ms != null ? Math.round(r.ms).toString(36) : "", /^[A-Z0-9]{3}$/.test(cf.colo || "") ? cf.colo : "", /^[A-Z]{2}$/.test(cf.loc || "") ? cf.loc : ""].join(":");
   }).join(",");
-  return "#r=1|" + Math.floor(ts / 1000).toString(36) + "|" + (/^[A-Z]{2}$/.test(tz || "") ? tz : "") + "|" + ex + "|" + rs;
+  return "#r=1|" + Math.floor(ts / 1000).toString(36) + "|" + (/^[A-Z]{2}$/.test(tz || "") ? tz : "") + "|" + ex + "|" + rs +
+    (nat && NAT[nat.k] ? "|n" + NAT[nat.k] + (nat.multi ? "m" : "") : "");
 }
-// → { ts, tz, exits, rows } with the exits labeled as on the sender's page, or null when the hash isn't a result.
+// → { ts, tz, exits, rows, nat } with the exits labeled as on the sender's page, or null when the hash isn't a result.
 // ids: the probe ids this page knows (a probe since removed is skipped).
 export function parseShare(h, ids) {
-  const m = /^#r=1\|([0-9a-z]+)\|([A-Z]{2})?\|([^|]*)\|(.*)$/.exec(h || "");
+  const m = /^#r=1\|([0-9a-z]+)\|([A-Z]{2})?\|([^|]*)\|([^|]*)(?:\|n([csu])(m?))?$/.exec(h || "");
   if (!m) return null;
   const dec = v => { try { return decodeURIComponent(v); } catch (e) { return ""; } };
   const exits = m[3] ? m[3].split(",").map((x, i) => {
@@ -238,5 +264,5 @@ export function parseShare(h, ids) {
   }
   labelExits(exits);
   for (const [id, r] of Object.entries(rows)) if (!r.why) r.l = exits.filter(e => e.probes.includes(id)).map(e => e.letter);
-  return { ts: parseInt(m[1], 36) * 1000, tz: m[2] || "", exits, rows };
+  return { ts: parseInt(m[1], 36) * 1000, tz: m[2] || "", exits, rows, nat: m[5] ? { k: NAT_OF[m[5]], multi: !!m[6] } : null };
 }

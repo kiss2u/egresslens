@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet, encodeShare, parseShare, verdictOf } from "../src/lib.mjs";
+import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet, encodeShare, parseShare, verdictOf, natOf, srflxAt } from "../src/lib.mjs";
 import { PROBES, GROUPS } from "../src/probes.mjs";
 
 const P = id => PROBES.find(p => p.id === id);
@@ -74,7 +74,7 @@ const cfAll = loc => Object.fromEntries(["chatgpt", "openai", "claude", "anthrop
 test("checks: split routing, AI region, WebRTC and IPv6 leaks, time zone", () => {
   const { seen } = scenario();
   const F = findings(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"), cfAll("JP"), "CN");
-  assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "v6", "tz"]);
+  assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "nat", "v6", "tz"]);
   assert.deepEqual(F.route, { s: "info", k: "split", v: { a: "D", b: "P" } });
   // the IPv6-only hosts take the local line: one exception item, consistent with the IPv6 row below
   assert.deepEqual(F.except, { s: "info", k: "some", v: { groups: [{ x: "D", list: ["@v6"] }] } });
@@ -121,10 +121,10 @@ test("share link: no addresses, and the receiver reads the same findings", () =>
   const { seen } = scenario();
   const exits = groupExits(seen, BOTH(), GROUP_OF, "off"), of = exitOfProbe(exits), cf = cfAll("JP");
   const rows = Object.fromEntries(PROBES.map(p => [p.id, of[p.id] ? { l: of[p.id], ms: 123.4, cf: cf[p.id] } : { why: { why: "http", n: 403 } }]));
-  const F = findings(PROBES, exits, cf, "CN");
+  const nat = { k: "sym", multi: true }, F = findings(PROBES, exits, cf, "CN", nat);
   assert.equal(verdictOf(F, exits), "leak");
   for (const place of [false, true]) {
-    const h = encodeShare({ ts: 1.7e12, tz: "CN", exits, rows, place });
+    const h = encodeShare({ ts: 1.7e12, tz: "CN", exits, rows, place, nat });
     assert.match(h, /^#r=1\|/);
     for (const ip of seen.map(s => s.ip)) assert.ok(!h.includes(encodeURIComponent(ip).replace(/[.:]/g, c => "%" + c.charCodeAt(0).toString(16).toUpperCase())) && !h.includes(ip), "address in link: " + ip);
     assert.equal(h.includes("Tokyo"), place);
@@ -132,7 +132,11 @@ test("share link: no addresses, and the receiver reads the same findings", () =>
     assert.equal(R.tz, "CN");
     assert.deepEqual(R.exits.map(e => [e.letter, e.kind, e.cc]), exits.map(e => [e.letter, e.kind, e.cc]));
     const cf2 = Object.fromEntries(Object.entries(R.rows).filter(([, r]) => r.cf).map(([id, r]) => [id, r.cf]));
-    assert.deepEqual(findings(PROBES, R.exits, cf2, R.tz), F);
+    assert.deepEqual(findings(PROBES, R.exits, cf2, R.tz, R.nat), F);
+    // a link from before the NAT row: the row has nothing to say
+    const old = parseShare(h.replace(/\|n[csu]m?$/, ""), PROBES.map(p => p.id));
+    assert.equal(old.nat, null);
+    assert.equal(findings(PROBES, old.exits, cf2, old.tz, old.nat).nat.s, "none");
     assert.deepEqual(oddProbes(PROBES, R.exits), oddProbes(PROBES, exits));
   }
   assert.equal(parseShare("#r=2|x", []), null);
@@ -147,4 +151,24 @@ test("WebRTC: a leak even when one site abroad is routed direct", () => {
   const F = findings(PROBES, exits, cfAll("JP"), "CN");
   assert.deepEqual(F.rtc, { s: "bad", k: "leak", v: { a: "D" } });
   assert.equal(oddProbes(PROBES, exits)["stun-cf"].k, "leak");
+});
+
+test("NAT type: one port for every server is a cone, a port per server symmetric, too few answers can't tell", () => {
+  const { seen } = scenario();
+  const exits = groupExits(seen, BOTH(), GROUP_OF, "off");
+  assert.deepEqual(srflxAt("candidate:1 1 udp 1677729535 114.254.73.157 60797 typ srflx raddr 0.0.0.0 rport 0 generation 0"), { ip: LOCAL4, port: 60797 });
+  assert.equal(srflxAt("candidate:1 1 udp 2122260223 abc.local 60797 typ host generation 0"), null);
+  const two = { "stun-mi": [LOCAL4], "stun-bili": [LOCAL4], "stun-google": [LOCAL6] };
+  assert.deepEqual(natOf([{ ip: LOCAL4, port: 1000 }, { ip: LOCAL6, port: 2000 }], two, exits), { k: "cone", multi: false });
+  assert.deepEqual(natOf([{ ip: LOCAL4, port: 1000 }, { ip: LOCAL4, port: 1001 }], two, exits), { k: "sym", multi: false });
+  // one server answered on its own: a single candidate may be the only answer, not a merge
+  assert.equal(natOf([{ ip: LOCAL4, port: 1000 }], { "stun-mi": [LOCAL4], "stun-google": [LOCAL6] }, exits).k, "none");
+  assert.equal(natOf([], two, exits).k, "none");
+  // two addresses on the local line: carrier-grade NAT or several lines
+  assert.equal(natOf([{ ip: LOCAL4, port: 1000 }, { ip: "114.254.73.158", port: 1000 }], two, [{ ...exits[0], ips: [LOCAL4, "114.254.73.158"] }]).multi, true);
+  // the row: a cone is fine, symmetric a warning, and behind a proxy the NAT is the proxy's
+  const F = findings(PROBES, exits, {}, "CN", { k: "cone", multi: false });
+  assert.equal(F.nat.s, "ok");
+  assert.equal(findings(PROBES, exits, {}, "CN", { k: "sym", multi: false }).nat.s, "warn");
+  assert.deepEqual(findings(PROBES, exits, {}, "CN", { k: "none", multi: false }).nat, { s: "info", k: "none", v: {} });
 });

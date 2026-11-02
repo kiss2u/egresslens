@@ -15,11 +15,11 @@
 | AI 服务 | ChatGPT、OpenAI、Sora、Claude、Anthropic、Grok、Perplexity、Copilot、Mistral、Poe、Character.AI、DeepL |
 | 常用网站 | Cloudflare、1.1.1.1、GitLab、npm、Notion、Linear、Zoom、Medium、Coinbase、Crunchyroll、Patreon、Shopify |
 | 仅 IPv4 / 仅 IPv6 | 单栈站点上的 IP.SB、Cloudflare Radar、ipify、icanhazip |
-| WebRTC（UDP） | Cloudflare、Google、Twilio、小米的 STUN 服务器 |
+| WebRTC（UDP） | Cloudflare、Google、Twilio、小米、哔哩哔哩、芒果 TV 的 STUN 服务器 |
 
 AI 服务和常用网站读取的是各站点自己域名上的 Cloudflare `/cdn-cgi/trace`：它返回连接过来的地址，并带 `Access-Control-Allow-Origin: *`。所以页面能看到在你的规则下，chatgpt.com、claude.ai 实际看到的是哪个出口。
 
-页面据此给出结论：国内外分流、单独走一条线路的服务、WebRTC 泄露（网站看到代理，UDP 却从自己的线路出去）、IPv6 泄露、时区与出口国家不一致，以及 Cloudflare WARP。
+页面据此给出结论：国内外分流、单独走一条线路的服务、WebRTC 泄露（网站看到代理，UDP 却从自己的线路出去）、NAT 类型（锥形或对称，用一个连接同时问所有 STUN 服务器得出）、IPv6 泄露、时区与出口国家不一致，以及 Cloudflare WARP。
 
 **隐私：** 网站只有静态文件。浏览器直接连接每个探测器，结果不会发给本站。截图前可以用“隐藏 IP”遮住地址。
 

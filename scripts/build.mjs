@@ -185,7 +185,7 @@ export async function build({ check = false } = {}) {
 > Free browser tool that shows every exit IP a visitor's traffic uses. ${N} probes are asked at once: sites in
 > mainland China, IP lookup services, AI services and popular sites (Cloudflare /cdn-cgi/trace on each one's own domain),
 > IPv4-only and IPv6-only hosts, and WebRTC STUN servers over UDP. The answers are grouped by network into exits
-> (local line or proxy), and the page reports split routing, per-service routes, WebRTC leaks, IPv6 leaks and
+> (local line or proxy), and the page reports split routing, per-service routes, WebRTC leaks, the NAT type (cone or symmetric), IPv6 leaks and
 > time-zone mismatches. Everything runs client-side; no results are sent to the site.
 
 - Page: ${SITE}/ (also ${langs.slice(1).map(([, s]) => "/" + s + "/").join(", ")})

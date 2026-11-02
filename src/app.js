@@ -74,9 +74,27 @@
     } finally { try { pc && pc.close(); } catch (e) {} }
   }
 
+  // the NAT type's probe: every STUN server on one peer connection (one socket), its srflx candidates (natOf in src/lib.mjs)
+  async function natProbe() {
+    if (!window.RTCPeerConnection) return [];
+    let pc;
+    try {
+      pc = new RTCPeerConnection({ iceServers: PROBES.filter(p => p.g === "udp").map(p => ({ urls: p.url })) });
+      pc.createDataChannel("x");
+      const out = [];
+      const done = new Promise(res => {
+        pc.onicecandidate = e => { if (!e.candidate) return res(); const c = srflxAt(e.candidate.candidate); if (c) out.push(c); };
+        setTimeout(res, 5000);
+      });
+      await pc.setLocalDescription(await pc.createOffer());
+      await done;
+      return out;
+    } catch (e) { return []; } finally { try { pc && pc.close(); } catch (e) {} }
+  }
+
   /* ---------- state and rendering ---------- */
   // shared: a result from a link being shown (no addresses; nothing is tested until the visitor asks)
-  const S = { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: [], odd: {}, done: false, gen: 0, shared: null };
+  const S = { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: [], odd: {}, nat: null, done: false, gen: 0, shared: null };
   const masked = () => store.get(K.mask) === "1";
   const ipTxt = ip => masked() ? maskIp(ip) : ip;
   const eye = $("#eye");
@@ -161,7 +179,7 @@
       if (el) el.textContent = S.gen ? `${d} / ${ids.length}` : "";
     }
   }
-  // The check table: six rows drawn by the build, each a label and a value. While running a value is a skeleton bar;
+  // The check table: seven rows drawn by the build, each a label and a value. While running a value is a skeleton bar;
   // when every probe is in, each row gets its status mark and its value.
   const ST = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
   // a host can announce its privacy check with <meta name="who" content="https://…">
@@ -184,7 +202,7 @@
       }
       li.classList.add("st-" + f.s); st.textContent = ST[f.s];
       li.classList.toggle("focus", row === D.focus);
-      val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "")) +
+      val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "") + (f.v.multi ? esc(t("v_nat_multi")) : "") + (f.v.px ? esc(t("v_nat_px")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
         (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}${EXT}</a>` : "") +
         // the AI region: the unlock check tries each AI service from this route
@@ -256,7 +274,7 @@
     leaveShared();
     const gen = ++S.gen;
     // clear everything the last run showed: exits, findings, and every probe row
-    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, done: false });
+    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, nat: null, done: false });
     renderExits(); renderGroups(); renderChecks(); renderFocus();
     $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); $("#share").disabled = true;
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
@@ -271,6 +289,7 @@
       lookups.push(fetch("https://api.ip.sb/geoip/" + encodeURIComponent(ip), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(6000) })
         .then(r => r.ok ? r.json() : Promise.reject()).then(b => { const r = READERS.ipsb(b); if (gen === S.gen && r.geo) { S.geo[ip] = r.geo; live(); } }).catch(() => {}));
     };
+    const natP = natProbe();
     let d = 0; setProg(0, PROBES.length);
     await Promise.all(PROBES.map(async p => {
       const t0 = performance.now();
@@ -291,7 +310,10 @@
     if (gen !== S.gen) return;
     S.exits = groupExits(seenAll(), S.geo, GROUP_OF, S.warp);
     const cf = Object.fromEntries(PROBES.map(p => [p.id, ((S.res[p.id] || [])[0] || {}).cf]).filter(([, c]) => c));
-    S.finds = findings(PROBES, S.exits, cf, tzCc());
+    const seen = Object.fromEntries(PROBES.filter(p => p.g === "udp").map(p => [p.id, (S.res[p.id] || []).map(r => r.ip)]));
+    S.nat = natOf(await natP, seen, S.exits);
+    if (gen !== S.gen) return;
+    S.finds = findings(PROBES, S.exits, cf, tzCc(), S.nat);
     S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
     renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
@@ -325,14 +347,14 @@
   // Opening a result link shows that result, worked out again from what the link carries, and tests nothing until the
   // visitor asks for their own (the run button). Format and parsing: src/lib.mjs.
   function showShared(R) {
-    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, exits: R.exits, shared: R, done: true, gen: 0 });
+    Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, exits: R.exits, nat: R.nat, shared: R, done: true, gen: 0 });
     for (const p of PROBES) {
       const r = R.rows[p.id]; if (!r) continue;
       S.ok[p.id] = !r.why; S.ms[p.id] = r.ms;
       if (r.why) S.why[p.id] = r.why; else S.res[p.id] = [{ ip: "", cf: r.cf }];
     }
     const cf = Object.fromEntries(Object.entries(R.rows).filter(([, r]) => r.cf && !r.why).map(([id, r]) => [id, r.cf]));
-    S.finds = findings(PROBES, S.exits, cf, R.tz);
+    S.finds = findings(PROBES, S.exits, cf, R.tz, R.nat);
     S.odd = oddProbes(PROBES, S.exits);
     eye.hidden = true;
     $("#sharedTxt").textContent = t("shared_from", { where: S.exits[0] ? whereOf(S.exits[0]) : "?", date: new Date(R.ts).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }) });
@@ -355,7 +377,7 @@
       if (S.ok[p.id] == null) continue;
       rows[p.id] = S.ok[p.id] ? { l: of[p.id] || [], ms: S.ms[p.id], cf: ((S.res[p.id] || [])[0] || {}).cf } : { why: S.why[p.id] };
     }
-    const hash = encodeShare({ ts: S.shared ? S.shared.ts : Date.now(), tz: S.shared ? S.shared.tz : tzCc(), exits: S.exits, rows, place: withPlace });
+    const hash = encodeShare({ ts: S.shared ? S.shared.ts : Date.now(), tz: S.shared ? S.shared.tz : tzCc(), exits: S.exits, rows, place: withPlace, nat: S.nat });
     return location.origin + D.home[LANG] + "r/" + verdict() + "/" + hash;
   }
   $("#share").onclick = async () => {
