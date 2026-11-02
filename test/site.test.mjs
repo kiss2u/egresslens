@@ -87,3 +87,11 @@ test("landing pages: their own words, canonical to themselves, every language li
     assert.equal(titles.size, LANGS.length, land.slug + ": a title per language");
   }
 });
+
+test("checkup embed: only from the host's <meta name=check>, messages to that origin alone, a compact layout", async () => {
+  const src = await readFile(new URL("../src/app.js", import.meta.url), "utf8"), css = await readFile(new URL("../src/style.css", import.meta.url), "utf8");
+  assert.match(src, /get\("embed"\) === "checkup" && !!at && from === at/);
+  assert.match(src, /parent\.postMessage\(\{ ms: "checkup", v: 1, tool: "egress", \.\.\.m \}, EMBED\)/);
+  assert.doesNotMatch(src, /postMessage\([^)]*"\*"\)/);
+  for (const sel of [".top", ".foot", ".probes", ".bar .acts"]) assert.ok(css.includes(`:root[data-ms-embed] ${sel}`), "hides " + sel);
+});

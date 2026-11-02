@@ -55,6 +55,7 @@ export default {
   why_odd: "看到的是 {x}，同类网站大多看到 {y}",
   why_leak: "经 UDP 看到本地出口 {x}：代理没有接管 WebRTC",
   no_net: "没有探测器返回结果，是否已断网？",
+  colon: "：",
   join: "、",
   k_local: "本地",
   k_proxy: "代理",

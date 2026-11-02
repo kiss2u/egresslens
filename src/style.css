@@ -242,3 +242,11 @@ select option:checked { background-color: var(--soft); }
 /* links to other 1ms.dog tools: the text, then the external-link icon at about the text's size */
 a.xl { display: inline-flex; align-items: center; gap: 3px; }
 svg.xi { width: .95em; height: .95em; flex: none; }
+
+/* embedded in the connection checkup: the progress, the exits and the findings, nothing else */
+:root[data-ms-embed] .top, :root[data-ms-embed] .foot, :root[data-ms-embed] .hero-h, :root[data-ms-embed] .focus, :root[data-ms-embed] .probes,
+:root[data-ms-embed] .bar .acts, :root[data-ms-embed] #eye, :root[data-ms-embed] .xl { display: none !important; }
+:root[data-ms-embed], :root[data-ms-embed] body { background: transparent; scrollbar-gutter: auto; }
+:root[data-ms-embed] .app { max-width: none; padding: 0; gap: 0; }
+:root[data-ms-embed] .hero { border: 0; border-radius: 0; padding: 12px 12px 0; }
+:root[data-ms-embed] .bar { margin: 0 -12px; padding: 8px 12px 10px; }

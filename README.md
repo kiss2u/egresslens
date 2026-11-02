@@ -36,6 +36,8 @@ npx wrangler deploy        # a static-assets Worker: no script, free and unmeter
 
 `wrangler.toml` turns off `*.workers.dev` and preview URLs; bind your own domain under **Workers & Pages → egress → Settings → Domains & Routes**, or set `workers_dev = true` for a quick test. Any static host works; `public/_headers` holds the security headers in Cloudflare's format. The WARP check reads `/cdn-cgi/trace` on the page's own host, so it only works behind Cloudflare.
 
+On 1ms.dog the page can also run inside the connection checkup (check.1ms.dog): opened with `?embed=checkup` from the origin the host names in `<meta name="check">`, it shows only the exits and the findings, starts at once and posts its progress and result to that origin. Without that meta, as when self-hosted, `?embed` is ignored.
+
 To put your own domain into canonical links and the sitemap:
 
 ```bash

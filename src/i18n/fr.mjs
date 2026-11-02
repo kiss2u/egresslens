@@ -55,6 +55,7 @@ export default {
   why_odd: "Voit {x} ; la plupart des sites similaires voient {y}",
   why_leak: "Voit votre sortie locale {x} en UDP : le proxy ne prend pas en charge WebRTC",
   no_net: "Aucune sonde n’a répondu. Êtes-vous hors ligne ?",
+  colon: " : ",
   join: ", ",
   k_local: "Local",
   k_proxy: "Proxy",

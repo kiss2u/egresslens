@@ -55,6 +55,7 @@ export default {
   why_odd: "{x} が見えています。同種のサイトの多くは {y}",
   why_leak: "UDP でローカルの出口 {x} が見えています：プロキシが WebRTC を扱っていません",
   no_net: "どのプローブも応答しません。オフラインですか？",
+  colon: "：",
   join: "、",
   k_local: "ローカル",
   k_proxy: "プロキシ",

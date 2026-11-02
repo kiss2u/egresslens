@@ -36,6 +36,8 @@ npx wrangler deploy        # 纯静态资源 Worker：没有脚本，免费且�
 
 `wrangler.toml` 关闭了 `*.workers.dev` 和预览地址。在 **Workers & Pages → egress → Settings → Domains & Routes** 绑定自己的域名，或临时设 `workers_dev = true` 测试。任何静态托管都可以，`public/_headers` 是 Cloudflare 格式的安全响应头。WARP 检测读取的是页面所在域名的 `/cdn-cgi/trace`，只在 Cloudflare 后面有效。
 
+在 1ms.dog 上，页面还可以嵌在线路体检（check.1ms.dog）里运行：带 `?embed=checkup` 打开、且来源是宿主在 `<meta name="check">` 里写明的地址时，只显示出口和检测结论，立即开始，并把进度和结果回传给那个地址。没有这个 meta（比如自行部署）时忽略 `?embed`。
+
 把规范链接和 sitemap 换成自己的域名：
 
 ```bash

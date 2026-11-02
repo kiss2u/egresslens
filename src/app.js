@@ -259,7 +259,60 @@
     v.querySelectorAll(".xl").forEach(a => a.remove());
     d.innerHTML = f.s === "none" ? "" : v.innerHTML;
   }
-  function setProg(d, n) { $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n }); }
+  function setProg(d, n) {
+    $("#prog").classList.toggle("end", S.done); $("#prog i").style.transform = `scaleX(${n ? d / n : 0})`; $("#progTxt").textContent = !S.gen ? "" : S.done ? t("done", { n }) : t("progress", { d, n });
+    if (EMBED && S.gen) { post({ type: "progress", done: d, total: n, text: $("#progTxt").textContent }); sendSize(); }
+  }
+
+  /* ---------- embedded in the connection checkup (1ms-shell docs/checkup.md) ---------- */
+  // Only when the page is opened with ?embed=checkup from the origin the host names in <meta name="check">; otherwise it
+  // is the ordinary page. The host marks the page with <html data-ms-embed>, which the compact layout keys on.
+  const EMBED = (() => {
+    const at = meta("check");
+    let from = "";
+    try { from = new URL(document.referrer).origin; } catch (e) {}
+    const on = new URLSearchParams(location.search).get("embed") === "checkup" && !!at && from === at;
+    if (!on) document.documentElement.removeAttribute("data-ms-embed");
+    return on ? at : "";
+  })();
+  const post = m => { try { parent.postMessage({ ms: "checkup", v: 1, tool: "egress", ...m }, EMBED); } catch (e) {} };
+  // the height on every change, and after each step of a run too (a frame in a hidden tab may never see a resize)
+  let sentH = 0;
+  const sendSize = () => { const n = Math.ceil(document.documentElement.getBoundingClientRect().height); if (n !== sentH) post({ type: "size", height: sentH = n }); };
+  if (EMBED) {
+    document.documentElement.setAttribute("data-ms-embed", "checkup");
+    new ResizeObserver(sendSize).observe(document.documentElement);
+  }
+  // the result, as the checkup report reads it: the page's headline, a few numbers, the check rows that say something
+  // (worst first, as the page words them) and facts for its rules across tools
+  function postResult() {
+    const F = S.finds, rank = { bad: 0, warn: 1, ok: 2 }, cfOf = id => ((S.res[id] || [])[0] || {}).cf || {};
+    // labels as the page shows them (the build fills them in; the strings file doesn't carry them)
+    const label = r => document.querySelector(`#finds [data-r="${r}"] .fr-l`).textContent.trim(), head = k => $(`[data-i="${k}"]`).textContent.trim();
+    const text = r => {
+      const v = document.querySelector(`#finds [data-r="${r}"] .fr-v`).cloneNode(true);
+      v.querySelectorAll(".xl").forEach(a => a.remove());
+      return label(r) + t("colon") + v.textContent.trim();
+    };
+    const ai = PROBES.filter(p => p.g === "ai").map(p => cfOf(p.id).loc).find(c => /^[A-Z]{2}$/.test(c || ""));
+    const nat = S.nat && S.nat.k !== "none" ? S.nat.k : "";
+    const stats = [{ label: head("exits_h"), value: String(S.exits.length) }];
+    if (ai) stats.push({ label: label("ai"), value: country(ai) });
+    if (nat) stats.push({ label: label("nat"), value: t("v_nat_" + nat).split(/s*[：:]s*/)[0] });
+    stats.push({ label: head("probes_h"), value: `${PROBES.filter(p => S.ok[p.id]).length} / ${PROBES.length}` });
+    const u = new URL(shareLink(false));
+    post({
+      type: "result", lang: LANG, path: u.pathname + u.hash, grade: null, score: null,
+      headline: S.exits.length ? t("vh_" + verdict()) : t("no_net"), stats,
+      findings: CHECKS.filter(r => F[r] && F[r].s in rank).sort((a, b) => rank[F[a].s] - rank[F[b].s]).slice(0, 4).map(r => ({ level: F[r].s, text: text(r) })),
+      facts: {
+        exits: S.exits.map(e => ({ country: e.cc || null, isp: e.org || null, via: e.kind === "local" ? "direct" : "proxy" })),
+        leak: F.rtc.s === "bad" || F.v6.s === "bad", split: F.route.k === "split",
+        ...(ai && { aiCountry: ai }), ...(nat && { nat: nat === "sym" ? "symmetric" : "cone" }),
+      },
+    });
+    sendSize();
+  }
 
   /* ---------- a run ---------- */
   const seenAll = () => PROBES.flatMap(p => (S.res[p.id] || []).map(r => ({ ip: r.ip, probe: p.id })));
@@ -318,6 +371,7 @@
     S.done = true;
     renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
     $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#share").disabled = !S.exits.length;
+    if (EMBED) postResult();
   }
 
   // leaving a shared result's page (/r/…, whose title is the verdict) opens the language's own page, which tests at once
@@ -492,6 +546,6 @@
 
   applyMask();
   const shared = parseShare(location.hash, PROBES.map(p => p.id));
-  if (shared && shared.exits.length) showShared(shared);
+  if (shared && shared.exits.length && !EMBED) showShared(shared);
   else { document.documentElement.removeAttribute("data-shared"); run(); }
 })();

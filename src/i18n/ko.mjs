@@ -55,6 +55,7 @@ export default {
   why_odd: "{x}로 보임. 비슷한 사이트 대부분은 {y}",
   why_leak: "UDP로 로컬 출구 {x}가 보임: 프록시가 WebRTC를 처리하지 않음",
   no_net: "응답한 프로브가 없습니다. 오프라인인가요?",
+  colon: ": ",
   join: ", ",
   k_local: "로컬",
   k_proxy: "프록시",
