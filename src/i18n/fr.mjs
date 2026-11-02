@@ -83,7 +83,6 @@ export default {
     ["Quelque chose est-il envoyé à ce site ?", "Non. Votre navigateur parle directement à chaque sonde ; ce site ne sert que des fichiers statiques et ne voit jamais vos résultats. Masquez les IP avant une capture d’écran."],
   ],
   share: "Partager",
-  shared_from: "Résultat depuis {where} · {date}",
   self_name: "Ce site",
   bad_link: "Impossible de lire ce résultat : le lien est tronqué ou vient d’une autre version.",
   embed_blocked: "Toutes les sondes ont échoué : un bloqueur de publicités (uBlock, AdGuard…) les bloque peut-être.",

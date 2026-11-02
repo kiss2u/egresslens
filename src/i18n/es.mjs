@@ -83,7 +83,6 @@ export default {
     ["¿Se envía algo a este sitio?", "No. Tu navegador habla directamente con cada sonda; este sitio solo sirve archivos estáticos y nunca ve tus resultados. Oculta las IP antes de hacer una captura."],
   ],
   share: "Compartir",
-  shared_from: "Resultado desde {where} · {date}",
   self_name: "Este sitio",
   bad_link: "No se puede leer este resultado: el enlace está cortado o es de otra versión.",
   embed_blocked: "Todas las sondas fallaron: puede que un bloqueador de anuncios (uBlock, AdGuard…) las esté bloqueando.",

@@ -331,7 +331,7 @@
     // clear everything the last run showed: exits, findings, and every probe row
     Object.assign(S, { res: {}, ok: {}, ms: {}, why: {}, geo: {}, warp: "off", exits: [], finds: {}, odd: {}, nat: null, done: false, err: false });
     renderExits(); renderGroups(); renderChecks(); renderFocus();
-    $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); $("#share").disabled = true;
+    $("#run").disabled = true; $("#run").classList.add("busy"); $("#run span").textContent = t("running"); renderVerdict();
     for (const p of PROBES) { renderRow(p); const c = document.querySelector("#p-" + p.id + " .pl"); if (c) c.innerHTML = ""; }
     // this site's own Cloudflare trace says whether WARP carries the traffic (absent when self-hosted elsewhere)
     fetch("/cdn-cgi/trace", { cache: "no-store", signal: AbortSignal.timeout(5000) }).then(r => r.ok ? r.text() : "")
@@ -379,7 +379,7 @@
     S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
     renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
-    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); $("#share").disabled = !S.exits.length;
+    $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); renderVerdict();
     if (EMBED && !won) blocked();
     if (EMBED && !S.err) postResult();
   }
@@ -421,15 +421,28 @@
     S.finds = findings(PROBES, S.exits, cf, R.tz, R.nat);
     S.odd = oddProbes(PROBES, S.exits);
     eye.hidden = true;
-    $("#sharedTxt").textContent = t("shared_from", { where: S.exits[0] ? whereOf(S.exits[0]) : "?", date: new Date(R.ts).toLocaleString(LANG, { dateStyle: "medium", timeStyle: "short" }) });
-    renderExits(); renderChips(); renderChecks(); renderGroups(); renderFocus(); for (const p of PROBES) renderRow(p);
-    $("#run span").textContent = t("test_mine"); $("#run").disabled = false; $("#share").disabled = false;
+    renderExits(); renderChips(); renderChecks(); renderGroups(); renderFocus(); renderVerdict(); for (const p of PROBES) renderRow(p);
+    $("#run span").textContent = t("test_mine"); $("#run").disabled = false;
+    // the shared dialog's banner above the result: when it was shared, and a button for the visitor's own test
+    import("/assets/share/share.js").then(({ received }) => {
+      if (S.shared === R) S.banner = received({ lang: LANG, ts: R.ts, at: $(".hero"), test: () => $("#run").click() });
+    }).catch(() => {});
   }
   function leaveShared() {
     if (S.badLink) { S.badLink = false; document.documentElement.removeAttribute("data-bad-link"); }
     else if (!S.shared) return;
     S.shared = null; eye.hidden = false; document.documentElement.removeAttribute("data-shared");
+    if (S.banner) { S.banner.remove(); S.banner = null; }
     history.replaceState(null, "", D.home[LANG]);
+  }
+
+  // the result's one-line verdict under the headline, the share button beside it; hidden until there is a result
+  function renderVerdict() {
+    const on = S.done && S.exits.length > 0, v = on && verdict();
+    $("#verdict").hidden = !on;
+    if (!on) return;
+    $("#vTxt").textContent = t("vh_" + v);
+    $("#verdict").classList.toggle("bad", v === "leak" || v === "ai");
   }
 
   /* ---------- share: the shared dialog (/assets/share/, copied verbatim from 1ms-shell), a link that carries the result ---------- */
@@ -459,12 +472,27 @@
   // visitor ticks the box; never addresses) and the check table as the page shows it, exit chips in their colors.
   // The dialog draws the frame: logo, name, QR code and date.
   const img = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
-  const EH = 54;
+  // Fitted into a 1200 × 630 link preview, the card must still read: the verdict large on top, the exits on as few
+  // lines as they take, then the check table one line per row (a value too long for it ends in "…").
+  const EH = 54, RH = 44;
   function measure(m, kit) {
     const { W, P, F } = kit, VW = W - P - (P + 210);
-    m.font = `700 44px ${F}`;
+    m.font = `700 52px ${F}`;
     const hLines = wrap(m, t("vh_" + verdict()), W - P * 2);
-    // the check rows: each value as the page shows it, as tokens (a piece of text, or an exit chip)
+    // the exits side by side: chip, flag, place, then kind (and network when shown), wrapping as needed
+    const items = S.exits.map(e => {
+      const where = (kit.show ? [e.city, e.cc && country(e.cc)] : [e.cc ? country(e.cc) : ""]).filter(Boolean).join(", ") || "?";
+      const sub = t(e.kind === "local" ? "k_local" : "k_proxy") + (kit.show && e.org ? " · " + e.org : "");
+      m.font = `600 26px ${F}`; const ww = m.measureText(where).width;
+      m.font = `400 22px ${F}`; const sw = Math.min(m.measureText(sub).width, 380);
+      return { e, where, sub, sw, w: chipW(m, kit, e.letter, 40) + 12 + (e.cc ? 42 : 0) + ww + 12 + sw };
+    });
+    const eLines = [[]]; let lw = 0;
+    for (const it of items) {
+      if (lw && lw + 40 + it.w > W - P * 2) { eLines.push([]); lw = 0; }
+      eLines[eLines.length - 1].push(it); lw += (lw ? 40 : 0) + it.w;
+    }
+    // the check rows: each value as the page shows it, as tokens (a piece of text, or an exit chip), on one line
     const rows = CHECKS.map(r => {
       const li = document.querySelector(`#finds [data-r="${r}"]`), toks = [];
       for (const n of li.querySelector(".fr-v").childNodes) {
@@ -472,30 +500,39 @@
         if (n.nodeType === 1 && n.classList.contains("lt")) toks.push({ chip: n.textContent });
         else for (const w of (n.textContent || "").match(TOK) || []) toks.push({ w });
       }
-      return { label: li.querySelector(".fr-l").textContent, s: (S.finds[r] || {}).s || "none", lines: layout(m, kit, toks, VW) };
+      const lines = layout(m, kit, toks, VW), line = lines[0] || [];
+      if (lines.length > 1) {
+        m.font = `400 22px ${F}`;
+        const ell = { w: "…", wd: m.measureText("…").width };
+        while (line.length && line.reduce((a, tk) => a + tk.wd, 0) + ell.wd > VW) line.pop();
+        while (line.length && line[line.length - 1].w && !line[line.length - 1].w.trim()) line.pop();
+        line.push(ell);
+      }
+      return { label: li.querySelector(".fr-l").textContent, s: (S.finds[r] || {}).s || "none", line };
     });
-    const hTop = kit.top + 44, eTop = hTop + hLines.length * 56 + 40, cTop = eTop + S.exits.length * EH + 20;
-    return { hLines, rows, hTop, eTop, cTop, H: cTop + rows.reduce((a, r) => a + 20 + r.lines.length * 34, 0) + 24 + 70 };
+    const hTop = kit.top + 52, eTop = hTop + (hLines.length - 1) * 62 + 74, cTop = eTop + eLines.length * EH;
+    return { hLines, eLines, rows, hTop, eTop, cTop, H: cTop + rows.length * RH + 24 + 70 };
   }
   async function drawCard(x, kit) {
-    const { W, P, F, v, dark, clip } = kit, VX = P + 210, { hLines, rows, hTop, eTop, cTop } = measure(x, kit);
+    const { W, P, F, v, dark, clip } = kit, VX = P + 210, { hLines, eLines, rows, hTop, eTop, cTop } = measure(x, kit);
     const C = { line: v("line"), fg: v("fg"), muted: v("muted"), ok: v("ok"), bad: v("bad"), warn: v("e-p1") };
     const colorOf = l => {
       const e = S.exits.find(x => x.letter === l), n = +((/\d+$/.exec(l) || [1])[0]);
       return !e ? C.muted : e.kind === "local" ? v(n === 2 ? "e-d2" : "e-d") : v("e-p" + (n >= 2 && n <= 4 ? n : 1));
     };
+    const v0 = verdict();
     x.textBaseline = "alphabetic";
-    x.fillStyle = C.fg; x.font = `700 44px ${F}`; hLines.forEach((l, i) => x.fillText(l, P, hTop + i * 56));
+    x.fillStyle = v0 === "leak" || v0 === "ai" ? C.bad : C.fg; x.font = `700 52px ${F}`; hLines.forEach((l, i) => x.fillText(l, P, hTop + i * 62));
     // exits
     let y = eTop;
-    for (const e of S.exits) {
-      chipAt(x, kit, e.letter, P, y - 30, 40, colorOf(e.letter));
-      let xx = P + 56;
-      if (e.cc) { try { x.drawImage(await img(`/flags/${e.cc.toLowerCase()}.svg`), xx, y - 22, 30, 22); xx += 42; } catch (er) {} }
-      const where = (kit.show ? [e.city, e.cc && country(e.cc)] : [e.cc ? country(e.cc) : ""]).filter(Boolean).join(", ") || "?";
-      x.fillStyle = C.fg; x.font = `600 24px ${F}`; x.fillText(where, xx, y - 2); xx += x.measureText(where).width + 14;
-      x.fillStyle = C.muted; x.font = `400 20px ${F}`;
-      x.fillText(clip(x, t(e.kind === "local" ? "k_local" : "k_proxy") + (kit.show && e.org ? " · " + e.org + (e.asn ? " · AS" + e.asn : "") : ""), W - P - xx), xx, y - 2);
+    for (const line of eLines) {
+      let xx = P;
+      for (const it of line) {
+        chipAt(x, kit, it.e.letter, xx, y - 31, 40, colorOf(it.e.letter)); xx += chipW(x, kit, it.e.letter, 40) + 12;
+        if (it.e.cc) { try { x.drawImage(await img(`/flags/${it.e.cc.toLowerCase()}.svg`), xx, y - 25, 32, 24); } catch (er) {} xx += 42; }
+        x.fillStyle = C.fg; x.font = `600 26px ${F}`; x.fillText(it.where, xx, y - 2); xx += x.measureText(it.where).width + 12;
+        x.fillStyle = C.muted; x.font = `400 22px ${F}`; x.fillText(clip(x, it.sub, it.sw), xx, y - 2); xx += it.sw + 40;
+      }
       y += EH;
     }
     // the check table
@@ -503,22 +540,19 @@
     const MARK = { ok: "✓", warn: "!", bad: "✕", info: "•", none: "–" };
     for (const r of rows) {
       x.fillStyle = C.line; x.fillRect(P, y, W - P * 2, 1);
-      y += 20;
-      const cx = P + 13, cy = y + 13;
+      const cx = P + 13, cy = y + RH / 2;
       x.beginPath(); x.arc(cx, cy, 13, 0, Math.PI * 2);
       if (["ok", "bad", "warn"].includes(r.s)) { x.fillStyle = C[r.s]; x.fill(); x.fillStyle = dark ? "#111" : "#fff"; }
       else { x.strokeStyle = C.line; x.lineWidth = 2; x.stroke(); x.fillStyle = C.muted; }
       x.font = `700 15px ${F}`; x.textAlign = "center"; x.fillText(MARK[r.s] || "–", cx, cy + 5); x.textAlign = "left";
-      x.fillStyle = C.muted; x.font = `400 20px ${F}`; x.fillText(clip(x, r.label, VX - P - 54), P + 40, y + 20);
-      r.lines.forEach((line, i) => {
-        let xx = VX;
-        for (const tk of line) {
-          if (tk.chip) chipAt(x, kit, tk.chip, xx + 2, y + i * 34 + 1, 26, colorOf(tk.chip));
-          else { x.fillStyle = r.s === "bad" ? C.bad : C.fg; x.font = `400 22px ${F}`; x.fillText(tk.w, xx, y + 21 + i * 34); }
-          xx += tk.wd;
-        }
-      });
-      y += r.lines.length * 34;
+      x.fillStyle = C.muted; x.font = `400 21px ${F}`; x.fillText(clip(x, r.label, VX - P - 54), P + 40, cy + 7);
+      let xx = VX;
+      for (const tk of r.line) {
+        if (tk.chip) chipAt(x, kit, tk.chip, xx + 2, cy - 13, 26, colorOf(tk.chip));
+        else { x.fillStyle = r.s === "bad" ? C.bad : C.fg; x.font = `400 22px ${F}`; x.fillText(tk.w, xx, cy + 8); }
+        xx += tk.wd;
+      }
+      y += RH;
     }
     x.fillStyle = C.line; x.fillRect(P, y, W - P * 2, 1);
   }

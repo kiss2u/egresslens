@@ -83,7 +83,6 @@ export default {
     ["Wird etwas an diese Website gesendet?", "Nein. Dein Browser spricht direkt mit jedem Prüfpunkt; diese Website liefert nur statische Dateien und sieht deine Ergebnisse nie. Verbirg die IPs vor einem Screenshot."],
   ],
   share: "Teilen",
-  shared_from: "Ergebnis aus {where} · {date}",
   self_name: "Diese Seite",
   bad_link: "Dieses Ergebnis lässt sich nicht lesen: Der Link ist abgeschnitten oder stammt aus einer anderen Version.",
   embed_blocked: "Alle Sonden sind fehlgeschlagen: Vielleicht blockiert ein Werbeblocker (uBlock, AdGuard …) sie.",

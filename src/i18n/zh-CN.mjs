@@ -83,7 +83,6 @@ export default {
     ["检测结果会发到这个网站吗？", "不会。浏览器直接连接每个探测器，本站只提供静态文件，看不到你的结果。截图前可以先点“隐藏 IP”。"],
   ],
   share: "分享",
-  shared_from: "这是一份来自{where}的检测结果 · {date}",
   self_name: "本站",
   bad_link: "无法读取这条结果：链接不完整，或来自其他版本。",
   embed_blocked: "探测请求全部失败，可能被广告拦截扩展（uBlock、AdGuard 等）拦下了。",

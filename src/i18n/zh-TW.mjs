@@ -83,7 +83,6 @@ export default {
     ["檢測結果會傳到這個網站嗎？", "不會。瀏覽器直接連線每個探測器，本站只提供靜態檔案，看不到你的結果。截圖前可以先點「隱藏 IP」。"],
   ],
   share: "分享",
-  shared_from: "這是一份來自{where}的檢測結果 · {date}",
   self_name: "本站",
   bad_link: "無法讀取這條結果：連結不完整，或來自其他版本。",
   embed_blocked: "探測請求全部失敗，可能被廣告攔截擴充功能（uBlock、AdGuard 等）擋下了。",

@@ -85,7 +85,6 @@ export default {
     ["Is anything sent to this site?", "No. Your browser talks to each probe directly; this site only serves static files and never sees your results. Hide IPs before taking a screenshot."],
   ],
   share: "Share",
-  shared_from: "A result from {where} · {date}",
   self_name: "This site",
   bad_link: "Can't read this result: the link is cut short or from another version.",
   embed_blocked: "Every probe failed: an ad blocker (uBlock, AdGuard…) may be blocking them.",
