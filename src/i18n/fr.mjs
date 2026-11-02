@@ -93,6 +93,7 @@ export default {
   vh_proxy: "Tous les sites voient la même sortie proxy",
   vh_direct: "Direct : tous les sites voient l’IP locale",
   who_link: "Votre profil complet et le test de camouflage",
+  check_link: "Faire un bilan complet",
   unlock_link: "Les IA accessibles par cette route",
   rtc_nav: "Test de fuite WebRTC",
   lp_ai: {

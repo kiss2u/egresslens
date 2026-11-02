@@ -93,6 +93,7 @@ export default {
   vh_proxy: "所有网站都走同一个代理出口",
   vh_direct: "直连：所有网站看到的都是本地 IP",
   who_link: "看完整画像和伪装检测",
+  check_link: "做一次完整体检",
   unlock_link: "这条线路能解锁哪些 AI",
   rtc_nav: "WebRTC 泄露检测",
   lp_ai: {

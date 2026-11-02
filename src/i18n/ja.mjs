@@ -93,6 +93,7 @@ export default {
   vh_proxy: "すべてのサイトが同じプロキシ出口",
   vh_direct: "直接接続：すべてのサイトにローカル IP が見えています",
   who_link: "全体像と偽装チェックを見る",
+  check_link: "まとめてチェックする",
   unlock_link: "この回線で使える AI",
   rtc_nav: "WebRTC リークテスト",
   lp_ai: {

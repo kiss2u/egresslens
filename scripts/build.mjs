@@ -74,7 +74,7 @@ export async function build({ check = false } = {}) {
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
   // static text the page already shows is not needed at runtime
-  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "rtc_nav", "lat_link", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
+  const RUNTIME_SKIP = new Set(["seo_title", "seo_desc", "seo_kw", "h1", "intro", "faq", "faq_h", "foot", "lang_label", "probes_h", "exits_h", "finds_h", "close", "r_desc", "rtc_nav", "check_link", "lat_link", ...LANDS.map(l => "lp_" + l.id), ...CHECKS.map(r => "r_" + r)]);
   const path = slug => "/" + (slug ? slug + "/" : "");
   const N = PROBES.length;
   const pages = [], files = {};
@@ -115,7 +115,9 @@ export async function build({ check = false } = {}) {
       .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(k === "h1" ? v.h1 : T(k)) + close)
       .replace("{{lang}}", lang).replace("{{pathsAttr}}", esc(JSON.stringify(paths))).replace("{{rootAttr}}", root ? " data-root" : "")
       .replace("{{prepaint}}", PREPAINT).replace("{{head}}", head).replace("{{css}}", cssName).replace("{{js}}", jsName).replace("{{strings}}", sName)
-      .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(v.intro, { n: N }))).replace("{{focus}}", focusOf(land))
+      .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(v.intro, { n: N })))
+      // the 1ms.dog checkup, which runs this tool with the others, once the host announces it (<meta name="check">)
+      .replace("{{checkLink}}", `<a class="xl" data-m="check" data-at="" target="_blank" rel="noopener" hidden>${esc(T("check_link"))}${EXT}</a>`).replace("{{focus}}", focusOf(land))
       .replace("{{groups}}", groupsOf(land && land.group)).replace("{{checks}}", checks).replace("{{faq}}", faqOf(v.faq)).replace("{{foot}}", esc(T("foot"))).replace("{{nav}}", navOf(land))
       .replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close")))
       .replace("{{data}}", JSON.stringify({ lang, paths, home, focus: land ? land.id : "" }).replace(/</g, "\\u003c"));

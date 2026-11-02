@@ -95,6 +95,7 @@ export default {
   vh_proxy: "Every website sees the same proxy exit",
   vh_direct: "Direct: every website sees the local IP",
   who_link: "Your full profile and disguise check",
+  check_link: "Run a full checkup",
   unlock_link: "Which AI services this route unlocks",
   rtc_nav: "WebRTC leak test",
   lp_ai: {

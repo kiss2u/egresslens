@@ -94,4 +94,7 @@ test("checkup embed: only from the host's <meta name=check>, messages to that or
   assert.match(src, /parent\.postMessage\(\{ ms: "checkup", v: 1, tool: "egress", \.\.\.m \}, EMBED\)/);
   assert.doesNotMatch(src, /postMessage\([^)]*"\*"\)/);
   for (const sel of [".top", ".foot", ".probes", ".bar .acts"]) assert.ok(css.includes(`:root[data-ms-embed] ${sel}`), "hides " + sel);
+  // the link to the checkup: hidden until the host announces it, and in the intro, which the embed hides
+  for (const [l, slug] of LANGS) assert.match(await page(slug), new RegExp(`<p class="intro">[^<]*<a class="xl" data-m="check" data-at="" target="_blank" rel="noopener" hidden>${I[l].check_link}<svg`), l + ": checkup link");
+  assert.ok(css.includes(":root[data-ms-embed] .hero-h"));
 });

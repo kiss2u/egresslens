@@ -241,6 +241,8 @@ select option:checked { background-color: var(--soft); }
 .where a.asl { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--muted); }
 /* links to other 1ms.dog tools: the text, then the external-link icon at about the text's size */
 a.xl { display: inline-flex; align-items: center; gap: 3px; }
+.intro a.xl { color: var(--ink); text-decoration: none; white-space: nowrap; }
+.intro a.xl:hover { text-decoration: underline; }
 svg.xi { width: .95em; height: .95em; flex: none; }
 
 /* embedded in the connection checkup: the progress, the exits and the findings, nothing else */
