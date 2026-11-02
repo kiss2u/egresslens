@@ -131,5 +131,5 @@ export default {
   lat_link: "Latência do ChatGPT e do Claude",
   asn_title: "Ver esta rede na consulta de ASN",
   ipq_title: "Verificar a qualidade deste IP",
-  foot: "Código aberto, licença MIT. Roda inteiramente no seu navegador.",
+  foot: "Código aberto, licença MIT.",
 };

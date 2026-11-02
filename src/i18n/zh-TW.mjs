@@ -131,5 +131,5 @@ export default {
   lat_link: "測 ChatGPT 和 Claude 的延遲",
   asn_title: "在 ASN 查詢中查看這個網路",
   ipq_title: "查看這個 IP 的品質",
-  foot: "開源，MIT 授權。全部在你的瀏覽器裡執行。",
+  foot: "開源，MIT 授權。",
 };

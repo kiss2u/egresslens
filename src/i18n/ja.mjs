@@ -131,5 +131,5 @@ export default {
   lat_link: "ChatGPT と Claude の遅延を測る",
   asn_title: "ASN 検索でこのネットワークを見る",
   ipq_title: "この IP の品質を調べる",
-  foot: "オープンソース、MIT ライセンス。すべてブラウザ内で動作します。",
+  foot: "オープンソース、MIT ライセンス。",
 };

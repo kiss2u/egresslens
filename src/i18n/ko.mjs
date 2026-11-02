@@ -131,5 +131,5 @@ export default {
   lat_link: "ChatGPT와 Claude 지연 시간 측정",
   asn_title: "ASN 조회에서 이 네트워크 보기",
   ipq_title: "이 IP의 품질 확인",
-  foot: "오픈 소스, MIT 라이선스. 모두 브라우저에서 실행됩니다.",
+  foot: "오픈 소스, MIT 라이선스.",
 };
