@@ -10,8 +10,11 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
   const K = { theme: "egress:theme", lang: "egress:lang", mask: "egress:mask" };
-  const country = cc => { try { return new Intl.DisplayNames([LANG], { type: "region" }).of(cc); } catch (e) { return cc; } };
-  const flag = cc => /^[A-Z]{2}$/.test(cc || "") ? `<img class="flag" src="/flags/${cc.toLowerCase()}.svg" alt="" width="20" height="15">` : "";
+  // Taiwan is "中国台湾 / Taiwan, China" with the PRC flag (1ms-shell docs/tool-contract.md §5); every other region by its system name
+  const TW = { "zh-CN": "中国台湾", "zh-TW": "中國台灣", en: "Taiwan, China", ja: "中国台湾", ko: "중국 대만", es: "Taiwán, China", fr: "Taïwan, Chine", de: "Taiwan, China", pt: "Taiwan, China", ru: "Тайвань, Китай" };
+  const country = cc => { if (cc === "TW") return TW[LANG]; try { return new Intl.DisplayNames([LANG], { type: "region" }).of(cc); } catch (e) { return cc; } };
+  const flagCode = cc => cc === "TW" ? "cn" : cc.toLowerCase();
+  const flag = cc => /^[A-Z]{2}$/.test(cc || "") ? `<img class="flag" src="/flags/${flagCode(cc)}.svg" alt="" width="20" height="15">` : "";
   const list = a => a.join(t("join"));
   /* @lib */
   const bust = u => u + (u.includes("?") ? "&" : "?") + "_eg=" + Math.random().toString(36).slice(2, 10);
@@ -529,7 +532,7 @@
       let xx = P;
       for (const it of line) {
         chipAt(x, kit, it.e.letter, xx, y - 31, 40, colorOf(it.e.letter)); xx += chipW(x, kit, it.e.letter, 40) + 12;
-        if (it.e.cc) { try { x.drawImage(await img(`/flags/${it.e.cc.toLowerCase()}.svg`), xx, y - 25, 32, 24); } catch (er) {} xx += 42; }
+        if (it.e.cc) { try { x.drawImage(await img(`/flags/${flagCode(it.e.cc)}.svg`), xx, y - 25, 32, 24); } catch (er) {} xx += 42; }
         x.fillStyle = C.fg; x.font = `600 26px ${F}`; x.fillText(it.where, xx, y - 2); xx += x.measureText(it.where).width + 12;
         x.fillStyle = C.muted; x.font = `400 22px ${F}`; x.fillText(clip(x, it.sub, it.sw), xx, y - 2); xx += it.sw + 40;
       }
