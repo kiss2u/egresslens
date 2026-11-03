@@ -186,8 +186,6 @@ select option:checked { background-color: var(--soft); }
 @media (max-width: 520px) { .brand-name { display: none; } }
 /* phones: exit cards tighter, so the findings show more of the first screen while the probes run */
 @media (max-width: 520px) {
-  /* a link after a value wraps like text: kept on one line it runs off a phone in the longer languages */
-  .fr-v a.xl { white-space: normal; }
   .hero { gap: 12px; padding-top: 16px; }
   .ex { min-height: 0; gap: 10px; padding: 7px 10px; }
   .lt.big { min-width: 28px; height: 28px; font-size: 13px; border-radius: 8px; }
@@ -213,6 +211,8 @@ select option:checked { background-color: var(--soft); }
 
 /* a link to another 1ms.dog tool, after the value it is about */
 .fr-v a.xl { color: var(--ink); font-weight: 400; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
+/* on a phone it wraps like text: kept on one line it runs off the screen in the longer languages */
+@media (max-width: 520px) { .fr-v a.xl, .intro a.xl { white-space: normal; } }
 .fr-v a.xl:hover { text-decoration: underline; }
 
 /* a landing page's lead panel: the verdict for its one check, then one row per probe it is about. Rows are drawn by
