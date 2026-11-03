@@ -186,6 +186,8 @@ select option:checked { background-color: var(--soft); }
 @media (max-width: 520px) { .brand-name { display: none; } }
 /* phones: exit cards tighter, so the findings show more of the first screen while the probes run */
 @media (max-width: 520px) {
+  /* a link after a value wraps like text: kept on one line it runs off a phone in the longer languages */
+  .fr-v a.xl { white-space: normal; }
   .hero { gap: 12px; padding-top: 16px; }
   .ex { min-height: 0; gap: 10px; padding: 7px 10px; }
   .lt.big { min-width: 28px; height: 28px; font-size: 13px; border-radius: 8px; }
