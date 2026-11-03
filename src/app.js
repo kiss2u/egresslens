@@ -300,7 +300,7 @@
     const nat = S.nat && S.nat.k !== "none" ? S.nat.k : "";
     const stats = [{ label: head("exits_h"), value: String(S.exits.length) }];
     if (ai) stats.push({ label: label("ai"), value: country(ai) });
-    if (nat) stats.push({ label: label("nat"), value: t("v_nat_" + nat).split(/s*[：:]s*/)[0] });
+    if (nat) stats.push({ label: label("nat"), value: t("v_nat_" + nat).split(/\s*[：:]\s*/)[0] });
     stats.push({ label: head("probes_h"), value: `${PROBES.filter(p => S.ok[p.id]).length} / ${PROBES.length}` });
     const u = new URL(shareLink(false));
     post({
