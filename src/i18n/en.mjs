@@ -39,7 +39,7 @@ export default {
   v_v6_ok: "Via {a}",
   v_v6_none: "No IPv6 exit",
   v_tz_ok: "Matches the exit ({a})",
-  v_tz_bad: "Your browser says {a}, your exit is in {b}: sites may guess you use a proxy",
+  v_tz_bad: "Browser: {a}, exit: {b}. Sites may guess you use a proxy",
   hide: "Hide IPs",
   show: "Show IPs",
   sniff: "Asking every checkpoint…",

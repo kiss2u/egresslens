@@ -37,7 +37,7 @@ export default {
   v_v6_ok: "Über {a}",
   v_v6_none: "Kein IPv6-Ausgang",
   v_tz_ok: "Passt zum Ausgang ({a})",
-  v_tz_bad: "Dein Browser meldet {a}, dein Ausgang liegt in {b}: Websites können auf einen Proxy schließen",
+  v_tz_bad: "Browser: {a}, Ausgang: {b}. Websites können auf einen Proxy schließen",
   hide: "IPs verbergen",
   show: "IPs zeigen",
   sniff: "Frage die Prüfpunkte …",
