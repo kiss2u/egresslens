@@ -213,6 +213,9 @@ select option:checked { background-color: var(--soft); }
 .fr-v a.xl { color: var(--ink); font-weight: 400; font-size: 12.5px; text-decoration: none; white-space: nowrap; }
 /* on a phone it wraps like text: kept on one line it runs off the screen in the longer languages */
 @media (max-width: 520px) { .fr-v a.xl, .intro a.xl { white-space: normal; } }
+/* an exit's place and its network share a line while they fit; a long place ("Los Angeles, Соединенные Штаты") puts
+   the network on the next line instead of squeezing it to nothing */
+@media (max-width: 520px) { .where { flex-wrap: wrap; row-gap: 2px; } }
 .fr-v a.xl:hover { text-decoration: underline; }
 
 /* a landing page's lead panel: the verdict for its one check, then one row per probe it is about. Rows are drawn by
