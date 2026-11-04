@@ -304,7 +304,7 @@
     const stats = [{ label: head("exits_h"), value: String(S.exits.length) }];
     if (ai) stats.push({ label: label("ai"), value: country(ai) });
     if (nat) stats.push({ label: label("nat"), value: t("v_nat_" + nat).split(/\s*[：:]\s*/)[0] });
-    stats.push({ label: head("probes_h"), value: `${PROBES.filter(p => S.ok[p.id]).length} / ${PROBES.length}` });
+    stats.push({ label: head("probes_h"), value: `${RUNS.filter(p => S.ok[p.id]).length} / ${RUNS.length}` });
     const u = new URL(shareLink(false));
     post({
       type: "result", lang: LANG, path: u.pathname + u.hash, grade: null, score: null,
@@ -384,7 +384,7 @@
     S.finds = findings(PROBES, S.exits, cf, tzCc(), S.nat);
     S.odd = oddProbes(PROBES, S.exits);
     S.done = true;
-    renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(PROBES.length, PROBES.length);
+    renderExits(); renderChips(); renderChecks(); renderFocus(); for (const p of PROBES) renderRow(p); setProg(RUNS.length, RUNS.length);
     $("#run").disabled = false; $("#run").classList.remove("busy"); $("#run span").textContent = t("rerun"); renderVerdict();
     if (EMBED && !won) blocked();
     if (EMBED && !S.err) postResult();
