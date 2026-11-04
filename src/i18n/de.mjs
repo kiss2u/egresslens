@@ -98,6 +98,7 @@ export default {
   check_link: "Kompletten Check starten",
   unlock_link: "Welche KI-Dienste über diese Route gehen",
   rtc_nav: "WebRTC-Leak-Test",
+  lp_all: "Vollständiger Test: alle {n} Messpunkte, mit Split-Routing, WebRTC und IPv6",
   lp_ai: {
     "nav": "IP bei ChatGPT und Claude",
     "title": "Welche IP sieht ChatGPT? IP und Region prüfen, die ChatGPT und Claude sehen",

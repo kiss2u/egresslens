@@ -100,6 +100,7 @@ export default {
   check_link: "Run a full checkup",
   unlock_link: "Which AI services work on this route",
   rtc_nav: "WebRTC leak test",
+  lp_all: "Run the full check: all {n} probes, with split routing, WebRTC and IPv6",
   lp_ai: {
     "nav": "ChatGPT & Claude IP",
     "title": "What IP does ChatGPT see? Check the IP and region ChatGPT and Claude see",

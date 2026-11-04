@@ -328,6 +328,9 @@
     S.exits = groupExits(seenAll().filter(s => geoOf(S.geo, s.ip)), S.geo, GROUP_OF, S.warp);
     renderExits(); renderChips(); renderFocus();
   }); };
+  // A landing page tests only what it is about: its own probes, and the mainland and abroad baselines that tell the
+  // direct exit from the proxy (docs: 1ms-shell tool-contract, "subpages test only their own item")
+  const RUNS = D.focus ? PROBES.filter(p => [D.focusGroup, "cn", "intl"].includes(p.g)) : PROBES;
   async function run() {
     leaveShared();
     const gen = ++S.gen;
@@ -347,14 +350,14 @@
       lookups.push(fetch("https://api.ip.sb/geoip/" + encodeURIComponent(ip), { cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(6000) })
         .then(r => r.ok ? r.json() : Promise.reject()).then(b => { const r = READERS.ipsb(b); if (gen === S.gen && r.geo) { S.geo[ip] = r.geo; live(); } }).catch(() => {}));
     };
-    const natP = natProbe();
-    let d = 0; setProg(0, PROBES.length);
+    const natP = D.focus ? Promise.resolve([]) : natProbe();
+    let d = 0; setProg(0, RUNS.length);
     // Embedded: when the probes elsewhere all fail (an ad blocker takes them as a batch), say so at once rather than
     // after every timeout, and send no result. This site's own probe doesn't count: blockers leave it alone.
     let won = 0, lost = 0;
     const blocked = () => { if (EMBED && !S.err && !won) { S.err = true; post({ type: "error", text: t("embed_blocked") }); } };
     const blockT = EMBED && setTimeout(blocked, 15000);
-    await Promise.all(PROBES.map(async p => {
+    await Promise.all(RUNS.map(async p => {
       const t0 = performance.now();
       let res = [];
       try { res = await (p.read === "stun" ? stunProbe(p) : httpProbe(p)); } catch (e) { res = []; S.why[p.id] = { why: e.why || "net", n: e.n }; }
@@ -366,7 +369,7 @@
       // geo-aware answers first, so a lookup isn't spent on a network another probe is about to name
       setTimeout(() => { if (gen === S.gen) for (const r of res) lookup(r.ip); }, 1200);
       if (!p.self) { if (res.length) won++; else if (++lost >= 12) blocked(); }
-      renderRow(p); renderGroups(); setProg(++d, PROBES.length); live();
+      renderRow(p); renderGroups(); setProg(++d, RUNS.length); live();
     }));
     clearTimeout(blockT);
     if (gen !== S.gen) return;

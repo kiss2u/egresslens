@@ -98,6 +98,7 @@ export default {
   check_link: "전체 점검 실행",
   unlock_link: "이 경로로 이용 가능한 AI",
   rtc_nav: "WebRTC 유출 테스트",
+  lp_all: "전체 검사: {n}개 지점 모두(분할 라우팅·WebRTC·IPv6 포함)",
   lp_ai: {
     "nav": "ChatGPT·Claude가 보는 IP",
     "title": "ChatGPT IP 확인: ChatGPT와 Claude에 보이는 IP와 지역",

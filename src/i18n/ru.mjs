@@ -98,6 +98,7 @@ export default {
   check_link: "Пройти полную проверку",
   unlock_link: "Какие ИИ доступны по этому маршруту",
   rtc_nav: "Проверка утечки WebRTC",
+  lp_all: "Полная проверка: все {n} точек, с раздельной маршрутизацией, WebRTC и IPv6",
   lp_ai: {
     "nav": "IP для ChatGPT и Claude",
     "title": "Какой IP видит ChatGPT? Проверьте IP и регион, которые видят ChatGPT и Claude",

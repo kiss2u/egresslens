@@ -98,6 +98,7 @@ export default {
   check_link: "做一次完整健檢",
   unlock_link: "這條線路能解鎖哪些 AI",
   rtc_nav: "WebRTC 外洩檢測",
+  lp_all: "做完整檢測：全部 {n} 個探測點，含分流、WebRTC 和 IPv6",
   lp_ai: {
     "nav": "ChatGPT/Claude 看到的 IP",
     "title": "ChatGPT IP 檢測：ChatGPT 和 Claude 看到的是你哪個 IP、哪個地區",

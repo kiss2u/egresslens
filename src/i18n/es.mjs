@@ -98,6 +98,7 @@ export default {
   check_link: "Hacer un chequeo completo",
   unlock_link: "Qué IA funcionan con esta ruta",
   rtc_nav: "Test de fuga WebRTC",
+  lp_all: "Prueba completa: los {n} puntos, con enrutamiento dividido, WebRTC e IPv6",
   lp_ai: {
     "nav": "IP de ChatGPT y Claude",
     "title": "¿Qué IP ve ChatGPT? Comprueba la IP y la región que ven ChatGPT y Claude",

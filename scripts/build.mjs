@@ -92,7 +92,8 @@ export async function build({ check = false } = {}) {
     const nameOf = p => p.self ? T("self_name") : p.name, hostOf = p => p.self ? new URL(SITE).host : p.host;
     const row = p => `<li class="pr" id="p-${p.id}"><span class="pn" title="${esc(hostOf(p))}">${esc(nameOf(p))}${p.fam ? ` <span class="m">v${p.fam}</span>` : ""}</span>` +
       `<span class="pip">–</span><span class="pl"></span><span class="pco"></span><span class="pms"></span></li>`;
-    const groupsOf = first => [first, ...GROUPS.filter(g => g !== first)].filter(Boolean)
+    // only: a landing page lists just the groups it tests
+    const groupsOf = (first, only) => [first, ...GROUPS.filter(g => g !== first)].filter(g => g && (!only || only.includes(g)))
       .map(g => `<div class="pg" data-g="${g}"><h3>${esc(T("g_" + g))}<b class="pg-n"></b></h3><ul>${PROBES.filter(p => p.g === g).map(row).join("")}</ul></div>`).join("\n");
     // the check table's rows: label now, status and value once the probes are in
     const checks = CHECKS.map(r => `<li class="fr" data-r="${r}"><i class="st"></i><span class="fr-l">${esc(T("r_" + r))}</span><span class="fr-v"><span class="bar"></span></span></li>`).join("");
@@ -105,6 +106,7 @@ export async function build({ check = false } = {}) {
       const fr = (id, name) => `<li class="fo-r" data-p="${id}"><span class="fo-n">${esc(name)}</span><span class="fo-x"></span><span class="fo-m"></span></li>`;
       const rows = PROBES.filter(p => p.g === land.group).map(p => fr(p.id, p.name)).join("") +
         // links to other 1ms.dog tools: [meta name, path after the language folder, text], shown once the host announces the tool
+        `<li class="fo-all"><a class="btn" href="${path(slug)}">${esc(fill(T("lp_all"), { n: N }))}</a></li>` +
         `<li class="fo-links">${[["home", "chatgpt/", "lat_link"], ["unlock", "ai/", "unlock_link"]]
           .map(([m, at, k]) => `<a class="xl" data-m="${m}" data-at="${at}" target="_blank" rel="noopener" hidden>${esc(T(k))}${EXT}</a>`).join("")}</li>`;
       return `<div class="focus" id="focus" data-focus="${land.id}"><div class="fo-h"><i class="st"></i><b class="fo-t">${esc(T("sniff"))}</b></div>` +
@@ -120,9 +122,9 @@ export async function build({ check = false } = {}) {
       .replace("{{homeHref}}", path(slug)).replace("{{langOpts}}", langOpts).replace("{{intro}}", esc(fill(v.intro, { n: N })))
       // the 1ms.dog checkup, which runs this tool with the others, once the host announces it (<meta name="check">)
       .replace("{{checkLink}}", `<a class="xl" data-m="check" data-at="" target="_blank" rel="noopener" hidden>${esc(T("check_link"))}${EXT}</a>`).replace("{{focus}}", focusOf(land))
-      .replace("{{groups}}", groupsOf(land && land.group)).replace("{{checks}}", checks).replace("{{faq}}", faqOf(v.faq)).replace("{{foot}}", esc(T("foot"))).replace("{{nav}}", navOf(land))
+      .replace("{{groups}}", groupsOf(land && land.group, land && [land.group, "cn", "intl"])).replace("{{checks}}", checks).replace("{{faq}}", faqOf(v.faq)).replace("{{foot}}", esc(T("foot"))).replace("{{nav}}", navOf(land))
       .replace("{{themeLabel}}", esc(T("th_system"))).replaceAll("{{closeLabel}}", esc(T("close")))
-      .replace("{{data}}", JSON.stringify({ lang, paths, home, focus: land ? land.id : "" }).replace(/</g, "\\u003c"));
+      .replace("{{data}}", JSON.stringify({ lang, paths, home, focus: land ? land.id : "", focusGroup: land ? land.group : "" }).replace(/</g, "\\u003c"));
 
     // the main page, then one landing page per check (LANDS), each with its own words and its own language versions
     let url, og = `${SITE}/og/${lang.toLowerCase()}.png`;

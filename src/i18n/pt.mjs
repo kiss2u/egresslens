@@ -98,6 +98,7 @@ export default {
   check_link: "Fazer um check-up completo",
   unlock_link: "Quais IAs funcionam nesta rota",
   rtc_nav: "Teste de vazamento WebRTC",
+  lp_all: "Teste completo: os {n} pontos, com roteamento dividido, WebRTC e IPv6",
   lp_ai: {
     "nav": "IP do ChatGPT e do Claude",
     "title": "Qual IP o ChatGPT vê? Confira o IP e a região que o ChatGPT e o Claude veem",

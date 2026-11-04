@@ -98,6 +98,7 @@ export default {
   check_link: "まとめて診断する",
   unlock_link: "この回線で使える AI",
   rtc_nav: "WebRTC 漏れチェック",
+  lp_all: "完全チェック：{n} か所すべて（振り分け・WebRTC・IPv6 を含む）",
   lp_ai: {
     "nav": "ChatGPT・Claude から見える IP",
     "title": "ChatGPT の IP チェック：ChatGPT と Claude から見える IP と地域",
