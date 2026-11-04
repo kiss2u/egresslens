@@ -5,7 +5,7 @@
 // id    stable id (row ids, share text)
 // g     group, see GROUPS
 // name  shown name; host: the domain shown under it
-// url   what the browser fetches; for g "udp" a STUN server
+// url   what the browser fetches; for read "stun" a STUN server
 // read  how to read the answer (READERS in src/lib.mjs)
 // fam   4 or 6 when the host only has that IP version
 // self  this page's own host: the 1ms.dog shell's /_ms/me (Cloudflare's view of this connection: the fastest answer,
@@ -13,7 +13,7 @@
 //       page (string self_name, the site's address).
 
 // group id → whether its probes stand for "abroad" when the page compares routes
-export const GROUPS = ["cn", "intl", "ai", "web", "stack", "udp"];
+export const GROUPS = ["cn", "intl", "ai", "web", "stack", "udp", "own"];
 
 const trace = (id, g, name, host) => ({ id, g, name, host, url: `https://${host}/cdn-cgi/trace`, read: "trace" });
 
@@ -84,4 +84,11 @@ export const PROBES = [
   // two more that answer from mainland China, where Google's answers only over IPv6: the NAT type needs two over IPv4
   { id: "stun-bili", g: "udp", name: "Bilibili", host: "stun.chat.bilibili.com", url: "stun:stun.chat.bilibili.com:3478", read: "stun" },
   { id: "stun-hitv", g: "udp", name: "Mango TV", host: "stun.hitv.com", url: "stun:stun.hitv.com:3478", read: "stun" },
+
+  // 1ms.dog's own server in Tokyo, over TCP on several ports and over UDP (STUN) on several: the destination stays the
+  // same, so another exit comes from rules by port or protocol. 443 is who.1ms.dog's probe (/conn, which also reads
+  // the connection's MSS); the rest is this repo's server/ (echo.1ms.dog, stun.1ms.dog).
+  { id: "t443", g: "own", name: "TCP 443", host: "probe.1ms.dog", url: "https://probe.1ms.dog/conn", read: "conn" },
+  ...[4433, 8080, 8443, 9443, 10443].map(n => ({ id: "t" + n, g: "own", name: "TCP " + n, host: "echo.1ms.dog", url: `https://echo.1ms.dog:${n}/`, read: "echo" })),
+  ...[3478, 19302, 51820, 40000].map(n => ({ id: "u" + n, g: "own", name: "UDP " + n, host: "stun.1ms.dog", url: `stun:stun.1ms.dog:${n}`, read: "stun" })),
 ];

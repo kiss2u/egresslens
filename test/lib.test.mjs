@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet, encodeShare, parseShare, verdictOf, natOf, srflxAt } from "../src/lib.mjs";
+import { readProbe, srflxOf, groupExits, exitOfProbe, findings, oddProbes, maskIp, parseTrace, sameNet, encodeShare, parseShare, verdictOf, natOf, srflxAt, tunneled } from "../src/lib.mjs";
 import { PROBES, GROUPS } from "../src/probes.mjs";
 
 const P = id => PROBES.find(p => p.id === id);
-const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.g]));
+const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.read === "stun" ? "udp" : p.g]));
 
 test("probes: unique ids, known groups and readers, https or stun", () => {
   const ids = new Set();
@@ -54,7 +54,7 @@ const GEO = { [LOCAL4]: { cc: "CN", city: "Beijing", asn: 4808, org: "China Unic
 function scenario() {
   const seen = [], ok = {};
   for (const p of PROBES) {
-    const ip = p.g === "cn" ? (p.fam === 6 ? LOCAL6 : LOCAL4) : p.g === "udp" ? LOCAL4 : p.g === "stack" ? (p.fam === 6 ? LOCAL6 : PROXY4) : PROXY6;
+    const ip = p.g === "cn" ? (p.fam === 6 ? LOCAL6 : LOCAL4) : p.read === "stun" ? LOCAL4 : p.g === "stack" ? (p.fam === 6 ? LOCAL6 : PROXY4) : PROXY6;
     seen.push({ ip, probe: p.id }); ok[p.id] = true;
   }
   return { seen, ok };
@@ -78,7 +78,7 @@ const cfAll = loc => Object.fromEntries(["chatgpt", "openai", "claude", "anthrop
 test("checks: split routing, AI region, WebRTC and IPv6 leaks, time zone", () => {
   const { seen } = scenario();
   const F = findings(PROBES, groupExits(seen, BOTH(), GROUP_OF, "off"), cfAll("JP"), "CN");
-  assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "nat", "v6", "tz"]);
+  assert.deepEqual(Object.keys(F), ["route", "except", "ai", "rtc", "port", "nat", "v6", "tz"]);
   assert.deepEqual(F.route, { s: "info", k: "split", v: { a: "D", b: "P" } });
   // the IPv6-only hosts take the local line: one exception item, consistent with the IPv6 row below
   assert.deepEqual(F.except, { s: "info", k: "some", v: { groups: [{ x: "D", list: ["@v6"] }] } });
@@ -86,6 +86,27 @@ test("checks: split routing, AI region, WebRTC and IPv6 leaks, time zone", () =>
   assert.deepEqual(F.rtc, { s: "bad", k: "leak", v: { a: "D" } });
   assert.deepEqual(F.v6, { s: "bad", k: "leak", v: { a: "D" } });
   assert.deepEqual(F.tz, { s: "warn", k: "bad", v: { a: "CN", b: "JP" } });
+  // the same Tokyo server: TCP through the proxy, UDP on the local line
+  assert.deepEqual(F.port, { s: "warn", k: "tcponly", v: { a: "P", b: "D", groups: [] } });
+});
+
+test("checks: ports and protocols on one server", () => {
+  const { seen } = scenario();
+  // TCP 8443 alone goes direct; UDP blocked altogether
+  const s2 = seen.filter(x => !/^u\d/.test(x.probe)).map(x => x.probe === "t8443" ? { ...x, ip: LOCAL4 } : x);
+  const F = findings(PROBES, groupExits(s2, BOTH(), GROUP_OF, "off"), cfAll("JP"), "JP");
+  assert.deepEqual(F.port, { s: "info", k: "noudp", v: { a: "P", groups: [{ x: "D", list: ["t8443"] }] } });
+  assert.equal(oddProbes(PROBES, groupExits(s2, BOTH(), GROUP_OF, "off")).t8443.k, "odd");
+  // nothing from the server at all
+  const F2 = findings(PROBES, groupExits(seen.filter(x => !/^[tu]\d/.test(x.probe)), BOTH(), GROUP_OF, "off"), cfAll("JP"), "JP");
+  assert.equal(F2.port.s, "none");
+});
+
+test("tunnel hint from the MSS", () => {
+  assert.ok(tunneled("1.2.3.4", 1380) && tunneled("2001:db8::1", 1360));
+  assert.ok(!tunneled("1.2.3.4", 1452) && !tunneled("1.2.3.4", 1460) && !tunneled("2001:db8::1", 1440) && !tunneled("1.2.3.4", null));
+  assert.deepEqual(readProbe({ read: "conn" }, { ip: "1.2.3.4", mss: 1380 }), { ip: "1.2.3.4", mss: 1380 });
+  assert.equal(readProbe({ read: "conn" }, { ip: "1.2.3.4", tcp: { mss: 1452 } }).mss, 1452);
 });
 
 test("checks: AI services that see an unsupported region", () => {
@@ -97,7 +118,7 @@ test("checks: AI services that see an unsupported region", () => {
 });
 
 test("checks: one exit, a service on its own route, no WebRTC answer", () => {
-  const seen = PROBES.filter(p => p.g !== "udp").map(p => ({ ip: p.fam === 6 ? "2001:db8::1" : "1.2.3.4", probe: p.id }));
+  const seen = PROBES.filter(p => p.read !== "stun").map(p => ({ ip: p.fam === 6 ? "2001:db8::1" : "1.2.3.4", probe: p.id }));
   const geo = { "1.2.3.4": { cc: "US", city: "Austin", asn: 7922, org: "Comcast" }, "2001:db8::1": { cc: "US", city: "Austin", asn: 7922, org: "Comcast" } };
   let F = findings(PROBES, groupExits(seen, geo, GROUP_OF, "off"), cfAll("US"), "US");
   assert.deepEqual(F.route, { s: "ok", k: "one", v: { a: "D" } });

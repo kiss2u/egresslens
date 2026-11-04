@@ -38,6 +38,9 @@ export const READERS = {
   ipify: b => ({ ip: b.ip }),
   me: b => ({ ip: b.ip, geo: geo(b.country, b.city, b.asn, b.org), cf: { colo: b.colo || "", loc: b.country || "", warp: "off" } }),
   bdc: b => ({ ip: b.ipString }),
+  // echo.1ms.dog: { ip, port, proto }; probe.1ms.dog/conn: { ip, mss, … } (or /fp's shape, { ip, tcp: { mss } })
+  echo: b => ({ ip: b.ip }),
+  conn: b => ({ ip: b.ip, mss: +(b.mss ?? (b.tcp && b.tcp.mss)) || null }),
 };
 // a reader's result, or null when the answer has no usable address (or the host has one IP version and it is not it)
 export function readProbe(probe, body) {
@@ -52,6 +55,10 @@ export function readProbe(probe, body) {
 export const srflxOf = line => { const p = String(line || "").split(" "); return / typ srflx /.test(line) && isIp(p[4]) ? p[4] : null; };
 // … with its port: { ip, port }, or null
 export const srflxAt = line => { const ip = srflxOf(line); return ip && { ip, port: +String(line).split(" ")[5] }; };
+
+// A TCP MSS (the most data one packet carries) well under Ethernet's 1460 (1440 over IPv6), and under PPPoE's 1452,
+// leaves room for a tunnel's own header: a VPN, or an ISP tunnel (DS-Lite) or a mobile network with a small MTU.
+export const tunneled = (ip, mss) => !!mss && mss <= (fam(ip) === 6 ? 1380 : 1400);
 
 /* ---------- exits ---------- */
 export const DC_RE = /amazon|google|microsoft|azure|digitalocean|vultr|choopa|constant company|linode|akamai|ovh|hetzner|oracle|alibaba|aliyun|tencent|huawei|m247|datacamp|cloudflare|leaseweb|contabo|hostinger|it7|racknerd|colocrossing|psychz|zenlayer|g-core|gcore|hostwinds|scaleway|ionos|kamatera|upcloud|bandwagon|dmit|cogent|quadranet|servers\.com|packet|equinix|fastly|cdn77|datapacket|tzulo|hostdare|greencloud|nexeon|frantech|buyvm|hosting|vps|data ?cent|mullvad|proton|nord|express ?vpn|surfshark|private internet|ucloud|kingsoft|baidu cloud|bytedance|volcano/i;
@@ -115,14 +122,14 @@ const AI_CHECK = ["chatgpt", "openai", "claude", "anthropic"];
 // The check table. probes: the PROBES list; exits: groupExits(); cf: probe id → its Cloudflare trace ({ loc } = the
 // country that site sees); tzCc: country of the browser's time zone.
 // nat: natOf(), or nothing (a shared result from before the NAT row).
-// Returns one row per check, always the same seven: { route, except, ai, rtc, nat, v6, tz }, each { s, k, v }:
+// Returns one row per check, always the same eight: { route, except, ai, rtc, port, nat, v6, tz }, each { s, k, v }:
 // s the status ("ok" | "warn" | "bad" | "info" | "none"), k the wording's variant, v the values it needs
 // (exit labels, probe ids, country codes).
 export function findings(probes, exits, cf, tzCc, nat) {
   const of = exitOfProbe(exits), byL = Object.fromEntries(exits.map(e => [e.letter, e]));
   const ids = g => probes.filter(p => p.g === g).map(p => p.id);
   const none = { s: "none", k: "none", v: {} };
-  if (!exits.length) return { route: none, except: none, ai: none, rtc: none, nat: none, v6: none, tz: none };
+  if (!exits.length) return { route: none, except: none, ai: none, rtc: none, port: none, nat: none, v6: none, tz: none };
   const cn = majority(ids("cn"), of), abroad = majority([...ids("intl"), ...ids("ai"), ...ids("web")], of) || cn;
   const R = {};
   // routing: mainland sites vs. sites abroad
@@ -144,12 +151,24 @@ export function findings(probes, exits, cf, tzCc, nat) {
   }
   // WebRTC: UDP sees the local line while websites abroad (most of them) go through a proxy. A site routed direct
   // seeing the local line too doesn't make it safe: any page, proxied or not, can read what STUN saw.
-  const udp = ids("udp").filter(id => of[id]), udpL = [...new Set(udp.flatMap(id => of[id]))];
+  const udp = probes.filter(p => p.read === "stun" && of[p.id]).map(p => p.id), udpL = [...new Set(udp.flatMap(id => of[id]))];
   const leaked = udpL.filter(l => byL[l].kind === "local");
   const proxied = byL[abroad].kind !== "local";
   R.rtc = !udp.length ? { s: "ok", k: "none", v: {} }
     : leaked.length && proxied ? { s: "bad", k: "leak", v: { a: leaked[0] } }
     : { s: "ok", k: proxied && udpL.every(l => byL[l].kind !== "local") ? "proxy" : "same", v: { a: udpL[0] } };
+  // Ports and protocols: one server (1ms.dog's own) over TCP and UDP on several ports. The exit most of each saw, and
+  // any port on another exit than the rest of its protocol.
+  const own = probes.filter(p => p.g === "own"), oTcp = own.filter(p => p.read !== "stun"), oUdp = own.filter(p => p.read === "stun");
+  const tcp = majority(oTcp.map(p => p.id), of), udpO = majority(oUdp.map(p => p.id), of), pOdd = {};
+  for (const p of own) { const want = p.read === "stun" ? udpO : tcp, l = of[p.id]; if (l && want && !l.includes(want)) (pOdd[l[0]] = pOdd[l[0]] || []).push(p.id); }
+  const pv = { groups: Object.entries(pOdd).map(([x, list]) => ({ x, list })) }, pi = pv.groups.length ? "info" : "ok";
+  R.port = !tcp && !udpO ? none
+    : !udpO ? { s: "info", k: "noudp", v: { a: tcp, ...pv } }
+    : !tcp ? { s: "info", k: "udp", v: { b: udpO, ...pv } }
+    : tcp === udpO ? { s: pi, k: "same", v: { a: tcp, ...pv } }
+    : byL[udpO].kind === "local" && byL[tcp].kind !== "local" ? { s: "warn", k: "tcponly", v: { a: tcp, b: udpO, ...pv } }
+    : { s: "info", k: "split", v: { a: tcp, b: udpO, ...pv } };
   // NAT type (natOf). STUN sees the UDP exit, so behind a proxy (a TUN-mode client too) it is the proxy's NAT.
   R.nat = !nat ? none : nat.k === "none" ? { s: "info", k: "none", v: {} }
     : { s: nat.k === "cone" ? "ok" : "warn", k: nat.k, v: { ...(nat.multi && { multi: true }), ...(udpL.some(l => byL[l].kind === "proxy") && { px: true }) } };
@@ -176,7 +195,7 @@ export function oddProbes(probes, exits) {
   if (!abroad) return out;
   for (const p of probes) {
     const l = of[p.id]; if (!l) continue;
-    if (p.g === "udp") {
+    if (p.read === "stun") {
       const loc = l.find(x => byL[x].kind === "local");
       if (loc && byL[abroad].kind !== "local") out[p.id] = { k: "leak", x: loc };
       continue;
@@ -187,7 +206,7 @@ export function oddProbes(probes, exits) {
   return out;
 }
 // the rows in the order the page shows them
-export const CHECKS = ["route", "except", "ai", "rtc", "nat", "v6", "tz"];
+export const CHECKS = ["route", "except", "ai", "rtc", "port", "nat", "v6", "tz"];
 
 // NAT type, from one peer connection that asks every STUN server at once from one socket. The browser merges
 // candidates with the same address and port: one public port for every server is a cone NAT (the mapping doesn't

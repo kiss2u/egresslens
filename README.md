@@ -28,12 +28,13 @@ Which IP addresses does the internet see you as? Rule-based proxies and VPNs pic
 | Popular sites | Cloudflare, 1.1.1.1, GitLab, npm, Notion, Linear, Zoom, Medium, Coinbase, Crunchyroll, Patreon, Shopify |
 | IPv4 only / IPv6 only | IP.SB, Cloudflare Radar, ipify, icanhazip on single-stack hosts |
 | WebRTC (UDP) | STUN servers of Cloudflare, Google, Twilio, Xiaomi, Bilibili and Mango TV |
+| 1ms.dog's Tokyo server | one destination over TCP 443 (who.1ms.dog's `probe.1ms.dog/conn`, which also reads the MSS), 4433, 8080, 8443, 9443, 10443 (HTTPS echo, `echo.1ms.dog`) and UDP 3478, 19302, 51820, 40000 (STUN, `stun.1ms.dog`): an exit that changes with the port or protocol alone comes from the proxy's rules. The server is [`server/`](server/) |
 
 AI services and popular sites are read through Cloudflare's `/cdn-cgi/trace` on each site's own domain: it returns the address that connected, with `Access-Control-Allow-Origin: *`. So the page sees exactly which exit chatgpt.com or claude.ai gets under your rules.
 
-From the answers the page reports split routing (mainland sites vs. abroad), services that take their own route, WebRTC leaks (UDP leaves through your own line while websites see a proxy), the NAT type (cone or symmetric, from one connection that asks every STUN server), IPv6 leaks, a time zone that doesn't match the exit country, and Cloudflare WARP.
+From the answers the page reports split routing (mainland sites vs. abroad), services that take their own route, WebRTC leaks (UDP leaves through your own line while websites see a proxy), the NAT type (cone or symmetric, from one connection that asks every STUN server), rules by port or protocol (TCP proxied, UDP direct), a tunnel hint from a small MSS, IPv6 leaks, a time zone that doesn't match the exit country, and Cloudflare WARP.
 
-**Private by design:** the site is static files. Your browser talks to each probe directly; no result is sent to the site. "Hide IPs" masks addresses for screenshots.
+**Private by design:** the site is static files. Your browser talks to each probe directly; no result is sent to the site. The site's own probes (`/_ms/me` and the Tokyo server) send back the address they see and keep no record. "Hide IPs" masks addresses for screenshots.
 
 ## Self-hosting
 

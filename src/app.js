@@ -43,8 +43,9 @@
     "America/Bogota:CO America/Lima:PE America/Argentina/Buenos_Aires:AR Africa/Johannesburg:ZA Africa/Cairo:EG Africa/Lagos:NG Africa/Nairobi:KE")
     .split(" ").map(p => p.split(":")));
   const tzCc = () => { try { return TZ_CC[Intl.DateTimeFormat().resolvedOptions().timeZone] || ""; } catch (e) { return ""; } };
-  const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.g]));
+  const GROUP_OF = Object.fromEntries(PROBES.map(p => [p.id, p.read === "stun" ? "udp" : p.g]));
   const NAME_OF = id => { const p = PROBES.find(x => x.id === id); return p.self ? t("self_name") : p.g === "stack" ? p.name + " IPv" + p.fam : p.g === "udp" ? "STUN " + p.name : p.name; };
+  const isStun = p => p.read === "stun";
 
   // A probe that gives no address says why, as { why, n }: "timeout", "http" (n = status), "net" (no connection:
   // blocked by the network, the proxy or an ad blocker), "parse" (an answer without a usable address), "stun".
@@ -84,7 +85,7 @@
     if (!window.RTCPeerConnection) return [];
     let pc;
     try {
-      pc = new RTCPeerConnection({ iceServers: PROBES.filter(p => p.g === "udp").map(p => ({ urls: p.url })) });
+      pc = new RTCPeerConnection({ iceServers: PROBES.filter(isStun).map(p => ({ urls: p.url })) });
       pc.createDataChannel("x");
       const out = [];
       const done = new Promise(res => {
@@ -168,8 +169,10 @@
       : S.shared && e["v" + f] ? `<span><em>IPv${f}</em>•••</span>` : "").join("");
     return `<li class="ex">${chip(e.letter, true)}<div class="ex-b">` +
       `<div class="where">${flag(e.cc)}<b>${esc(whereOf(e))}</b>${e.org || e.asn ? `<span class="m">${esc(e.org)}${e.asn ? (e.org ? " · " : "") + asRef(e.asn) : ""}</span>` : ""}</div>` +
-      `<div class="ips">${ips}</div></div></li>`;
+      `<div class="ips">${ips}</div>` + (tunOf(e) ? `<div class="m tun">${esc(t("ex_tun", { n: tunOf(e) }))}</div>` : "") + `</div></li>`;
   };
+  // the MSS 1ms.dog's TCP 443 read, when this exit carried that connection and the MSS suggests a tunnel
+  const tunOf = e => { const r = (S.res.t443 || [])[0]; return r && e.ips.includes(r.ip) && tunneled(r.ip, r.mss) ? r.mss : 0; };
   const slot = () => `<li class="ex sk"><i class="lt big k-none">?</i><span class="blink">${esc(t("sniff"))}</span></li>`;
   function renderExits() {
     const ul = $("#exList"), E = S.exits;
@@ -207,7 +210,7 @@
       }
       li.classList.add("st-" + f.s); st.textContent = ST[f.s];
       li.classList.toggle("focus", row === D.focus);
-      val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (f.v.dc ? esc(t("v_dc")) : "") + (f.v.multi ? esc(t("v_nat_multi")) : "") + (f.v.px ? esc(t("v_nat_px")) : "")) +
+      val.innerHTML = (f.s === "none" ? esc(t("v_none")) : f.k === "some" ? v.groups : t(`v_${row}_${f.k}`, v) + (row === "port" && v.groups ? " · " + v.groups : "") + (f.v.dc ? esc(t("v_dc")) : "") + (f.v.multi ? esc(t("v_nat_multi")) : "") + (f.v.px ? esc(t("v_nat_px")) : "")) +
         // a WebRTC leak or split routing: the privacy check shows what else gives the visitor away
         (WHO && ((row === "rtc" && f.s === "bad") || (row === "route" && f.k === "split")) ? ` <a class="xl" href="${esc(WHO + D.home[LANG])}" target="_blank" rel="noopener">${esc(t("who_link"))}${EXT}</a>` : "") +
         // the AI region: the unlock check tries each AI service from this route
@@ -378,7 +381,7 @@
     if (gen !== S.gen) return;
     S.exits = groupExits(seenAll(), S.geo, GROUP_OF, S.warp);
     const cf = Object.fromEntries(PROBES.map(p => [p.id, ((S.res[p.id] || [])[0] || {}).cf]).filter(([, c]) => c));
-    const seen = Object.fromEntries(PROBES.filter(p => p.g === "udp").map(p => [p.id, (S.res[p.id] || []).map(r => r.ip)]));
+    const seen = Object.fromEntries(PROBES.filter(isStun).map(p => [p.id, (S.res[p.id] || []).map(r => r.ip)]));
     S.nat = natOf(await natP, seen, S.exits);
     if (gen !== S.gen) return;
     S.finds = findings(PROBES, S.exits, cf, tzCc(), S.nat);
