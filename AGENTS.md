@@ -70,7 +70,16 @@ probes in `src/probes.mjs` point at 1ms.dog's own instance, which answers any or
 1. Two DNS names pointing straight at the server (no CDN proxy in front: the server must see the visitor's own
    connection): `<stun-domain>` and `<echo-domain>`, with A and AAAA records.
 2. A certificate for `<echo-domain>` (for example certbot with webroot or DNS-01).
-3. Build anywhere with Go, for the server's architecture:
+3. Get the program. For linux/amd64, download the latest build and check it; no Go needed:
+   ```bash
+   cd /tmp
+   curl -fsSLO https://github.com/yt1988/egresslens/releases/latest/download/egress-echo
+   curl -fsSLO https://github.com/yt1988/egresslens/releases/latest/download/SHA256SUMS
+   sha256sum -c SHA256SUMS       # must print "egress-echo: OK"
+   ```
+   Each change to `server/` on main publishes a Release tagged `server-<short commit>` (`.github/workflows/server-release.yml`:
+   static, `CGO_ENABLED=0`, `-trimpath -ldflags="-s -w"`), always marked latest; an older build is under its own tag
+   at `releases/download/server-<commit>/egress-echo`. For another architecture, or to build it yourself, anywhere with Go:
    ```bash
    cd server && go test ./... && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o egress-echo .
    ```

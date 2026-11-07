@@ -1,0 +1,41 @@
+# The echo server (server/) as a ready-made program: each time it changes on main, build it for linux/amd64 and
+# publish it to a GitHub Release tagged server-<short commit>, marked latest, with SHA256SUMS. So
+# https://github.com/yt1988/egresslens/releases/latest/download/egress-echo is always the newest build.
+name: server release
+
+on:
+  push:
+    branches: [main]
+    paths: ["server/**", ".github/workflows/server-release.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+      - name: Test
+        working-directory: server
+        run: go vet ./... && go test ./...
+      - name: Build
+        working-directory: server
+        env: { GOOS: linux, GOARCH: amd64, CGO_ENABLED: "0" }
+        run: |
+          mkdir -p ../dist
+          go build -trimpath -ldflags="-s -w" -o ../dist/egress-echo .
+          cd ../dist && sha256sum egress-echo > SHA256SUMS && cat SHA256SUMS
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="server-${GITHUB_SHA::7}"
+          gh release create "$tag" dist/egress-echo dist/SHA256SUMS --target "$GITHUB_SHA" --latest \
+            --title "egress-echo $tag" \
+            --notes "The echo server (server/) at ${GITHUB_SHA::7}, built for linux/amd64 (static, CGO_ENABLED=0). Check it with: sha256sum -c SHA256SUMS"

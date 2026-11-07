@@ -12,12 +12,13 @@ ports, so a different exit can only come from the visitor's proxy rules. Ports, 
 
 Nothing is logged or stored; errors only. Without a certificate the HTTPS ports stay off and STUN still runs.
 
-Build (on any machine with Go) and deploy:
+Each change here on main publishes a ready-made linux/amd64 build to a GitHub Release (latest:
+`https://github.com/yt1988/egresslens/releases/latest/download/egress-echo`, with `SHA256SUMS`). To build it yourself,
+on any machine with Go:
 
 ```bash
 cd server && go test ./... && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o egress-echo .
 ```
 
-Upload `egress-echo` to `/opt/1ms/egress/` and `1ms-egress.service` to `/etc/systemd/system/`, then
-`systemctl daemon-reload && systemctl enable --now 1ms-egress`. The certificate for `echo.1ms.dog` is issued by
-Public's certbot and read through `LoadCredential=`; Public restarts the service after a renewal.
+Install it under `/opt/<app>/` and run it with systemd; `1ms-egress.service` is a working unit to adapt (user, path,
+certificate directory read through `LoadCredential=`). The full steps are in the root AGENTS.md.
