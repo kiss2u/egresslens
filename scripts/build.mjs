@@ -69,7 +69,7 @@ export async function build({ check = false } = {}) {
   new Function(appFull);                                                // must parse
   const cssFull = (await Promise.all(["fonts.css", "style.css"].map(f => readFile(new URL(f, src), "utf8")))).join("\n");
   // minified with esbuild (pinned version, so the output, and its hash, only changes when the source does)
-  const js = (await transform(appFull, { loader: "js", minify: true, target: "es2020", legalComments: "none" })).code;
+  const js = (await transform(appFull, { loader: "js", minify: true, target: ["es2019", "chrome70", "safari12", "firefox68", "edge79"], legalComments: "none" })).code;
   const css = (await transform(cssFull, { loader: "css", minify: true, legalComments: "none" })).code;
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
 
