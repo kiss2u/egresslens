@@ -598,6 +598,65 @@
     return lines;
   }
 
+  /* ---------- reporting a problem (the host's dialog) ---------- */
+  // When the host provides "Report a problem" (1ms-shell src/report.js), the dialog asks this page for what the visitor
+  // saw: one line in the visitor's language, JSON that can reproduce the run, and the readings offered as one-tap
+  // answers. Same scope as a shared link's default: no address leaves unmasked, and city and network stay out (the
+  // share dialog's own opt-in fields). The check rows are read back as the page words them, so no new strings.
+  const rpLabel = r => { const el = document.querySelector(`#finds [data-r="${r}"] .fr-l`); return el ? el.textContent.trim() : ""; };
+  const rpValue = r => { const el = document.querySelector(`#finds [data-r="${r}"] .fr-v`); return el ? el.textContent.trim() : ""; };
+  // a pick is one short line: the dialog already cuts them at 60 characters, cut here so the "…" is ours
+  const rpPick = s => s.length > 60 ? s.slice(0, 59) + "…" : s;
+  window.msReport = () => {
+    if (!S.done) return null;
+    const v0 = S.exits.length ? verdict() : "";
+    // "what it tested and what it found": the tool's name, the verdict, how traffic is split, and where a leak is
+    const bad = ["rtc", "v6", "ai"].find(r => S.finds[r] && S.finds[r].s === "bad");
+    const summary = [t("name"), v0 ? t("vh_" + v0) : t("no_net"), S.exits.length ? rpValue("route") : "",
+      bad ? rpLabel(bad) + t("colon") + rpValue(bad) : ""].filter(Boolean).join(" · ").slice(0, 300);
+    // the probes that gave no address, by reason ("timeout", "http404", …): the commonest "nothing showed up" report
+    const fail = {};
+    for (const p of PROBES) if (S.ok[p.id] === false) {
+      const w = S.why[p.id] || { why: "net" }, k = w.why === "http" && w.n ? "http" + w.n : w.why;
+      (fail[k] = fail[k] || []).push(p.id);
+    }
+    // each exit and how it was told apart: masked addresses, the checkpoints that saw it (the grouping's evidence),
+    // the data-center/WARP flags that make the D/P label, IPv4/IPv6, and the MSS hint of a tunnel
+    const exits = S.exits.map(e => ({
+      l: e.letter, k: e.kind, cc: e.cc || null, ips: e.ips.map(maskIp), probes: e.probes,
+      ...(e.dc ? { dc: 1 } : {}), ...(e.warp ? { warp: 1 } : {}), ...(e.v4 ? { v4: 1 } : {}), ...(e.v6 ? { v6: 1 } : {}),
+      ...(tunOf(e) ? { tun: tunOf(e) } : {}),
+    }));
+    // the check rows as the page decided them. Their "which probes" lists (except/port) are left out: the same
+    // evidence is in each exit's probes, and the dialog cuts the JSON at 6 KB
+    const checks = Object.fromEntries(CHECKS.filter(r => S.finds[r]).map(r => {
+      const f = S.finds[r], v = { ...f.v };
+      delete v.groups;
+      return [r, { s: f.s, k: f.k, v }];
+    }));
+    const data = {
+      v: 1, lang: LANG, shared: S.shared ? 1 : 0, ...(D.focus ? { focus: D.focus } : {}),
+      verdict: v0 || null, warp: S.warp || "off", tz: tzCc() || null,
+      nat: S.nat && S.nat.k ? S.nat.k : null, ...(S.nat && S.nat.multi ? { natMulti: 1 } : {}),
+      exits, checks,
+      ...(Object.keys(fail).length ? { fail } : {}),
+    };
+    // what a visitor most often says is wrong, as "what it read" one-tap answers: each exit, the routing row, then
+    // every check that did not come out clean (leak, exceptions, ports, NAT, time zone…)
+    const picks = [];
+    for (const e of S.exits) picks.push(rpPick(`${e.letter}${t("colon")}${[e.cc ? country(e.cc) : "?", t(e.kind === "local" ? "k_local" : "k_proxy")].join(" · ")}`));
+    for (const r of CHECKS) {
+      const f = S.finds[r];
+      if (f && f.s !== "none" && (r === "route" || f.s !== "ok")) picks.push(rpPick(rpLabel(r) + t("colon") + rpValue(r)));
+    }
+    return { summary, data, picks: picks.filter(Boolean).slice(0, 8) };
+  };
+  // The entry beside the verdict: it starts the shell's dialog with its box filled in, so a visitor who sends it as it
+  // is gets the dialog's "which part is wrong?" question and this run's picks. Shown only where the host has the
+  // dialog (1ms-shell injects msOpenReport in the page head; a self-hosted copy has neither and keeps it hidden).
+  const rpAsk = $("#rpAsk");
+  if (rpAsk && typeof window.msOpenReport === "function" && !EMBED) { rpAsk.setAttribute("data-ms-report", t("rp_entry")); rpAsk.hidden = false; }
+
   applyMask();
   const shared = parseShare(location.hash, PROBES.map(p => p.id));
   if (shared && shared.exits.length && !EMBED) showShared(shared);

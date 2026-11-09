@@ -94,6 +94,7 @@ export default {
     ["Is my result sent to this site?","No. Your browser talks to each checkpoint directly; this site only serves static files and never sees your result. This site's own checkpoints (“This site” and the “1ms.dog's Tokyo server” group) see the IP and port you connect from, send them straight back to you and keep no record. Two more things are your choice: Share puts the result in the link after the #, a part that is never sent to the server when the link opens; Report a problem attaches a summary of this run, without IP addresses. Use Hide IPs before taking a screenshot."],
   ],
   share: "Share",
+  rp_entry: "Result wrong?",
   self_name: "This site",
   bad_link: "Can't read this result: the link is incomplete or from an older version. You can run your own test.",
   embed_blocked: "Every check failed. An ad blocker (uBlock, AdGuard…) may be blocking them. Turn it off and try again.",

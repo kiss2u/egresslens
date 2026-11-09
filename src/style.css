@@ -196,7 +196,7 @@ select option:checked { background-color: var(--soft); }
 @media (pointer: coarse) {
   a.xl { padding-block: 6px; margin-block: -6px; }
   .foot a { display: inline-block; padding-block: 8px; margin-block: -8px; }
-  #eye { padding-block: 7px; margin-block: -7px; }
+  #eye, #rpAsk { padding-block: 7px; margin-block: -7px; }
 }
 @media (max-width: 420px) {
   .logo, .logo img { width: 70px; height: 28px; }

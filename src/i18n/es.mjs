@@ -92,6 +92,7 @@ export default {
     ["¿Se envía mi resultado a este sitio?","No. Tu navegador consulta cada punto de prueba directamente; este sitio solo sirve archivos estáticos y nunca ve tu resultado. Los puntos de prueba propios de este sitio («Este sitio» y el grupo «Servidor de 1ms.dog en Tokio») ven la IP y el puerto desde los que te conectas, te los devuelven tal cual y no guardan nada. Además, hay dos cosas que decides tú: Compartir guarda el resultado en el enlace, después del #, una parte que nunca se envía al servidor al abrirlo; Informar de un problema adjunta un resumen de esta prueba, sin direcciones IP. Pulsa Ocultar IP antes de hacer una captura."],
   ],
   share: "Compartir",
+  rp_entry: "¿El resultado está mal?",
   self_name: "Este sitio",
   bad_link: "No se puede leer este resultado: el enlace está incompleto o es de una versión anterior. Puedes hacer tu propia prueba.",
   embed_blocked: "Fallaron todas las consultas. Puede que un bloqueador de anuncios (uBlock, AdGuard…) las esté bloqueando. Desactívalo y vuelve a intentarlo.",

@@ -92,6 +92,7 @@ export default {
     ["Mon résultat est-il envoyé à ce site ?","Non. Votre navigateur interroge chaque point de test directement ; ce site ne sert que des fichiers statiques et ne voit jamais votre résultat. Les points de test de ce site (« Ce site » et le groupe « Serveur de 1ms.dog à Tokyo ») voient l’IP et le port depuis lesquels vous vous connectez, vous les renvoient tels quels et n’en gardent aucune trace. Deux autres choses dépendent de vous : « Partager » place le résultat dans le lien, après le #, une partie qui n’est jamais envoyée au serveur à l’ouverture du lien ; « Signaler un problème » joint un résumé de ce test, sans adresse IP. Pensez à « Masquer les IP » avant une capture d’écran."],
   ],
   share: "Partager",
+  rp_entry: "Résultat incorrect ?",
   self_name: "Ce site",
   bad_link: "Impossible de lire ce résultat : le lien est incomplet ou vient d’une ancienne version. Vous pouvez faire votre propre test.",
   embed_blocked: "Toutes les requêtes ont échoué. Un bloqueur de pub (uBlock, AdGuard…) les bloque peut-être. Désactivez-le et réessayez.",

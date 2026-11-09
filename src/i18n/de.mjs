@@ -92,6 +92,7 @@ export default {
     ["Wird mein Ergebnis an diese Website gesendet?","Nein. Dein Browser fragt jeden Prüfpunkt direkt; diese Website liefert nur statische Dateien und sieht dein Ergebnis nie. Die eigenen Prüfpunkte dieser Website („Diese Seite“ und die Gruppe „1ms.dog-Server in Tokio“) sehen die IP und den Port, von denen du dich verbindest, schicken sie unverändert zurück und speichern nichts. Zwei weitere Dinge entscheidest du selbst: „Teilen“ schreibt das Ergebnis in den Link hinter das #, ein Teil, der beim Öffnen nie an den Server geht; „Problem melden“ hängt eine Zusammenfassung dieses Tests an, ohne IP-Adressen. Vor einem Screenshot am besten „IPs verbergen“ drücken."],
   ],
   share: "Teilen",
+  rp_entry: "Ergebnis falsch?",
   self_name: "Diese Seite",
   bad_link: "Dieses Ergebnis lässt sich nicht lesen: Der Link ist unvollständig oder stammt aus einer älteren Version. Du kannst selbst testen.",
   embed_blocked: "Alle Anfragen sind fehlgeschlagen. Vielleicht blockiert ein Werbeblocker (uBlock, AdGuard …) sie. Schalte ihn aus und versuch es noch einmal.",
