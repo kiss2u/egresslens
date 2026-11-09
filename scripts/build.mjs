@@ -64,7 +64,7 @@ export async function build({ check = false } = {}) {
   const lib = (await readFile(new URL("lib.mjs", src), "utf8")).replace(/^export /gm, "");
   const appSrc = await readFile(new URL("app.js", src), "utf8");
   if (!appSrc.includes("/* @lib */")) throw new Error("src/app.js has no /* @lib */ marker");
-  const probes = PROBES.map(({ id, g, name, host, url, read, fam }) => ({ id, g, name, host, url, read, ...(fam ? { fam } : {}) }));
+  const probes = PROBES.map(({ id, g, name, host, url, read, fam, self }) => ({ id, g, name, host, url, read, ...(fam ? { fam } : {}), ...(self ? { self } : {}) }));
   const appFull = `const PROBES = ${JSON.stringify(probes)}, GROUPS = ${JSON.stringify(GROUPS)};\n` + appSrc.replace("/* @lib */", () => lib);
   new Function(appFull);                                                // must parse
   const cssFull = (await Promise.all(["fonts.css", "style.css"].map(f => readFile(new URL(f, src), "utf8")))).join("\n");
