@@ -19,6 +19,20 @@
   /* @lib */
   const bust = u => u + (u.includes("?") ? "&" : "?") + "_eg=" + Math.random().toString(36).slice(2, 10);
 
+  /* Findings lead on phones, including in reading and keyboard order. Move existing
+     nodes only at the breakpoint, retaining handlers and focus across reparenting. */
+  const phoneLayout = matchMedia("(max-width: 520px)");
+  const heroBody = $(".hero-b"), exitsCol = $(".exits-col"), findsCol = $(".finds-col");
+  const arrangeResults = () => {
+    const first = phoneLayout.matches ? findsCol : exitsCol;
+    if (heroBody.firstElementChild === first) return;
+    const active = document.activeElement;
+    heroBody.prepend(first);
+    if (active && heroBody.contains(active) && document.activeElement !== active) active.focus({ preventScroll: true });
+  };
+  arrangeResults();
+  phoneLayout.addEventListener("change", arrangeResults);
+
   /* ---------- theme and language ---------- */
   const thBtn = $("#theme"), TH = ["system", "light", "dark"];
   const applyTheme = th => {

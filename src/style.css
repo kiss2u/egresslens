@@ -220,7 +220,7 @@ select option:checked { background-color: var(--soft); }
 
 /* a landing page's lead panel: the verdict for its one check, then one row per probe it is about. Rows are drawn by
    the build and only their text changes; the verdict line keeps its height while running. */
-.focus ~ .hero-b > .col:last-child { display: none; }
+.focus ~ .hero-b > .finds-col { display: none; }
 .fo-all { list-style: none; margin-top: 4px; }
 .focus { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
 .focus.st-bad { border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); background: color-mix(in srgb, var(--bad) 5%, transparent); }
